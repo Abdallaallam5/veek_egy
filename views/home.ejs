@@ -1,0 +1,138 @@
+<%- include("partials/header") %>
+<div class="hero-slider">
+  <div class="slide active">
+    <img src="/images/photo_2026-01-23_22-10-51.jpg">
+    <div class="overlay"></div>
+    <div class="content">
+      <h2>New Collection 🔥</h2>
+      <p>Discover latest trends</p>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="/images/photo_2026-01-23_22-10-49.jpg">
+    <div class="overlay"></div>
+    <div class="content">
+      <h2>Sale Up To 50%</h2>
+      <p>Don't miss out</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+
+  menuToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+  });
+  const slides = document.querySelectorAll(".slide");
+  let index = 0;
+
+  setInterval(() => {
+    slides[index].classList.remove("active");
+    index = (index + 1) % slides.length;
+    slides[index].classList.add("active");
+  }, 4000); // كل 4 ثواني
+</script>
+<% productsByCategory.forEach(section => { %>
+
+  <div class="category-section">
+    <p class="category-title">
+      <strong><%= section.category.name %></strong>
+    </p>
+
+    <div class="products-grid">
+      <% section.products.forEach(product => { %>
+<div class="product-card">
+
+  <% if(product.stock === 0) { %>
+    <div class="out-of-stock">OUT OF STOCK</div>
+  <% } %>
+
+  <% if(product.salePrice && product.salePrice < product.price) { %>
+    <div class="sale-badge">SALE</div>
+  <% } %>
+
+  <img 
+    src="<%= product.images && product.images.length ? product.images[0] : '/images/default.png' %>" 
+    alt="<%= product.name %>"
+  >
+
+  <h3><%= product.name %></h3>
+
+  <p class="price">
+    <% if(product.salePrice && product.salePrice < product.price) { %>
+      <span class="old-price"><%= product.price %> EGP</span>
+      <span class="sale-price"><%= product.salePrice %> EGP</span>
+    <% } else { %>
+      <span><%= product.price %> EGP</span>
+    <% } %>
+  </p>
+
+  <% if(product.stock === 0||product.stock===null) { %>
+    <button class="btn disabled">Out of Stock</button>
+  <% } else { %>
+    <button onclick="addToCart('<%= product._id %>')" class="btn">Add To Cart</button>
+  <% } %>
+  <% if(product.stock === 0||product.stock===null) { %>
+    <div class="out-of-stock">OUT OF STOCK</div>
+  <% }else{
+
+   %>
+  <a href="/product/<%= product._id %>" class="btn">View</a>
+<%}%>
+</div>
+      <% }) %>
+    </div>
+
+  </div>
+
+<% }) %>
+
+
+<style>
+  /* ===== OUT OF STOCK ===== */
+
+.product-card {
+  position: relative;
+}
+
+/* البادج */
+.out-of-stock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px 20px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  z-index: 5;
+}
+.out-of-stock {
+  top: 10px;
+  left: 10px;
+  transform: none;
+  background: black;
+}
+/* الصورة تبقى باهتة */
+.product-card img {
+  transition: 0.3s;
+}
+.product-card:has(.out-of-stock) {
+  pointer-events: none;
+}
+.product-card:has(.out-of-stock) img {
+  filter: grayscale(100%) opacity(0.6);
+}
+
+/* زرار disabled */
+.btn.disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+</style>
+<%- include("partials/footer") %>

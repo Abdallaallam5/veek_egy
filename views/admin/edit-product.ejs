@@ -1,0 +1,127 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<style>
+/* ===== General ===== */
+body { font-family: "Segoe UI", sans-serif; background-color: #f5f6fa; margin:0; padding:0; }
+.admin-content { margin-left: 220px; padding: 30px; }
+h1 { font-size: 28px; margin-bottom: 20px; color: #2f3640; }
+
+/* ===== Cards ===== */
+.card { background: #fff; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.sizes label, .colors label { display:inline-block; margin-right:15px; margin-top:8px; font-weight:500; }
+.sizes input, .colors input { margin-right:5px; }
+button.submit-btn { background:#4cd137; color:#fff; padding:15px 25px; border:none; border-radius:10px; cursor:pointer; }
+button.submit-btn:hover { background:#44bd32; }
+img { max-width:100%; border-radius:10px; margin-top:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+</style>
+
+<div class="admin-content">
+  <h1>Edit Product</h1>
+
+  <form id="editProductForm" enctype="multipart/form-data">
+
+    <div class="card">
+      <h3>Title</h3>
+      <input name="name" value="<%= product.name %>" required>
+    </div>
+
+    <div class="card">
+      <h3>Description</h3>
+      <textarea name="description" rows="5"><%= product.description %></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Media</h3>
+      <input type="file" name="images" multiple>
+      <% if(product.mainImage) { %>
+        <img src="<%= product.mainImage %>" width="150">
+      <% } %>
+      <% if(product.images && product.images.length > 1) { %>
+        <% product.images.slice(1).forEach(img => { %>
+          <img src="<%= img %>" width="150">
+        <% }); %>
+      <% } %>
+    </div>
+
+    <!-- Categories -->
+    <div class="card">
+      <h3>Category</h3>
+      <div class="categories-list">
+        <% categories.forEach(c => { %>
+          <label>
+            <input type="checkbox" name="category[]" value="<%= c._id %>" 
+              <%= product.categories.some(pc => pc._id.toString() === c._id.toString()) ? "checked" : "" %>>
+            <span><%= c.name %></span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Pricing</h3>
+      <input name="price" type="number" value="<%= product.price %>" required>
+      <input name="salePrice" type="number" value="<%= product.salePrice %>">
+    </div>
+
+    <div class="card">
+      <h3>Inventory</h3>
+      <input name="stock" type="number" value="<%= product.stock %>">
+    </div>
+
+    <!-- Variants -->
+    <div class="card">
+      <h3>Variants</h3>
+      <div class="sizes">
+        <% ["S","M","L","XL","XXL"].forEach(size => { %>
+          <label>
+            <input type="checkbox" value="<%= size %>" 
+              <%= product.sizes.includes(size) ? "checked" : "" %>> <%= size %>
+          </label>
+        <% }) %>
+      </div>
+      <div class="colors">
+        <% ["Black","White"].forEach(color => { %>
+          <label>
+            <input type="checkbox" value="<%= color %>" 
+              <%= product.colors.includes(color) ? "checked" : "" %>> <%= color %>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">Update Product</button>
+  </form>
+
+  <a href="/admin/products">⬅ Back</a>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("editProductForm");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = new FormData(form);
+
+    // جمع الـ sizes و colors
+    const sizes = [...document.querySelectorAll(".sizes input:checked")].map(i => i.value);
+    const colors = [...document.querySelectorAll(".colors input:checked")].map(i => i.value);
+    data.set("sizes", sizes.join(","));
+    data.set("colors", colors.join(","));
+
+    const res = await fetch("/admin/products/edit/<%= product._id %>", {
+      method: "POST",
+      body: data
+    });
+
+    const json = await res.json();
+    if(json.success){
+      alert("Product updated ✅");
+      window.location = "/admin/products";
+    } else {
+      alert("Error ❌");
+    }
+  });
+});
+</script>

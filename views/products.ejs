@@ -1,0 +1,24 @@
+<%- include("partials/header") %>
+
+<h2 class="mb-4">Shop All Products</h2>
+
+<div class="row">
+    <% products.forEach(product => { %>
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <img src="<%= product.images[0] || 'https://via.placeholder.com/300' %>" 
+                     class="card-img-top" 
+                     style="height:250px; object-fit:cover;">
+                <div class="card-body text-center">
+                    <h6><%= product.name %></h6>
+                    <p>$<%= product.price %></p>
+                    <a href="/products/<%= product._id %>" class="btn btn-outline-dark btn-sm">
+                        View
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+</div>
+
+<%- include("partials/footer") %>

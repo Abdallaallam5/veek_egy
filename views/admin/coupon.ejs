@@ -1,0 +1,143 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<div class="admin-content">
+  <h2 id="form-title">Create Coupon</h2>
+
+  <!-- Form إنشاء أو تعديل كوبون -->
+  <form method="POST" action="/admin/create-coupon" class="coupon-form" id="coupon-form">
+    <input type="hidden" name="couponId" id="couponId">
+
+    <input type="text" name="code" placeholder="Code" required id="code"><br><br>
+
+    <select name="discountType" id="discountType">
+      <option value="percentage">Percentage</option>
+      <option value="fixed">Fixed</option>
+    </select><br><br>
+
+    <input type="number" name="discountValue" placeholder="Value" required id="discountValue"><br><br>
+
+    <input type="number" name="maxUses" placeholder="Max Uses" id="maxUses"><br><br>
+
+    <input type="date" name="expiresAt" id="expiresAt"><br><br>
+
+    <button type="submit" id="submit-btn">Create</button>
+    <button type="button" id="cancel-edit" style="display:none;">Cancel</button>
+  </form>
+
+  <hr>
+
+  <!-- جدول الكوبونات -->
+  <h2>Existing Coupons</h2>
+  <table class="coupons-table">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Max Uses</th>
+        <th>Expires</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% coupons.forEach(coupon => { %>
+        <tr data-id="<%= coupon._id %>" 
+            data-code="<%= coupon.code %>" 
+            data-type="<%= coupon.discountType %>" 
+            data-value="<%= coupon.discountValue %>" 
+            data-max="<%= coupon.maxUses %>" 
+            data-expires="<%= coupon.expiresAt ? coupon.expiresAt.toISOString().split('T')[0] : '' %>">
+          <td><%= coupon.code %></td>
+          <td><%= coupon.discountType %></td>
+          <td>
+            <% if(coupon.discountType === 'percentage'){ %>
+              <%= coupon.discountValue %> %
+            <% } else { %>
+              <%= coupon.discountValue %> EGP
+            <% } %>
+          </td>
+          <td><%= coupon.maxUses || '∞' %></td>
+          <td><%= coupon.expiresAt ? coupon.expiresAt.toISOString().split('T')[0] : 'Never' %></td>
+          <td>
+            <!-- زر تعديل -->
+            <button type="button" class="btn edit-btn">Edit</button>
+
+            <!-- زر حذف -->
+            <form method="POST" action="/admin/delete-coupon/<%= coupon._id %>" style="display:inline;">
+              <button type="submit" class="btn delete">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const editButtons = document.querySelectorAll('.edit-btn');
+const form = document.getElementById('coupon-form');
+const formTitle = document.getElementById('form-title');
+const submitBtn = document.getElementById('submit-btn');
+const cancelBtn = document.getElementById('cancel-edit');
+
+editButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tr = btn.closest('tr');
+    document.getElementById('couponId').value = tr.dataset.id;
+    document.getElementById('code').value = tr.dataset.code;
+    document.getElementById('discountType').value = tr.dataset.type;
+    document.getElementById('discountValue').value = tr.dataset.value;
+    document.getElementById('maxUses').value = tr.dataset.max !== '∞' ? tr.dataset.max : '';
+    document.getElementById('expiresAt').value = tr.dataset.expires;
+
+    formTitle.textContent = 'Edit Coupon';
+    submitBtn.textContent = 'Update';
+    cancelBtn.style.display = 'inline-block';
+  });
+});
+
+cancelBtn.addEventListener('click', () => {
+  form.reset();
+  document.getElementById('couponId').value = '';
+  formTitle.textContent = 'Create Coupon';
+  submitBtn.textContent = 'Create';
+  cancelBtn.style.display = 'none';
+});
+</script>
+<style>
+  .admin-content {
+  padding: 120px 30px 30px; /* top padding أكبر عشان Header */
+  background: #f9f9f9;
+}
+.coupons-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.coupons-table th,
+.coupons-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+.coupons-table th {
+  background: #000;
+  color: #fff;
+}
+.btn {
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 13px;
+}
+.btn.edit-btn {
+  background: #4caf50;
+}
+.btn.delete {
+  background: #f44336;
+}
+</style>

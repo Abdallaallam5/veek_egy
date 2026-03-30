@@ -1,0 +1,95 @@
+</div>
+
+<footer class="bg-dark text-white text-center p-3 mt-5">
+    <p>© 2026 Veek Clothing. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+<script>
+
+function openCart(){
+document.getElementById("slide-cart").classList.add("active")
+document.getElementById("cart-overlay").classList.add("active")
+}
+
+function closeCart(){
+document.getElementById("slide-cart").classList.remove("active")
+document.getElementById("cart-overlay").classList.remove("active")
+}
+
+
+async function addToCart(id){
+
+const res = await fetch("/cart/add/"+id,{
+method:"POST"
+})
+
+const data = await res.json()
+
+if(data.success){
+
+document.querySelector(".cart-count").innerText = data.cartCount
+
+renderCart(data.cart)
+
+openCart()
+
+}
+
+}
+
+
+function renderCart(cart){
+
+let container = document.getElementById("cart-items")
+
+container.innerHTML=""
+
+let subtotal = 0
+
+cart.forEach(item=>{
+
+subtotal += item.price * item.qty
+
+container.innerHTML += `
+<div class="cart-item">
+
+<img src="${item.image}">
+
+<div>
+<p>${item.name}</p>
+<p>${item.price} EGP</p>
+<p>Qty: ${item.qty}</p>
+</div>
+
+</div>
+`
+
+})
+
+document.getElementById("cart-subtotal").innerText = subtotal
+
+}
+
+</script>
+<script>
+
+async function addToCart(id){
+
+ const res = await fetch("/cart/add/" + id,{
+   method:"POST"
+ });
+
+ const data = await res.json();
+
+ if(data.success){
+
+   document.querySelector(".cart-count").innerText = data.cartCount;
+
+ }
+
+}
+
+</script>

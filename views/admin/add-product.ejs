@@ -1,0 +1,129 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<style>
+
+
+.product-form { display: grid; gap: 20px; }
+.card { background: white; padding: 20px; border-radius: 12px; }
+.submit-btn { background: black; color: white; padding: 15px; border: none; font-size: 16px; cursor:pointer; }
+</style>
+
+<div class="admin-content">
+  <h1>Add Product</h1>
+
+  <form id="productForm" enctype="multipart/form-data" class="product-form">
+
+    <!-- TITLE -->
+    <div class="card">
+      <h3>Title</h3>
+      <input name="name" placeholder="Product name" required>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="card">
+      <h3>Description</h3>
+      <textarea name="description" rows="5"></textarea>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="card">
+      <h3>Media</h3>
+      <input type="file" name="images" multiple>
+    </div>
+
+    <!-- CATEGORY -->
+    <div class="card">
+      <h3>Category</h3>
+      <div class="categories-list">
+        <% categories.forEach(c => { %>
+          <label>
+            <input type="checkbox" name="category[]" value="<%= c._id %>">
+            <span><%= c.name %></span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- PRICE -->
+    <div class="card">
+      <h3>Pricing</h3>
+      <input name="price" type="number" placeholder="Price" required>
+      <input name="salePrice" placeholder="Sale Price">
+    </div>
+
+    <!-- INVENTORY -->
+    <div class="card">
+      <h3>Inventory</h3>
+      <input name="stock" type="number" placeholder="Stock">
+      <input name="sku" placeholder="SKU">
+    </div>
+
+    <!-- VARIANTS -->
+    <div class="card">
+      <h3>Variants</h3>
+      <div class="sizes">
+        <p>Sizes</p>
+        <label><input type="checkbox" value="S"> S</label>
+        <label><input type="checkbox" value="M"> M</label>
+        <label><input type="checkbox" value="L"> L</label>
+        <label><input type="checkbox" value="XL"> XL</label>
+        <label><input type="checkbox" value="XXL"> XXL</label>
+      </div>
+      <div class="colors">
+        <p>Colors</p>
+        <label><input type="checkbox" value="Black"> Black</label>
+        <label><input type="checkbox" value="White"> White</label>
+      </div>
+    </div>
+
+
+    <button type="submit" class="submit-btn">Add Product</button>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const productForm = document.getElementById("productForm");
+
+  productForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = new FormData(productForm);
+
+    // sizes & colors
+    const sizes = [...document.querySelectorAll(".sizes input:checked")].map(i => i.value);
+    const categories = [...document.querySelectorAll(".category input:checked")].map(i => i.value);
+    const colors = [...document.querySelectorAll(".colors input:checked")].map(i => i.value);
+
+    form.set("sizes", sizes.join(","));
+    form.set("colors", colors.join(","));
+    form.set("categories-list", categories.join(","));
+
+
+    
+    
+
+    try {
+      const res = await fetch("/admin/products/add", {
+        method: "POST",
+        body: form
+      });
+
+      const data = await res.json();
+
+      if(data.success){
+        alert("Product Added ✅");
+        window.location = "/admin/products";
+      } else {
+        alert("Error ❌");
+      }
+
+    } catch(err) {
+      console.error("Error:", err);
+      alert("Error ❌");
+    }
+
+  });
+});
+</script>

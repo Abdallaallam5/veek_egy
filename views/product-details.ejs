@@ -1,0 +1,78 @@
+<%- include("partials/header") %>
+
+<div class="container mt-5 product-page">
+
+  <div class="row">
+
+    <!-- قسم الصور -->
+    <div class="col-md-6">
+      <div class="main-image-wrapper position-relative">
+        <% if(product.salePrice < product.price && product.salePrice){ %>
+          <div class="sale-badge">SALE</div>
+        <% } %>
+        <img id="mainProductImage" src="<%= product.images[0] %>" class="img-fluid rounded shadow">
+      </div>
+
+      <!-- صور مصغرة -->
+      <div class="thumbnail-wrapper d-flex gap-2 mt-3 flex-wrap">
+        <% product.images.forEach((img, index) => { %>
+          <img src="<%= img %>" class="img-thumbnail product-thumb" onclick="changeImage('<%= img %>')" alt="Product Image <%= index+1 %>">
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- قسم التفاصيل -->
+    <div class="col-md-6">
+      <h2><%= product.name %></h2>
+
+      <div class="product-price mb-3">
+        <% if(product.salePrice < product.price&& product.salePrice ){ %>
+          <span class="old-price"><%= product.price %> EGP</span>
+          <span class="sale-price"><%= product.salePrice %> EGP</span>
+        <% } else { %>
+          <span class="normal-price"><%= product.price %> EGP</span>
+        <% } %>
+      </div>
+
+      <p><%= product.description %></p>
+
+ <form action="/checkout/get" method="GET" class="add-to-cart-form mt-4">
+
+  <input type="hidden" name="productId" value="<%= product._id %>">
+
+  <!-- SIZE -->
+  <label>Size</label>
+  <select name="size" required>
+    <% product.sizes.forEach(size => { %>
+      <option value="<%= size %>"><%= size %></option>
+    <% }) %>
+  </select>
+
+  <!-- COLOR -->
+  <label>Color</label>
+  <select name="color" required>
+    <% product.colors.forEach(color => { %>
+      <option value="<%= color %>"><%= color %></option>
+    <% }) %>
+  </select>
+
+  <!-- QUANTITY -->
+  <input type="number" name="qty" value="1" min="1">
+
+  <button type="submit">Buy Now</button>
+
+</form>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>
+
+<!-- JavaScript لتغيير الصورة الرئيسية -->
+<script>
+  function changeImage(src){
+    document.getElementById('mainProductImage').src = src;
+  }
+</script>

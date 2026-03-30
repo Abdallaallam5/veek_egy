@@ -1,0 +1,117 @@
+<%- include("partials/header") %>
+
+<h1 class="page-title">🔥 SALE</h1>
+
+<div class="products-grid">
+  <% products.forEach(product => { %>
+    <div class="product-card">
+
+      <div class="sale-badge">SALE</div>
+
+      <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+
+      <h3><%= product.name %></h3>
+
+      <p class="price">
+        <span class="old-price"><%= product.price %> EGP</span>
+        <span class="sale-price"><%= product.finalPrice %> EGP</span>
+      </p>
+
+      <a href="/product/<%= product._id %>" class="btn">View</a>
+
+    </div>
+  <% }) %>
+</div>
+<style>
+  /* ===== SALE PAGE ===== */
+
+/* title */
+.page-title {
+  text-align: center;
+  font-size: 36px;
+  margin: 50px 0 40px;
+  letter-spacing: 2px;
+}
+
+/* استخدم نفس الجريد */
+.products-grid {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* product card تحسين */
+.product-card {
+  position: relative;
+  background: #fff;
+  transition: 0.3s ease;
+  text-align: center;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* الصورة */
+.product-card img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+}
+
+/* الاسم */
+.product-card h3 {
+  font-size: 15px;
+  margin-top: 15px;
+  font-weight: 500;
+}
+
+/* السعر */
+.price {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-right: 8px;
+}
+
+.sale-price {
+  color: red;
+  font-weight: bold;
+}
+
+/* badge */
+.sale-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  z-index: 5;
+}
+
+/* button */
+.btn {
+  margin-top: 10px;
+}
+
+/* hover effect */
+.product-card:hover img {
+  transform: scale(1.05);
+  transition: 0.4s;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 24px;
+  }
+}
+</style>
+<%- include("partials/footer") %>

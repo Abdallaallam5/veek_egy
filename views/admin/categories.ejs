@@ -1,0 +1,226 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<div class="admin-content">
+
+  <h1>Categories</h1>
+  <button id="addCategoryBtn">+ Add Category</button>
+
+  <table id="categoriesTable">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% categories.forEach(c => { 
+          if(c.image){
+            c.image = c.image.replace(/^public[\\\/]/, '').replace(/\\/g,'/');
+          } %>
+        <tr data-id="<%= c._id %>">
+          <td>
+            <% if(c.image){ %>
+              <img src="<%= c.image %>" width="60" />
+            <% } %>
+          </td>
+          <td class="cat-name"><%= c.name %></td>
+          <td class="cat-desc"><%= c.description %></td>
+          <td>
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <!-- Add/Edit Modal -->
+  <div id="categoryModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
+    <div style="background:white;padding:20px;border-radius:12px;width:350px;">
+      <h3 id="modalTitle">Add Category</h3>
+      <input type="text" id="categoryName" placeholder="Category Name" style="width:100%;margin-bottom:10px;padding:8px;">
+      <textarea id="categoryDesc" placeholder="Description" style="width:100%;margin-bottom:10px;padding:8px;"></textarea>
+      <input type="file" id="categoryImage" style="margin-bottom:10px;">
+      <button id="saveCategoryBtn" style="background:#4cd137;color:white;padding:10px 20px;border:none;border-radius:8px;">Save</button>
+      <button id="closeModalBtn" style="background:#dcdde1;padding:10px 20px;border:none;border-radius:8px;margin-left:10px;">Cancel</button>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.admin-content {
+  margin-left: 220px;
+  padding: 30px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#categoriesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#categoriesTable th, #categoriesTable td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+img {
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+#addCategoryBtn {
+  background-color: #4cd137;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #487eb0;
+  color: white;
+  margin-right:5px;
+}
+
+.delete-btn {
+  background-color: #e84118;
+  color: white;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("categoryModal");
+  const categoryName = document.getElementById("categoryName");
+  const categoryDesc = document.getElementById("categoryDesc");
+  const categoryImage = document.getElementById("categoryImage");
+  const saveBtn = document.getElementById("saveCategoryBtn");
+  const closeBtn = document.getElementById("closeModalBtn");
+  const addBtn = document.getElementById("addCategoryBtn");
+  let editId = null;
+
+  // Open modal for Add
+  addBtn.addEventListener("click", () => {
+    editId = null;
+    categoryName.value = "";
+    categoryDesc.value = "";
+    categoryImage.value = "";
+    document.getElementById("modalTitle").innerText = "Add Category";
+    modal.style.display = "flex";
+  });
+
+  // Close modal
+  closeBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // Save Add/Edit
+  saveBtn.addEventListener("click", async () => {
+    const name = categoryName.value.trim();
+    const desc = categoryDesc.value.trim();
+    const imageFile = categoryImage.files[0];
+
+    if(!name) return alert("Enter category name");
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", desc);
+    if(imageFile) formData.append("image", imageFile);
+
+    if(editId){
+      // Edit
+      const res = await fetch(`/admin/categories/edit/${editId}`, {
+        method:"POST",
+        body: formData
+      });
+      const data = await res.json();
+      if(data.success){
+        const tr = document.querySelector(`tr[data-id="${editId}"]`);
+        tr.querySelector(".cat-name").innerText = name;
+        tr.querySelector(".cat-desc").innerText = desc;
+
+        if(data.category && data.category.image){
+          const imgPath = data.category.image.replace(/^public[\\\/]/,'').replace(/\\/g,'/');
+          let img = tr.querySelector("td img");
+          if(!img){
+            img = document.createElement("img");
+            tr.querySelector("td").appendChild(img);
+          }
+          img.src = "/" + imgPath;
+          img.width = 60;
+        }
+
+        modal.style.display = "none";
+      }
+    } else {
+      // Add
+      const res = await fetch("/admin/categories/add", {
+        method:"POST",
+        body: formData
+      });
+      const data = await res.json();
+      if(data.success){
+        const tbody = document.querySelector("#categoriesTable tbody");
+        const tr = document.createElement("tr");
+        tr.dataset.id = data.category._id;
+
+        let imgTag = "";
+        if(data.category.image){
+          const imgPath = data.category.image.replace(/^public[\\\/]/,'').replace(/\\/g,'/');
+          imgTag = `<img src="/${imgPath}" width="60">`;
+        }
+
+        tr.innerHTML = `
+          <td>${imgTag}</td>
+          <td class="cat-name">${data.category.name}</td>
+          <td class="cat-desc">${data.category.description}</td>
+          <td>
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+        modal.style.display = "none";
+      }
+    }
+  });
+
+  // Edit/Delete row buttons
+  document.querySelector("#categoriesTable tbody").addEventListener("click", async (e) => {
+    const tr = e.target.closest("tr");
+    if(!tr) return;
+    const id = tr.dataset.id;
+
+    if(e.target.classList.contains("edit-btn")){
+      editId = id;
+      categoryName.value = tr.querySelector(".cat-name").innerText;
+      categoryDesc.value = tr.querySelector(".cat-desc").innerText;
+      document.getElementById("modalTitle").innerText = "Edit Category";
+      modal.style.display = "flex";
+    }
+
+    if(e.target.classList.contains("delete-btn")){
+      if(confirm("Delete this category?")){
+        await fetch(`/admin/categories/delete/${id}`, { method:"DELETE" });
+        tr.remove();
+      }
+    }
+  });
+
+});
+</script>

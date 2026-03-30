@@ -1,0 +1,229 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<div class="main-container">
+  <div class="content">
+    <h1>Orders</h1>
+
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Products</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td><%= order._id %></td>
+            <td><%= order.customerName %></td>
+            <td>
+              <% order.products.forEach(item => { %>
+                <%= item.product.name %><br>
+              <% }) %>
+            </td>
+            <td><%= order.totalPrice %> EGP</td>
+            <td class="status <%= order.status %>"><%= order.status %></td>
+            <td>
+              <button class="view-btn" data-id="<%= order._id %>">View Details</button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div id="orderDetails"></div>
+  </div>
+</div>
+<style>
+/* Layout */
+.main-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar موجود من partials/sidebar، عادة بعرض ثابت */
+.content {
+  flex: 1;
+  padding: 30px;
+  background-color: #f9f9f9;
+  margin-left: 250px; /* لو sidebar ثابت بعرض 250px */
+}
+
+/* Orders Table */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.orders-table th, .orders-table td {
+  padding: 15px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.orders-table th {
+  background-color: #f4f4f4;
+  font-weight: 600;
+  color: #333;
+}
+
+.orders-table tr:hover {
+  background-color: #f1faff;
+}
+
+.orders-table td img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* Status badge */
+.status.pending { color: #d9a900; font-weight: 700; }
+.status.completed { color: #00a300; font-weight: 700; }
+.status.cancelled { color: #d90000; font-weight: 700; }
+
+/* View Button */
+.view-btn {
+  padding: 6px 14px;
+  cursor: pointer;
+  background-color: #1e90ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.view-btn:hover { background-color: #0d6efd; }
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  overflow-y: auto;
+  padding-top: 50px;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: auto;
+  padding: 25px;
+  width: 70%;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #555;
+}
+
+.close:hover { color: #000; }
+</style>
+<!-- تعديل عرض التفاصيل في المودال -->
+<script>
+const modal = document.getElementById('orderModal');
+const orderDetails = document.getElementById('orderDetails');
+const closeBtn = document.querySelector('.close');
+
+document.querySelectorAll('.view-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const orderId = btn.dataset.id;
+    try {
+      const res = await fetch(`/admin/orders/${orderId}`);
+      if (!res.ok) throw new Error('Failed to fetch order');
+
+      const data = await res.json();
+
+      // عرض التفاصيل مع الكوبون وخيارات الحالة والحذف
+      orderDetails.innerHTML = `
+        <h2>Order Details</h2>
+        <p><strong>Customer:</strong> ${data.customerName}</p>
+        <p><strong>Email:</strong> ${data.customerEmail}</p>
+        <p><strong>Address:</strong> ${data.customerAddress}</p>
+        <p><strong>Governorate:</strong> ${data.governorate}</p>
+        <p><strong>Coupon:</strong> ${data.couponCode || 'None'}</p>
+        <p><strong>Status:</strong> 
+          <select id="orderStatusSelect">
+            <option value="pending" ${data.status==='pending'?'selected':''}>Pending</option>
+            <option value="completed" ${data.status==='completed'?'selected':''}>Completed</option>
+            <option value="cancelled" ${data.status==='cancelled'?'selected':''}>Cancelled</option>
+          </select>
+          <button id="updateStatusBtn">Update</button>
+        </p>
+        <h3>Products:</h3>
+        ${data.products.map(p => `
+          <div class="product-item" style="display:flex; align-items:center; margin-bottom:10px;">
+            <img src="${p.product?.images?.[0] || '/uploads/default.jpg'}" width="50" style="object-fit:cover; border-radius:4px; margin-right:10px;">
+            <div>
+              <p><strong>${p.product?.name || 'Deleted Product'}</strong></p>
+              <p>Size: ${p.size}, Color: ${p.color}, Qty: ${p.quantity}</p>
+              <p>Price: ${( p.product?.price || 0) * p.quantity} EGP</p>
+            </div>
+          </div>
+        `).join('')}
+        <p><strong>Total:</strong> ${data.totalPrice} EGP</p>
+        <button id="deleteOrderBtn" style="background:red;color:#fff;padding:6px 12px;border:none;border-radius:4px;margin-top:10px;cursor:pointer;">Delete Order</button>
+      `;
+
+      // تحديث الحالة
+      document.getElementById('updateStatusBtn').onclick = async () => {
+        const newStatus = document.getElementById('orderStatusSelect').value;
+        const res = await fetch(`/admin/orders/${orderId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if(res.ok) {
+          alert('Status updated ✅');
+          location.reload();
+        } else alert('Failed to update status');
+      }
+
+      // حذف الأوردر
+      document.getElementById('deleteOrderBtn').onclick = async () => {
+        if(!confirm('Are you sure you want to delete this order?')) return;
+        const res = await fetch(`/admin/orders/${orderId}`, { method: 'DELETE' });
+        if(res.ok) {
+          alert('Order deleted ✅');
+          location.reload();
+        } else alert('Failed to delete order');
+      }
+
+      modal.style.display = 'block';
+    } catch (err) {
+      alert('Error loading order details');
+      console.error(err);
+    }
+  });
+});
+
+closeBtn.onclick = () => { modal.style.display = 'none'; }
+window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; }
+</script>

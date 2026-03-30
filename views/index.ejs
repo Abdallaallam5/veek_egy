@@ -1,0 +1,45 @@
+<%- include("partials/header") %>
+
+<% productsByCategory.forEach(section => { %>
+
+  <div class="category-section">
+    <h2 class="category-title">
+      <a href="/category/<%= encodeURIComponent(section.category) %>"><%= section.category %></a>
+    </h2>
+
+    <div class="products-grid">
+      <% section.products.forEach(product => { %>
+        <div class="product-card">
+
+          <% if(product.salePrice && product.salePrice < product.price) { %>
+            <div class="sale-badge">SALE</div>
+          <% } %>
+
+          <img 
+            src="<%= product.images && product.images.length ? product.images[0] : '/images/default.png' %>" 
+            alt="<%= product.name %>"
+          >
+
+          <h3><%= product.name %></h3>
+
+          <p class="price">
+            <% if(product.salePrice && product.salePrice < product.price) { %>
+              <span class="old-price"><%= product.price %> EGP</span>
+              <span class="sale-price"><%= product.salePrice %> EGP</span>
+            <% } else { %>
+              <span><%= product.price %> EGP</span>
+            <% } %>
+          </p>
+
+          <button onclick="addToCart('<%= product._id %>')" class="btn">Add To Cart</button>
+          <a href="/product/<%= product._id %>" class="btn">View</a>
+
+        </div>
+      <% }) %>
+    </div>
+
+  </div>
+
+<% }) %>
+
+<%- include("partials/footer") %>

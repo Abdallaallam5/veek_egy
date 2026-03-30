@@ -1,0 +1,47 @@
+<%- include("partials/header") %>
+
+<h1 class="page-title"><%= category %></h1>
+
+    <div class="products-grid">
+      <% products.forEach(product => { %>
+<div class="product-card">
+
+  <% if(product.salePrice < product.price && product.finalPrice){ %>
+    <div class="sale-badge">SALE</div>
+  <% } %>
+
+<img src="<%= product.images[0] %>" alt="<%= product.name %>">
+
+  <h3><%= product.name %></h3>
+
+  <p class="price">
+
+    <% if(product.salePrice < product.price && product.finalPrice){ %>
+
+      <span class="old-price">
+        <%= product.price %> EGP
+      </span>
+
+      <span class="sale-price">
+        <%= product.salePrice %> EGP
+      </span>
+
+    <% } else { %>
+
+      <span>
+        <%= product.price %> EGP
+      </span>
+
+    <% } %>
+
+  </p>
+<button onclick="addToCart('<%= product._id %>')" class="btn">
+Add To Cart
+</button>
+  <a href="/product/<%= product._id %>" class="btn">View</a>
+
+</div>
+      <% }) %>
+    </div>
+
+<%- include("partials/footer") %>

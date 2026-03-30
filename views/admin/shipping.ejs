@@ -1,0 +1,56 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<div class="admin-content">
+  <h1>Shipping Settings</h1>
+
+  <div class="card">
+    <h3>Add / Update Shipping</h3>
+
+    <select id="gov"></select>
+    <input id="price" type="number" placeholder="Shipping Price">
+
+    <button onclick="saveShipping()">Save</button>
+  </div>
+
+  <div class="card">
+    <h3>Current Shipping Prices</h3>
+    <ul id="shippingList"></ul>
+  </div>
+</div>
+
+
+<script>
+async function loadGovs(){
+  const res = await fetch("/admin/governorates"); // لازم يكون نفس الroute هنا
+  const govs = await res.json();
+  document.getElementById("gov").innerHTML =
+    govs.map(g => `<option value="${g}">${g}</option>`).join("");
+}
+
+async function loadShipping(){
+  const res = await fetch("/admin/shipping");
+  const data = await res.json();
+
+  document.getElementById("shippingList").innerHTML =
+    data.map(s => `<li>${s.governorate} - ${s.price} EGP</li>`).join("");
+}
+
+async function saveShipping(){
+  const governorate = document.getElementById("gov").value;
+  const price = document.getElementById("price").value;
+
+  await fetch("/admin/shipping", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ governorate, price })
+  });
+
+  alert("Saved ✅");
+  loadShipping();
+}
+
+// تحميل البيانات عند فتح الصفحة
+loadGovs();
+loadShipping();
+</script>

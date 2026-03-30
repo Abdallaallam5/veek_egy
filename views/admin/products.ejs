@@ -1,0 +1,102 @@
+<%- include("partials/sidebar") %>
+<%- include("partials/header") %>
+
+<div class="admin-content">
+
+  <div class="page-header">
+    <h1>Products</h1>
+    <a href="/admin/add-product" class="add-btn">Add Product</a>
+  </div>
+
+  <table class="products-table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="productsTable"></tbody>
+  </table>
+
+</div>
+
+<style>
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-table th,
+.products-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.products-table img {
+  width: 60px;
+  border-radius: 8px;
+}
+
+.add-btn {
+  background: black;
+  color: white;
+  padding: 10px 18px;
+  text-decoration: none;
+  border-radius: 8px;
+}
+</style>
+
+<tbody id="productsTable"></tbody>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const productsTable = document.getElementById("productsTable");
+  if(!productsTable) return;
+
+  async function loadProducts() {
+    const res = await fetch("/admin/products/list");
+    const products = await res.json();
+
+    let html = "";
+    products.forEach(p => {
+      // لو عندك categories array
+      const categoryNames = p.categories && p.categories.length > 0
+        ? p.categories.map(c => c.name).join(", ")
+        : "—";
+
+      html += `
+        <tr>
+          <td><img src="${p.mainImage || ''}" /></td>
+          <td>${p.name || ''}</td>
+          <td>${p.finalPrice || p.price || 0} EGP</td>
+          <td>${p.stock || 0}</td>
+          <td>${categoryNames}</td>
+          <td>
+            <a href="/admin/edit/${p._id}" class="view-btn">View</a>
+            <button onclick="deleteProduct('${p._id}')">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+
+    productsTable.innerHTML = html;
+  }
+
+  window.deleteProduct = async function(id) {
+    if(!confirm("Delete product?")) return;
+
+    await fetch("/admin/products/delete/"+id, { method:"DELETE" });
+    loadProducts();
+  }
+
+  loadProducts();
+
+});
+</script>

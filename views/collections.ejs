@@ -1,0 +1,23 @@
+<%- include("partials/header") %>
+
+<h1 class="page-title">Collections</h1>
+
+<div class="collections-grid">
+
+  <% categories.forEach(category => { %>
+
+    <a href="/collections/<%= category._id %>" class="collection-card">
+
+      <img src="<%= category.image %>" alt="vvv">
+
+      <div class="collection-info">
+        <span><%= category.name %> →</span>
+      </div>
+
+    </a>
+
+  <% }) %>
+
+</div>
+
+<%- include("partials/footer") %>

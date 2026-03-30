@@ -1,0 +1,40 @@
+<form id="loginForm">
+
+<input name="email" placeholder="Email">
+
+<input name="password" type="password" placeholder="Password">
+
+<button type="submit">Login</button>
+
+</form>
+
+<script>
+
+document.getElementById("loginForm").addEventListener("submit", async (e)=>{
+
+e.preventDefault()
+
+const email = document.querySelector('[name="email"]').value
+const password = document.querySelector('[name="password"]').value
+
+const res = await fetch("/admin/login",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({email,password})
+})
+
+const data = await res.json()
+
+console.log(data)
+
+if(data.success){
+window.location.href="/admin/dashboard"
+}else{
+alert("Wrong email or password")
+}
+
+})
+
+</script>
