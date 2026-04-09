@@ -1,6 +1,71 @@
-/* ========================= */
-/* ===== Global Reset ===== */
-/* ========================= */
+/* ===== Navbar Fix - أضف ده في البداية ===== */
+.top-bar {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 2000 !important;
+  height: 34px !important;
+}
+
+.navbar {
+  position: fixed !important;
+  top: 34px !important;
+  z-index: 1000 !important;
+  height: 56px !important;
+}
+
+body {
+  padding-top: 90px !important;
+}
+
+/* Mobile Menu Fix */
+@media (max-width: 768px) {
+  .nav-links {
+    position: fixed !important;
+    top: 90px !important;  /* تحت الـ headers */
+    right: -100% !important;
+    width: 280px !important;
+    height: calc(100vh - 90px) !important;
+    background: #000 !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 0 !important;
+    transition: right 0.4s ease !important;
+    z-index: 9999 !important;
+    padding: 40px 20px !important;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.5) !important;
+  }
+
+  .nav-links.active {
+    right: 0 !important;
+  }
+
+  .nav-links li {
+    width: 100% !important;
+  }
+
+  .nav-links a {
+    display: block !important;
+    padding: 18px 25px !important;
+    width: 100% !important;
+    font-size: 18px !important;
+    text-align: center !important;
+    border-bottom: 1px solid #333 !important;
+  }
+
+  .menu-toggle {
+    display: block !important;
+    font-size: 28px !important;
+    z-index: 10001 !important;
+  }
+
+  .nav-icons {
+    position: absolute !important;
+    right: 80px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+}
 * {
   margin: 0;
   padding: 0;
@@ -18,90 +83,7 @@ body {
   color: #111;
 }
 
-/* ========================= */
-/* ===== Top Bar ===== */
-/* ========================= */
-.top-bar {
-  width: 100%;
-  background: #f8f8f8;
-  text-align: center;
-  padding: 8px 0;
-  font-size: 13px;
-  letter-spacing: 1px;
-}
 
-/* ========================= */
-/* ===== Navbar ===== */
-/* ========================= */
-.navbar {
-  width: 100%;
-  background: #000;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 5%; /* بدل 60px */
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-sizing: border-box;
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 2px;
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 35px;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: white;
-  font-size: 14px;
-  letter-spacing: 1px;
-  position: relative;
-  transition: 0.3s;
-}
-
-.nav-links a::after {
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 1px;
-  background: white;
-  left: 0;
-  bottom: -5px;
-  transition: 0.3s;
-}
-
-.nav-links a:hover::after {
-  width: 100%;
-}
-
-.nav-icons {
-  display: flex;
-  gap: 20px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* ========================= */
-/* ===== Mobile Toggle ===== */
-/* ========================= */
-.menu-toggle {
-  display: none;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-/* ========================= */
-/* ===== Sections ===== */
-/* ========================= */
 .category-section,
 .products-section {
   width: 90%;

@@ -9,7 +9,8 @@ exports.getHome = async (req, res) => {
   try {
     // جلب كل الكاتيجوريز
     const categories = await Category.find().lean();
-
+   const cart = req.session.cart || [];
+const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
     let productsByCategory = [];
 
     for (let cat of categories) {
@@ -50,7 +51,7 @@ exports.getHome = async (req, res) => {
       });
     }
 
-    res.render("home", { productsByCategory });
+    res.render("home", { productsByCategory, totalQuantity });
 
   } catch (err) {
     console.error(err);

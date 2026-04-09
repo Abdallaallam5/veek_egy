@@ -10,6 +10,8 @@ const Order = require("../models/Order");
 const shippingController = require("../controllers/shippingController");
 
 // ===== Admin Auth =====
+router.get("/signup", admin.signuppage);
+router.post("/signup", admin.signup);
 router.get("/login", admin.loginPage);
 router.post("/login", admin.login);
 

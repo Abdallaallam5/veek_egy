@@ -1,0 +1,107 @@
+<%- include("partials/header") %>
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Size Guide</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f7f7f7;
+    color: #333;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .size-section {
+    margin-bottom: 40px;
+  }
+
+  .size-section h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+  }
+
+  .size-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .size-images img {
+    width: 100%;
+    max-width: 250px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    padding: 5px;
+    background: white;
+    border-radius: 8px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .size-images {
+      flex-direction: column;
+      align-items: center;
+    }
+    .size-images img {
+      max-width: 90%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1> Size Guide</h1>
+
+  <!-- الهوديز -->
+  <div class="size-section">
+    <h2>Hoodies</h2>
+    <div class="size-images">
+      <img src="images/Screenshot 2026-04-09 153643.jpg" alt="">
+
+    </div>
+  </div>
+
+  <!-- التيشرتات -->
+  <div class="size-section">
+    <h2>T-Shirts</h2>
+    <div class="size-images">
+      <img src="images/Screenshot 2026-04-09 153035.jpg" alt="">
+      <img src="images/Screenshot 2026-04-09 153346.jpg" alt="">
+      
+    </div>
+  </div>
+
+  <!-- البناطيل -->
+  <div class="size-section">
+    <h2>Sweatpants</h2>
+    <div class="size-images">
+      <img src="images/Screenshot 2026-04-09 153518.jpg" alt="">
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
+
+<%- include("partials/footer") %>

@@ -1,27 +1,53 @@
 const Admin = require("../models/Admin")
 const Product = require("../models/Product")
+const bcrypt = require("bcrypt");
+exports.signuppage=(req,res)=>{
+ res.render("admin/signup")
+}
 
+exports.signup = async (req, res) => {
+    const { email, password } = req.body; // تصحيح هنا
 
+    if (!email || !password) {
+        return res.json({ success: false, message: "Email and password are required" });
+    }
+
+    const existingAdmin = await Admin.findOne({ email });
+
+    if (existingAdmin) {
+        return res.json({ success: false, message: "Admin already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10); // الآن password موجودة
+    await Admin.create({ email, password: hashedPassword });
+
+    res.json({ success: true });
+};
 exports.loginPage=(req,res)=>{
  res.render("admin/login")
 }
 
- exports.login = async (req,res)=>{
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
 
-const {email,password} = req.body
+    if (!email || !password) {
+        return res.json({ success: false, message: "Email and password are required" });
+    }
 
-const admin = await Admin.findOne({email,password})
+    const admin = await Admin.findOne({ email }); // البحث فقط بالـ email
 
-if(!admin){
-  return res.json({success:false})
-}
+    if (!admin) {
+        return res.json({ success: false, message: "Admin not found" });
+    }
 
-req.session.admin = admin._id
+    const isMatch = await bcrypt.compare(password, admin.password); // المقارنة مع الباسورد المشفر
+    if (!isMatch) {
+        return res.json({ success: false, message: "Incorrect password" });
+    }
 
-res.json({success:true})
-
-
-}
+    req.session.admin = admin._id; // تخزين الـ id في الجلسة
+    res.json({ success: true });
+};
 
 exports.dashboard=(req,res)=>{
  res.render("admin/dashboard")

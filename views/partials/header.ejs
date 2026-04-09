@@ -7,92 +7,243 @@
     <link rel="stylesheet" href="/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+<style>
+/* Top Bar */
+#cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.top-bar {
+  width: 100%;
+  background: #f5f5f5;
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: bold;
+  position: fixed;
+  top: 0;
+  z-index: 2000;
+  height: 34px;
+}
+
+/* Navbar */
+.navbar {
+  width: 100%;
+  background: #000;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5%;
+  position: fixed;
+  top: 34px;
+  z-index: 1000;
+  height: 56px;
+}
+
+/* Logo */
+.logo {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+/* Links */
+.mobile-nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+.mobile-nav-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.mobile-nav-links a:hover {
+  opacity: 0.7;
+}
+
+/* Icons */
+.nav-icons {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  position: relative;
+}
+
+/* Menu Toggle */
+.mobile-menu-btn {
+  display: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: white;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* Overlay */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 999;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display:contents;
+  }
+
+  .mobile-nav-links {
+    position: fixed;
+    top: 90px; /* top-bar + navbar */
+    right: -100%;
+    width: 280px;
+    height: calc(100vh - 90px);
+    background: #000;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0;
+    transition: right 0.4s ease;
+    z-index: 1001;
+    padding: 40px 20px;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+  }
+
+  .mobile-nav-links.active {
+    right: 0;
+  }
+
+  .mobile-nav-links li {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .mobile-nav-links a {
+    display: block;
+    padding: 15px 20px;
+    width: 100%;
+    font-size: 18px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+  }
+
+  .mobile-nav-links a:hover {
+    background: #333;
+  }
+
+  .nav-icons {
+    position: absolute;
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/* Body spacing */
+body {
+  padding-top: 90px;
+}</style>
 </head>
 
 <body>
-<div class="top-bar">
-  FREE SHIPPING OVER 1999 EGP!
-</div>
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+<!-- Top Bar -->
+<div class="top-bar">FREE SHIPPING OVER 1499 EGP!</div>
 
+<!-- Overlay -->
+<div class="overlay" id="overlay" style="display: none;"></div>
 
-
+<!-- Navbar -->
 <!-- Navbar -->
 <nav class="navbar">
   <div class="logo">Veek</div>
 
-  <div class="menu-toggle">&#9776;</div> <!-- أيقونة الموبايل برا الـ ul -->
+  <!-- غيرنا الاسم -->
+  <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
 
-  <ul class="nav-links">
+  <!-- غيرنا الاسم -->
+  <ul class="mobile-nav-links" id="mobileNavLinks">
     <li><a href="/">Home</a></li>
     <li><a href="/collections">Collections</a></li>
     <li><a href="/sale">SALE!</a></li>
     <li><a href="/contact">Contact</a></li>
     <li><a href="/faq">FAQs</a></li>
+    <li><a href="/size-guide">Size Guide</a></li>
   </ul>
+
+  <div class="nav-icons">
+    <a href="/cart" class="icon">
+      <i class="fa fa-shopping-bag"></i>
+      <span id="cart-count"><%= cartCount %></span>
+    </a>
+  </div>
 </nav>
-</nav>
-<div id="cart-overlay"></div>
 
-<div id="slide-cart">
+<!-- باقي محتوى الصفحة -->
 
-<div class="cart-header">
-<h3>Your Cart</h3>
-<button onclick="closeCart()">✕</button>
-</div>
-
-<div id="cart-items"></div>
-
-<div class="cart-footer">
-<p>Subtotal: <span id="cart-subtotal">0</span> EGP</p>
-
-<a href="/cart" class="cart-btn">View Cart</a>
-<a href="/checkout" class="cart-btn checkout">Checkout</a>
-
-</div>
-
-</div>
-</body>
 <script>
-  const menuToggle = document.querySelector('.menu-toggle');
-  const navLinks = document.querySelector('.nav-links');
+document.addEventListener('DOMContentLoaded', function() {
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('mobileNavLinks');
+  const overlay = document.getElementById('overlay');
 
-  menuToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
+  menuBtn.addEventListener('click', function() {
+    const isActive = navLinks.classList.contains('active');
+    
+    if (isActive) {
+      menuBtn.innerHTML = '☰';
+      navLinks.classList.remove('active');
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    } else {
+      menuBtn.innerHTML = '✕';
+      navLinks.classList.add('active');
+      overlay.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
   });
-</script>
-<!-- Carousel Slider -->
-<style>
-  @media(max-width:768px){
-  .nav-links {
-    position: fixed;
-    top: 0;
-    right: -100%; /* مخفية بالكامل */
-    height: 100vh;
-    width: 250px;
-    background: #000;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 30px;
-    transition: right 0.4s ease;
-    z-index: 10001; /* خليها فوق كل حاجة */
-  }
 
-  .nav-links.active {
-    right: 0; /* تظهر عند الضغط */
-  }
+  overlay.addEventListener('click', function() {
+    menuBtn.innerHTML = '☰';
+    navLinks.classList.remove('active');
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  });
 
-  .menu-toggle {
-    display: block; /* تظهر الأيقونة */
-    font-size: 28px;
-    color: #fff;
-    cursor: pointer;
-    z-index: 10002; /* فوق كل العناصر */
-  }
-
-  .nav-links a {
-    font-size: 16px; /* حجم مناسب للموبايل */
-  }
-}
-</style>
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      menuBtn.innerHTML = '☰';
+      navLinks.classList.remove('active');
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  });
+});</script>
+</body>
+</html>

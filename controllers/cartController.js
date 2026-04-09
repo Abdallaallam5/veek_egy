@@ -1,101 +1,72 @@
-const Product = require("../models/Product");
-
-exports.getCart = (req, res) => {
-
-  const cart = req.session.cart || [];
-
-  const subtotal = cart.reduce((total, item) => {
-    return total + item.price * item.qty;
-  }, 0);
-
-  res.render("cart", {
-    cart: cart,
-    subtotal: subtotal
-  });
-
-};
-
+const Product = require('../models/Product');
 
 exports.addToCart = async (req, res) => {
+  try {
+const { productId, size, color } = req.body;
 
-  const product = await Product.findById(req.params.id);
+if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
+  return res.json({ success: false, error: "Invalid product id" });
+}
 
-  if (!product) return res.redirect("/");
+    if (!req.session.cart) req.session.cart = [];
 
-  if (!req.session.cart) {
-    req.session.cart = [];
+    const cart = req.session.cart;
+
+    const existing = cart.find(item =>
+      item.product === productId &&
+      item.size === size &&
+      item.color === color
+    );
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({
+        product: productId,
+        quantity: 1,
+        size,
+        color
+      });
+    }
+
+    // احسب العدد الكلي للكارت
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    res.json({ success: true, totalQuantity });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
   }
-
-  const cart = req.session.cart;
-
-  // نحسب السعر النهائي
-  let finalPrice = product.price;
-
-  if (product.saleType === "percentage") {
-    finalPrice = product.price - (product.price * product.discountValue / 100);
-  }
-
-  if (product.saleType === "fixed") {
-    finalPrice = product.price - product.discountValue;
-  }
-
-  if (product.saleType === "salePrice") {
-    finalPrice = product.salePrice;
-  }
-
-  const existing = cart.find(item => item.productId == product._id);
-
-  if (existing) {
-
-    existing.qty += 1;
-
-  } else {
-
-    cart.push({
-      productId: product._id,
-      name: product.name,
-      price: Math.round(finalPrice),
-      image: product.images[0],
-      qty: 1
-    });
-
-  }
-
-res.json({
-success:true,
-cart:req.session.cart,
-cartCount:req.session.cart.reduce((t,i)=>t+i.qty,0)
-})
-
 };
 
+exports.getCart = async (req, res) => {
+  try {
+    const cart = req.session.cart || [];
 
-exports.removeFromCart = (req, res) => {
+    // ✅ فلتر أي productId مش ObjectId صالح
+    const validProductIds = cart
+      .map(item => item.product)
+      .filter(id => id && /^[0-9a-fA-F]{24}$/.test(id));
 
-  const id = req.params.id;
+    const products = await Product.find({ _id: { $in: validProductIds } });
 
-  // لو الكارت مش موجود
-  if (!req.session.cart) {
-    return res.redirect("/cart");
+    const cartItems = cart.map(item => {
+      const product = products.find(p => p._id.toString() === item.product);
+      if (!product) return null; // تجاهل أي منتجات غير موجودة
+      return {
+        ...product._doc,
+        quantity: item.quantity,
+        selectedSize: item.size,
+        selectedColor: item.color,
+        selectedPrice: product.salePrice || product.price
+      };
+    }).filter(i => i !== null);
+
+    res.render('cart', { cartItems });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading cart");
   }
-
-  req.session.cart = req.session.cart.filter(item => item.productId != id);
-
-  res.redirect("/cart");
-
-};
-
-exports.updateQty = (req, res) => {
-
-  const { id, qty } = req.body;
-
-  const cart = req.session.cart;
-
-  const item = cart.find(i => i.productId == id);
-
-  if (item) {
-    item.qty = parseInt(qty);
-  }
-
-  res.redirect("/cart");
 };

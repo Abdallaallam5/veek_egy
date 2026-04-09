@@ -1,78 +1,236 @@
-<%- include("partials/header") %>
+<%- include('partials/header') %>
+<div class="container product-page">
 
-<div class="container mt-5 product-page">
+  <div class="row align-items-start">
 
-  <div class="row">
-
-    <!-- قسم الصور -->
+    <!-- الصور -->
     <div class="col-md-6">
-      <div class="main-image-wrapper position-relative">
-        <% if(product.salePrice < product.price && product.salePrice){ %>
-          <div class="sale-badge">SALE</div>
-        <% } %>
-        <img id="mainProductImage" src="<%= product.images[0] %>" class="img-fluid rounded shadow">
+      <div class="main-image">
+        <img id="mainProductImage" src="<%= product.images[0] %>">
       </div>
 
-      <!-- صور مصغرة -->
-      <div class="thumbnail-wrapper d-flex gap-2 mt-3 flex-wrap">
-        <% product.images.forEach((img, index) => { %>
-          <img src="<%= img %>" class="img-thumbnail product-thumb" onclick="changeImage('<%= img %>')" alt="Product Image <%= index+1 %>">
+      <div class="thumbs">
+        <% product.images.forEach(img => { %>
+          <img src="<%= img %>" onclick="changeImage('<%= img %>')">
         <% }) %>
       </div>
     </div>
+    <!-- التفاصيل -->
+    <div class="col-md-6 product-info">
 
-    <!-- قسم التفاصيل -->
-    <div class="col-md-6">
-      <h2><%= product.name %></h2>
+      <form action="/checkout/get" method="GET" class="add-to-cart-form mt-4">
+        <input type="hidden" name="productId" value="<%= product._id %>">
+        <h1 class="product-title"><%= product.name %></h1>
 
-      <div class="product-price mb-3">
-        <% if(product.salePrice < product.price&& product.salePrice ){ %>
-          <span class="old-price"><%= product.price %> EGP</span>
-          <span class="sale-price"><%= product.salePrice %> EGP</span>
-        <% } else { %>
-          <span class="normal-price"><%= product.price %> EGP</span>
-        <% } %>
-      </div>
+        <div class="price">
+          <% if(product.salePrice && product.salePrice < product.price){ %>
+            <span class="old"><%= product.price %> EGP</span>
+            <span class="new"><%= product.salePrice %> EGP</span>
+            <span class="badge-sale">Sale</span>
+          <% } else { %>
+            <span class="new"><%= product.price %> EGP</span>
+          <% } %>
+        </div>
 
-      <p><%= product.description %></p>
+        <p class="desc"><%= product.description %></p>
 
- <form action="/checkout/get" method="GET" class="add-to-cart-form mt-4">
+        <!-- Color -->
+        <label>Color</label>
+        <select name="color" class="select-box">
+          <% product.colors.forEach(color => { %>
+            <option value="<%= color %>"><%= color %></option>
+          <% }) %>
+        </select>
 
-  <input type="hidden" name="productId" value="<%= product._id %>">
+        <!-- Size -->
+        <label>Size</label>
+        <select name="size" class="select-box">
+          <% product.sizes.forEach(size => { %>
+            <option><%= size %></option>
+          <% }) %>
+        </select>
 
-  <!-- SIZE -->
-  <label>Size</label>
-  <select name="size" required>
-    <% product.sizes.forEach(size => { %>
-      <option value="<%= size %>"><%= size %></option>
-    <% }) %>
-  </select>
+        <!-- Quantity -->
+        <div class="qty-box">
+          <button type="button" onclick="changeQty(-1)">-</button>
+          <input id="qty" name="qty" type="number" value="1" min="1">
+          <button type="button" onclick="changeQty(1)">+</button>
+        </div>
 
-  <!-- COLOR -->
-  <label>Color</label>
-  <select name="color" required>
-    <% product.colors.forEach(color => { %>
-      <option value="<%= color %>"><%= color %></option>
-    <% }) %>
-  </select>
-
-  <!-- QUANTITY -->
-  <input type="number" name="qty" value="1" min="1">
-
-  <button type="submit">Buy Now</button>
-
-</form>
-
+        <!-- Buttons -->
+        <button id="confirmAdd" class="btn-cart">Add to cart</button>
+        <button class="btn-buy">Buy it now</button>
+      </form>
     </div>
 
   </div>
 </div>
+<%- include('partials/footer') %>
 
-<%- include("partials/footer") %>
+<style>
+.product-page {
+  margin-top: 50px;
+}
 
-<!-- JavaScript لتغيير الصورة الرئيسية -->
-<script>
-  function changeImage(src){
-    document.getElementById('mainProductImage').src = src;
+/* الصورة الكبيرة - ثابتة */
+.main-image {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  background: #eee;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* الصور الصغيرة */
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.thumbs img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+
+/* العنوان */
+.product-title {
+  font-size: 28px;
+  font-weight: 500;
+}
+
+/* السعر */
+.price {
+  margin: 15px 0;
+}
+
+.price .old {
+  text-decoration: line-through;
+  color: gray;
+  margin-right: 10px;
+}
+
+.price .new {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.badge-sale {
+  background: red;
+  color: white;
+  padding: 3px 10px;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+/* select */
+.select-box {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+/* الكمية */
+.qty-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.qty-box button {
+  width: 40px;
+  height: 40px;
+}
+
+/* الأزرار */
+.btn-cart {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid black;
+  background: white;
+  margin-bottom: 10px;
+}
+
+.btn-buy {
+  width: 100%;
+  padding: 15px;
+  background: black;
+  color: white;
+}
+
+/* وصف المنتج - ثابت الحجم مع scroll */
+.desc {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+/* تحسين الموبايل */
+@media (max-width: 768px) {
+  .main-image {
+    height: 300px;
   }
+
+  .desc {
+    max-height: 200px;
+  }
+}
+</style>
+
+<script>
+  // تغيير الصورة الرئيسية
+  function changeImage(src){
+    document.getElementById("mainProductImage").src = src;
+  }
+
+  // تعديل الكمية
+  function changeQty(amount){
+    let qty = document.getElementById("qty");
+    let value = parseInt(qty.value) || 1;
+    value += amount;
+    if(value < 1) value = 1;
+    qty.value = value;
+  }
+
+  // ✅ AJAX Add to Cart
+  document.getElementById('confirmAdd').addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const form = document.querySelector('.add-to-cart-form');
+    const productId = form.querySelector('input[name="productId"]').value;
+    const color = form.querySelector('select[name="color"]').value;
+    const size = form.querySelector('select[name="size"]').value;
+    const qty = parseInt(form.querySelector('input[name="qty"]').value) || 1;
+
+    try {
+      const res = await fetch('/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, color, size, qty })
+      });
+
+      const data = await res.json();
+
+      if(data.success){
+        const cartCount = document.getElementById('cart-count');
+        if(cartCount) cartCount.innerText = data.totalQuantity || 0;
+      } else {
+        alert(data.error || '❌ Error adding product to cart');
+      }
+
+    } catch(err){
+      console.error(err);
+      alert('❌ Error adding product to cart');
+    }
+  });
 </script>

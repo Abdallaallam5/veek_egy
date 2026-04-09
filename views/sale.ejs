@@ -3,7 +3,10 @@
 <h1 class="page-title">🔥 SALE</h1>
 
 <div class="products-grid">
-  <% products.forEach(product => { %>
+  <% products.forEach(product => 
+  {
+    if(product.salePrice!=null){ %>
+    
     <div class="product-card">
 
       <div class="sale-badge">SALE</div>
@@ -14,13 +17,13 @@
 
       <p class="price">
         <span class="old-price"><%= product.price %> EGP</span>
-        <span class="sale-price"><%= product.finalPrice %> EGP</span>
+        <span class="sale-price"><%= product.salePrice %> EGP</span>
       </p>
 
       <a href="/product/<%= product._id %>" class="btn">View</a>
 
     </div>
-  <% }) %>
+  <% }}) %>
 </div>
 <style>
   /* ===== SALE PAGE ===== */

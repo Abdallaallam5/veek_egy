@@ -7,7 +7,9 @@ exports.getSignup = (req, res) => res.render("signup");
 // POST Signup
 exports.postSignup = async (req, res) => {
     const { name, email, password } = req.body;
-    // تحقق من البريد مسبقًا، تشفير الباسورد، الخ...
+    if (!isGmail(req.body.email)) {
+  return res.status(400).json({ error: "Admin email must be Gmail only" });
+            }
     res.send("Sign Up success (placeholder)");
 };
 

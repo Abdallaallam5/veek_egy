@@ -1,0 +1,168 @@
+<%- include("partials/header") %>
+<h1>FAQs</h1>
+
+  <!-- Content -->
+  <ol>
+    <li>
+      <strong>How can I purchase your products?</strong><br>
+      You can purchase through our website.
+    </li>
+    <li>
+      <strong>Can I open the package before paying the courier?</strong><br>
+      Unfortunately, you cannot. Couriers are not allowed to wait for try‑ons or return with opened packages.
+    </li>
+    <li>
+      <strong>Where can I find the size chart?</strong><br>
+      The size chart is available in the product gallery on each product page on our website.
+    </li>
+    <li>
+      <strong>How long does delivery take?</strong><br>
+      Orders are delivered within 5–8 business days in Cairo, Giza, and Alexandria. Deliveries to other governorates take up to 9 business days.
+    </li>
+    <li>
+      <strong>Can I make my order arrive faster?</strong><br>
+      Unfortunately, no. Orders are shipped according to the courier’s delivery schedule, and delivery times cannot be expedited.
+    </li>
+    <li>
+      <strong>Do you have a physical store?</strong><br>
+      No, we operate exclusively online.
+    </li>
+    <li>
+      <strong>Do you allow exchanges/returns?</strong><br>
+      Yes, but some items may not be eligible for returns or exchanges. Please review our return/exchange policy on the website before placing your order.
+    </li>
+    <li>
+      <strong>How to request a refund, exchange, or cancel my order?</strong><br>
+      Please send an email to: veekegy@gmail.com. Please note: Orders are confirmed one day after being placed. Once confirmed, cancellations are not allowed.
+    </li>
+    <li>
+      <strong>How can I contact you?</strong><br>
+      Reach out through DM, our Contact Us page, or email: veekegy@gmail.com.
+    </li>
+    <li>
+      <strong>What happens if the courier cannot deliver my order?</strong><br>
+      The courier will attempt delivery once. If the order is not received, it will be automatically canceled.
+    </li>
+    <li>
+      <strong>Can I order two sizes of the same item and pay for the one that fits?</strong><br>
+      This is not allowed. Such orders are automatically canceled by our website system. This is against our policy, and couriers are not allowed to return opened packages.
+    </li>
+  </ol>
+<style>
+/* ---------- Header / Nav ---------- */
+nav {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+}
+
+nav ul li {
+    display: inline;
+}
+
+/* ---------- Page Title ---------- */
+h1 {
+    text-align: center;
+    color: #222;
+    margin: 30px 0 20px;
+    font-size: 28px;
+}
+
+h2 {
+    color: #555;
+    margin-top: 20px;
+}
+
+h3 {
+    color: #777;
+    margin-top: 10px;
+}
+
+/* ---------- FAQ List ---------- */
+ol {
+    max-width: 800px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+ol li {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+ol li strong {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #000;
+}
+
+/* ---------- Links and Emails ---------- */
+ol li a {
+    color: #000;
+    text-decoration: underline;
+}
+
+ol li a:hover {
+    color: #555;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    ol {
+        max-width: 90%;
+        padding: 15px 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin: 20px 0 15px;
+    }
+
+    ol li {
+        font-size: 14px;
+    }
+}
+
+/* ---------- Extra Small Screens ---------- */
+@media (max-width: 480px) {
+    ol {
+        padding: 12px 12px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    ol li {
+        font-size: 13px;
+    }
+}
+</style>
+<%- include("partials/footer") %>

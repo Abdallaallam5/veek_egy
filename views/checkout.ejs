@@ -31,17 +31,35 @@
     <!-- RIGHT -->
     <div class="checkout-right">
 
-      <div class="order-item">
-        <img src="<%= product.images?.[0] || '/uploads/default.jpg' %>" alt="Product Image">
-        <div>
-          <h4><%= product.name %></h4>
-          <p>Size: <input type="hidden" name="size" value="<%= size %>"><%= size %></p>
-          <p>Price: <input type="hidden" name="price" id="price" value="<%= product.price %>"><%= product.price %> EGP</p>
-          <p>Color: <input type="hidden" name="color" value="<%= color %>"><%= color %></p>
-          <input type="hidden" name="productId" value="<%= product._id %>">
-          <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
-        </div>
-      </div>
+<% cartItems.forEach(item => { %>
+
+  <div class="order-item">
+    <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>" alt="Product">
+
+    <div>
+      <h4><%= item.name %></h4>
+
+      <% if(item.selectedSize) { %>
+        <p>Size: <%= item.selectedSize %></p>
+      <% } %>
+
+      <% if(item.selectedColor) { %>
+        <p>Color: <%= item.selectedColor %></p>
+      <% } %>
+
+      <p>Price: <%= item.selectedPrice %> EGP</p>
+      <p>Quantity: <%= item.quantity %></p>
+
+      <!-- hidden inputs -->
+      <input type="hidden" name="productId[]" value="<%= item._id %>">
+      <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
+      <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
+      <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
+<input type="hidden" name="color[]" value="<%= item.selectedColor %>">
+    </div>
+  </div>
+
+<% }) %>
 
       <div class="price-box">
         <div class="price-row">
@@ -63,6 +81,7 @@
         <div class="price-row">
           <span>Shipping</span>
           <span id="shipping"><%= shipping %> EGP</span>
+          <span id="message"><%= message %></span>
         </div>
 
         <div class="price-row total-row">
@@ -96,46 +115,63 @@ document.getElementById("citySelect").addEventListener('change', updatePrices);
 document.getElementById("applyCoupon").addEventListener('click', updatePrices);
 
 async function submitOrder() {
-  const form = document.getElementById("checkoutForm");
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData.entries());
+  try {
+    const form = document.getElementById("checkoutForm");
+    const formData = new FormData(form);
 
-  const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-  const price = parseFloat(document.getElementById("price").value) || 0;
-  const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-  const total = parseFloat(document.getElementById("total").textContent) || 0;
+    // ✅ هات كل المنتجات
+    const productIds = formData.getAll("productId[]");
+    const quantities = formData.getAll("quantity[]");
+    const prices = formData.getAll("price[]");
+    const sizes = formData.getAll("size[]");
+    const colors = formData.getAll("color[]");
 
-  data.quantity = parseInt(data.quantity);
+    const products = productIds.map((id, i) => ({
+      product: id,
+      quantity: parseInt(quantities[i]),
+      price: parseFloat(prices[i]),
+      finalprice: parseFloat(finalprice[i]),
+      size: sizes[i] || null,
+      color: colors[i] || null
+    }));
 
-  const res = await fetch("/checkout/place-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      products: [{
-        product: data.productId,
-        quantity: data.quantity,
-        size: data.size,
-        color: data.color,
-        price: data.price
-      }],
-      customerName: data.name,
-      customerEmail: data.email,
-      customerAddress: data.address,
-      governorate: data.city,
-      shipping,
-      discount,
-      total,
-      couponCode: data.couponCode || null
-    })
-  });
+    // ✅ بيانات العميل
+    const data = Object.fromEntries(formData.entries());
 
-  const result = await res.json();
+    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
+    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
+    const total = parseFloat(document.getElementById("total").textContent) || 0;
 
-  if(res.ok) {
-    alert("Order placed ✅");
-    window.location.href = "/";
-  } else {
-    alert("Error ❌: " + (result.error || "Unknown error"));
+    const res = await fetch("/checkout/place-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        products,
+        customerName: data.name,
+        customerEmail: data.email,
+        customerAddress: data.address,
+        governorate: data.city,
+        shipping,
+        discount,
+        total,
+        couponCode: document.getElementById("couponCode").value || null
+      })
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      alert("Order placed ✅");
+      window.location.href = "/";
+    } else {
+      alert("Error ❌: " + (result.error || "Unknown error"));
+    }
+
+  } catch (err) {
+    console.error("Submit Error:", err);
+    alert("Something went wrong ❌");
   }
 }
 </script>
@@ -257,6 +293,11 @@ body {
   font-weight: 700;
   font-size: 16px;
   color: #1e90ff;
+}
+#message {
+  font-weight: 700;
+  color: green;
+  margin-left: 10px;
 }
 
 /* ===== Responsive ===== */
