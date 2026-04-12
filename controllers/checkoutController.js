@@ -64,7 +64,7 @@ exports.getCheckout = async (req, res) => {
     let message = '';
 
     if (subtotal < 1499) {
-      shipping = 50;
+      shipping = 0;
     } else {
       message = "🎉 Free shipping applied!";
     }
