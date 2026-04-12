@@ -3,6 +3,102 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Coupon = require('../models/Coupon');
 const Shipping = require('../models/Shipping');
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+const otpStore = new Map(); // مؤقت (يفضل Redis بعدين)
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+exports.sendOtp = async (req, res) => {
+  try {
+    const { email, name, address, city, products } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email required" });
+    }
+
+    const otp = generateOTP();
+    const orderId = crypto.randomUUID();
+
+    otpStore.set(orderId, {
+      otp,
+      email,
+      data: { name, address, city, products },
+      expires: Date.now() + 5 * 60 * 1000
+    });
+
+    // إرسال الإيميل
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    await transporter.sendMail({
+      to: email,
+      from: process.env.EMAIL_USER,
+      subject: "Your OTP Code",
+      html: `<h2>Your OTP is:</h2><h1>${otp}</h1>`
+    });
+
+    res.json({
+      success: true,
+      orderId
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to send OTP" });
+  }
+};
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { orderId, otp } = req.body;
+
+    const record = otpStore.get(orderId);
+
+    if (!record) {
+      return res.status(400).json({ error: "Session expired" });
+    }
+
+    if (Date.now() > record.expires) {
+      otpStore.delete(orderId);
+      return res.status(400).json({ error: "OTP expired" });
+    }
+
+    if (record.otp !== otp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    // ✅ إنشاء الأوردر الحقيقي هنا
+    const order = new Order({
+      products: record.data.products,
+      customerName: record.data.name,
+      customerEmail: record.email,
+      customerAddress: record.data.address,
+      governorate: record.data.city,
+      status: "confirmed"
+    });
+
+    await order.save();
+
+    otpStore.delete(orderId);
+
+    res.json({
+      success: true,
+      message: "Order confirmed",
+      orderId: order._id
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Verification failed" });
+  }
+};
 
 // GET Checkout Page
 // GET Checkout Page
