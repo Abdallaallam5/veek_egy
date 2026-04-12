@@ -6,6 +6,19 @@
     <p style="margin-top:15px;">Processing your order...</p>
   </div>
 
+  <!-- OTP OVERLAY (SAME PAGE) -->
+  <div id="otpOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center; flex-direction:column; color:#fff;">
+    <div style="background:#fff; color:#000; padding:25px; border-radius:10px; width:300px; text-align:center;">
+      <h3>Verify OTP</h3>
+      <p>We sent a code to your email</p>
+
+      <input id="otpInput" placeholder="Enter OTP" style="width:100%; padding:10px; margin-top:10px; text-align:center; font-size:18px;">
+      <button onclick="verifyOtp()" style="margin-top:10px; width:100%; padding:10px; background:black; color:white; border:none;">Verify</button>
+
+      <p id="otpMsg" style="color:red; font-size:13px; margin-top:10px;"></p>
+    </div>
+  </div>
+
   <div class="checkout">
 
     <!-- LEFT -->
@@ -99,184 +112,29 @@
 </form>
 
 <style>
-/* ===== Checkout Page Layout ===== */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f7f8fc;
-  margin: 0;
-  padding: 0;
-}
-
-.checkout {
-  display: flex;
-  max-width: 1100px;
-  margin: 40px auto;
-  gap: 30px;
-}
-
-/* ===== Left Section ===== */
-.checkout-left {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.checkout-left h2 {
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
-}
-
-.checkout-left input {
-  width: 100%;
-  padding: 12px 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  outline: none;
-  transition: 0.2s;
-}
-
-.checkout-left input:focus {
-  border-color: #1e90ff;
-  box-shadow: 0 0 5px rgba(30,144,255,0.2);
-}
-
-.checkout-left .checkout-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #1e90ff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.checkout-left .checkout-btn:hover {
-  background-color: #0d6efd;
-}
-
-/* ===== Right Section ===== */
-.checkout-right {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.order-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.order-item img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-right: 15px;
-  border: 1px solid #eee;
-}
-
-.order-item h4 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.order-item p {
-  margin: 3px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.price-box {
-  border-top: 1px solid #eee;
-  padding-top: 15px;
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #333;
-}
-
-.total-row {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1e90ff;
-}
-#message {
-  font-weight: 700;
-  color: green;
-  margin-left: 10px;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 900px) {
-  .checkout {
-    flex-direction: column;
-  }
-  
-  .checkout-left, .checkout-right {
-    width: 100%;
-  }
-
-  .order-item img {
-    width: 60px;
-    height: 60px;
-  }
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 
 <script>
-async function updatePrices() {
-  const couponCode = document.getElementById("couponCode").value;
-  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
-  const governorate = document.getElementById("citySelect").value;
-  if(!governorate) return;
-
-  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-  const data = await res.json();
-
-  if(data.success) {
-    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage").textContent = data.message;
-  }
-}
-
-document.getElementById("citySelect").addEventListener('change', updatePrices);
-document.getElementById("applyCoupon").addEventListener('click', updatePrices);
+let pendingOrderData = null;
 
 function validateEmail(email){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function showLoading(show){
-  document.getElementById("loadingOverlay").style.display = show ? "flex" : "none";
+function showLoading(v){
+  document.getElementById("loadingOverlay").style.display = v ? "flex" : "none";
+}
+
+function showOtp(v){
+  document.getElementById("otpOverlay").style.display = v ? "flex" : "none";
 }
 
 async function submitOrder() {
   try {
 
     const email = document.getElementById("email").value;
-    if(!validateEmail(email)){
-      alert("❌ Please enter a valid email");
-      return;
-    }
+    if(!validateEmail(email)) return alert("❌ Invalid email");
 
     showLoading(true);
 
@@ -289,50 +147,86 @@ async function submitOrder() {
     const sizes = formData.getAll("size[]");
     const colors = formData.getAll("color[]");
 
-    const products = productIds.map((id, i) => ({
-      product: id,
-      quantity: parseInt(quantities[i]),
-      price: parseFloat(prices[i]),
-      size: sizes[i] || null,
-      color: colors[i] || null
+    const products = productIds.map((id,i)=>({
+      product:id,
+      quantity:+quantities[i],
+      price:+prices[i],
+      size:sizes[i]||null,
+      color:colors[i]||null
     }));
 
     const data = Object.fromEntries(formData.entries());
 
-    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-    const total = parseFloat(document.getElementById("total").textContent) || 0;
-
-    const res = await fetch("/checkout/place-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
+    const res = await fetch("/checkout/send-otp", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        email:data.email,
+        name:data.name,
+        address:data.address,
+        city:data.city,
+        products
       })
     });
 
     const result = await res.json();
 
+    showLoading(false);
+
     if(res.ok){
-      alert("OTP sent to your email");
-      window.location.href = `/verify-otp?orderId=${result.orderId}`;
+      pendingOrderData = result;
+      showOtp(true);
     } else {
-      alert("Error ❌: " + (result.error || "Unknown error"));
+      alert(result.error || "Error");
     }
 
-  } catch(err) {
-    console.error(err);
-    alert("Something went wrong ❌");
-  } finally {
+  } catch(e){
     showLoading(false);
+    console.error(e);
+    alert("Error");
   }
 }
+
+async function verifyOtp(){
+  const otp = document.getElementById("otpInput").value;
+
+  if(!otp) return;
+
+  const res = await fetch("/checkout/verify-otp", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ otp, orderId: pendingOrderData.orderId })
+  });
+
+  const data = await res.json();
+
+  if(res.ok){
+    showOtp(false);
+    alert("✅ Order confirmed successfully");
+    window.location.href = "/order-success";
+  } else {
+    document.getElementById("otpMsg").innerText = data.error || "Invalid OTP";
+  }
+}
+
+// coupon logic unchanged
+async function updatePrices(){
+  const couponCode=document.getElementById("couponCode").value;
+  const subtotal=parseFloat(document.getElementById("subtotal").textContent)||0;
+  const governorate=document.getElementById("citySelect").value;
+  if(!governorate) return;
+
+  const res=await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
+  const data=await res.json();
+
+  if(data.success){
+    document.getElementById("discount").textContent=data.discount+" EGP";
+    document.getElementById("shipping").textContent=data.shipping+" EGP";
+    document.getElementById("total").textContent=data.total+" EGP";
+    document.getElementById("couponMessage").textContent=data.message;
+  }
+}
+
+document.getElementById("citySelect").addEventListener("change",updatePrices);
+document.getElementById("applyCoupon").addEventListener("click",updatePrices);
 </script>
