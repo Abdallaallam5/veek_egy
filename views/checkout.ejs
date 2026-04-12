@@ -1,11 +1,5 @@
 <form id="checkoutForm" onsubmit="event.preventDefault(); submitOrder();">
 
-  <!-- LOADING OVERLAY -->
-  <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; flex-direction:column; color:#fff;">
-    <div style="border:4px solid #f3f3f3; border-top:4px solid #fff; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div>
-    <p style="margin-top:15px;">Processing your order...</p>
-  </div>
-
   <div class="checkout">
 
     <!-- LEFT -->
@@ -13,7 +7,7 @@
 
       <h2>Contact</h2>
       <input name="name" placeholder="Full Name" required>
-      <input name="email" id="email" placeholder="Email" type="email" required>
+      <input name="email" placeholder="Email" type="email" required>
       <input name="phone" placeholder="Phone" required>
 
       <h2>Shipping</h2>
@@ -56,11 +50,12 @@
       <p>Price: <%= item.selectedPrice %> EGP</p>
       <p>Quantity: <%= item.quantity %></p>
 
+      <!-- hidden inputs -->
       <input type="hidden" name="productId[]" value="<%= item._id %>">
       <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
       <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
       <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
-      <input type="hidden" name="color[]" value="<%= item.selectedColor %>">
+<input type="hidden" name="color[]" value="<%= item.selectedColor %>">
     </div>
   </div>
 
@@ -98,6 +93,87 @@
   </div>
 </form>
 
+<script>
+async function updatePrices() {
+  const couponCode = document.getElementById("couponCode").value;
+  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
+  const governorate = document.getElementById("citySelect").value;
+  if(!governorate) return;
+
+  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
+  const data = await res.json();
+
+  if(data.success) {
+    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
+    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
+    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
+    document.getElementById("couponMessage").textContent = data.message;
+  }
+}
+
+document.getElementById("citySelect").addEventListener('change', updatePrices);
+document.getElementById("applyCoupon").addEventListener('click', updatePrices);
+
+async function submitOrder() {
+  try {
+    const form = document.getElementById("checkoutForm");
+    const formData = new FormData(form);
+
+    // ✅ هات كل المنتجات
+    const productIds = formData.getAll("productId[]");
+    const quantities = formData.getAll("quantity[]");
+    const prices = formData.getAll("price[]");
+    const sizes = formData.getAll("size[]");
+    const colors = formData.getAll("color[]");
+
+    const products = productIds.map((id, i) => ({
+      product: id,
+      quantity: parseInt(quantities[i]),
+      price: parseFloat(prices[i]),
+      size: sizes[i] || null,
+      color: colors[i] || null
+    }));
+
+    // ✅ بيانات العميل
+    const data = Object.fromEntries(formData.entries());
+
+    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
+    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
+    const total = parseFloat(document.getElementById("total").textContent) || 0;
+
+    const res = await fetch("/checkout/place-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        products,
+        customerName: data.name,
+        customerEmail: data.email,
+        customerAddress: data.address,
+        governorate: data.city,
+        shipping,
+        discount,
+        total,
+        couponCode: document.getElementById("couponCode").value || null
+      })
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      alert("Order placed ✅");
+      window.location.href = "/";
+    } else {
+      alert("Error ❌: " + (result.error || "Unknown error"));
+    }
+
+  } catch (err) {
+    console.error("Submit Error:", err);
+    alert("Something went wrong ❌");
+  }
+}
+</script>
 <style>
 /* ===== Checkout Page Layout ===== */
 body {
@@ -239,100 +315,3 @@ body {
   }
 }
 </style>
-
-<script>
-async function updatePrices() {
-  const couponCode = document.getElementById("couponCode").value;
-  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
-  const governorate = document.getElementById("citySelect").value;
-  if(!governorate) return;
-
-  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-  const data = await res.json();
-
-  if(data.success) {
-    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage").textContent = data.message;
-  }
-}
-
-document.getElementById("citySelect").addEventListener('change', updatePrices);
-document.getElementById("applyCoupon").addEventListener('click', updatePrices);
-
-function validateEmail(email){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function showLoading(show){
-  document.getElementById("loadingOverlay").style.display = show ? "flex" : "none";
-}
-
-async function submitOrder() {
-  try {
-
-    const email = document.getElementById("email").value;
-    if(!validateEmail(email)){
-      alert("❌ Please enter a valid email");
-      return;
-    }
-
-    showLoading(true);
-
-    const form = document.getElementById("checkoutForm");
-    const formData = new FormData(form);
-
-    const productIds = formData.getAll("productId[]");
-    const quantities = formData.getAll("quantity[]");
-    const prices = formData.getAll("price[]");
-    const sizes = formData.getAll("size[]");
-    const colors = formData.getAll("color[]");
-
-    const products = productIds.map((id, i) => ({
-      product: id,
-      quantity: parseInt(quantities[i]),
-      price: parseFloat(prices[i]),
-      size: sizes[i] || null,
-      color: colors[i] || null
-    }));
-
-    const data = Object.fromEntries(formData.entries());
-
-    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-    const total = parseFloat(document.getElementById("total").textContent) || 0;
-
-    const res = await fetch("/checkout/place-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
-      })
-    });
-
-    const result = await res.json();
-
-    if(res.ok){
-      alert("OTP sent to your email");
-      window.location.href = `/verify-otp?orderId=${result.orderId}`;
-    } else {
-      alert("Error ❌: " + (result.error || "Unknown error"));
-    }
-
-  } catch(err) {
-    console.error(err);
-    alert("Something went wrong ❌");
-  } finally {
-    showLoading(false);
-  }
-}
-</script>
