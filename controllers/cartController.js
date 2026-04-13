@@ -2,7 +2,7 @@ const Product = require('../models/Product');
 
 exports.addToCart = async (req, res) => {
   try {
-const { productId, size, color } = req.body;
+const { productId, size, color,qty } = req.body;
 
 if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
   return res.json({ success: false, error: "Invalid product id" });
@@ -15,7 +15,8 @@ if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
     const existing = cart.find(item =>
       item.product === productId &&
       item.size === size &&
-      item.color === color
+      item.color === color&&
+      item.quantity === qty
     );
 
     if (existing) {
@@ -23,7 +24,7 @@ if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
     } else {
       cart.push({
         product: productId,
-        quantity: 1,
+        quantity: qty,
         size,
         color
       });
