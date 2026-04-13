@@ -7,49 +7,52 @@ const mongoose = require("mongoose");
 /* ========================= */
 exports.getHome = async (req, res) => {
   try {
-    // جلب كل الكاتيجوريز
-    const categories = await Category.find().lean();
-   const cart = req.session.cart || [];
-const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-    let productsByCategory = [];
+    // جلب الكاتيجوريز + ترتيب الأحدث أولاً
+    const categories = await Category.find()
+      .sort({ createdAt: -1 }) // 👈 أهم تعديل هنا
+      .lean();
 
-    for (let cat of categories) {
-      // جلب 4 منتجات مرتبطة بالكاتيجوري دي
-      const products = await Product.find({ categories: cat._id })
-                                    .limit(4)
-                                    .lean();
+    const cart = req.session.cart || [];
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-      // حساب السعر النهائي لكل منتج
-      products.forEach(p => {
-        // لو المنتج جاي من lean() مش حيكون فيه methods، لذا نعمل نسخة مؤقتة
-        p.finalPrice = (() => {
-          const price = Number(p.price);
-          const discount = Number(p.discountValue);
-          const salePrice = Number(p.salePrice);
+    const productsByCategory = await Promise.all(
+      categories.map(async (cat) => {
 
-          if (!price || isNaN(price)) return 0;
+        const products = await Product.find({ categories: cat._id })
+          .limit(4)
+          .lean();
+
+        const formattedProducts = products.map((p) => {
+          const price = Number(p.price) || 0;
+          const discount = Number(p.discountValue) || 0;
+          const salePrice = Number(p.salePrice) || 0;
 
           let finalPrice = price;
 
           if (p.saleType === "percentage" && discount) {
             finalPrice -= (price * discount / 100);
-          } else if (p.saleType === "fixed" && discount) {
+          } 
+          else if (p.saleType === "fixed" && discount) {
             finalPrice -= discount;
-          } else if (p.saleType === "salePrice" && salePrice) {
+          } 
+          else if (p.saleType === "salePrice" && salePrice) {
             finalPrice = salePrice;
           }
 
           if (finalPrice < 0) finalPrice = 0;
 
-          return Math.round(finalPrice);
-        })();
-      });
+          return {
+            ...p,
+            finalPrice: Math.round(finalPrice)
+          };
+        });
 
-      productsByCategory.push({
-        category: cat,
-        products
-      });
-    }
+        return {
+          category: cat,
+          products: formattedProducts
+        };
+      })
+    );
 
     res.render("home", { productsByCategory, totalQuantity });
 
@@ -117,10 +120,15 @@ exports.getProducts = async (req, res) => {
 /* ========================= */
 exports.getCollections = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find()
+      .sort({ createdAt: -1 }) // 👈 الأحدث أولاً
+      .lean();
+
     res.render("collections", { categories });
+
   } catch (err) {
-    console.log(err);
+    console.error("Collections Error:", err);
+    res.status(500).send("Server Error");
   }
 };
 
@@ -168,16 +176,39 @@ exports.getProductSale = async (req, res) => {
         { saleType: { $exists: true, $ne: null } },
         { discountValue: { $gt: 0 } }
       ]
+    })
+      .sort({ createdAt: -1 }) // 👈 الأحدث أولاً (اختياري)
+      .lean();
+
+    const formattedProducts = products.map((p) => {
+      const price = Number(p.price) || 0;
+      const discount = Number(p.discountValue) || 0;
+      const salePrice = Number(p.salePrice) || 0;
+
+      let finalPrice = price;
+
+      if (p.saleType === "percentage" && discount) {
+        finalPrice -= (price * discount / 100);
+      } 
+      else if (p.saleType === "fixed" && discount) {
+        finalPrice -= discount;
+      } 
+      else if (p.saleType === "salePrice" && salePrice) {
+        finalPrice = salePrice;
+      }
+
+      if (finalPrice < 0) finalPrice = 0;
+
+      return {
+        ...p,
+        finalPrice: Math.round(finalPrice)
+      };
     });
 
-    products.forEach(p => {
-      p.finalPrice = p.getFinalPrice();
-    });
-
-    res.render("sale", { products });
+    res.render("sale", { products: formattedProducts });
 
   } catch (err) {
-    console.log(err);
-    res.redirect("/");
+    console.error("Sale Page Error:", err);
+    res.status(500).redirect("/");
   }
 };
