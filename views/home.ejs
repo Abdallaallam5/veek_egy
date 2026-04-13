@@ -229,164 +229,153 @@ html {
   scroll-behavior: smooth;
 }
   </style>
-
+</head>
+<body>
 <div class="hero-slider">
-  <div class="slide active">
-    <img src="/images/photo_2026-01-23_00-05-32.jpg">
-    <div class="overlay"></div>
-    <div class="content"></div>
-  </div>
-  <div class="slide">
-    <img src="/images/photo_2026-01-23_00-05-32 (2).jpg">
-    <div class="overlay"></div>
-    <div class="content"></div>
-  </div>
+  <div class="slide active"><img src="/images/photo1.jpg"></div>
+  <div class="slide"><img src="/images/photo2.jpg"></div>
 </div>
 
 <% productsByCategory.forEach(section => { %>
   <div class="category-section">
-    <p class="category-title"><strong><%= section.category.name %></strong></p>
+    <p class="category-title"><%= section.category.name %></p>
+
     <div class="products-grid">
       <% section.products.forEach(product => { %>
         <div class="product-card">
-          <% if(product.stock === 0) { %>
-            <div class="out-of-stock">OUT OF STOCK</div>
-          <% } %>
-          <% if(product.salePrice && product.salePrice < product.price) { %>
-            <div class="sale-badge">SALE</div>
-          <% } %>
 
-          <a href="/product/<%= product._id %>">
-            <img src="<%= product.images && product.images.length ? product.images[0] : '/images/default.png' %>" alt="<%= product.name %>">
-          </a>
+          <img src="<%= product.images?.[0] || '/images/default.png' %>">
 
           <h3><%= product.name %></h3>
 
           <p class="price">
             <% if(product.salePrice && product.salePrice < product.price) { %>
-              <span class="old-price"><%= product.price %> EGP</span>
-              <span class="sale-price"><%= product.salePrice %> EGP</span>
+              <span class="old-price"><%= product.price %></span>
+              <span class="sale-price"><%= product.salePrice %></span>
             <% } else { %>
-              <%= product.price %> EGP
+              <%= product.price %>
             <% } %>
           </p>
 
           <div class="product-actions">
-            <% if(product.stock === 0 || product.stock === null) { %>
-              <button class="btn disabled">Out of Stock</button>
-            <% } else { %>
-              <button class="btn main-btn add-to-cart-btn" 
-                data-id="<%= product._id %>"
-                data-name="<%= product.name %>"
-                data-sizes='<%= JSON.stringify(product.sizes || []) %>'
-                data-colors='<%= JSON.stringify(product.colors || []) %>'
-                data-price="<%= product.salePrice || product.price %>">
-                Add To Cart
-              </button>
-              <a href="/product/<%= product._id %>" class="btn view-btn">View</a>
-            <% } %>
+            <button class="btn main-btn add-to-cart-btn"
+              data-id="<%= product._id %>"
+              data-name="<%= product.name %>"
+              data-sizes='<%= JSON.stringify(product.sizes || []) %>'
+              data-colors='<%= JSON.stringify(product.colors || []) %>'>
+              Add To Cart
+            </button>
+
+            <a class="btn view-btn" href="/product/<%= product._id %>">View</a>
           </div>
+
         </div>
       <% }) %>
     </div>
   </div>
 <% }) %>
 
-<!-- Modal -->
-<div id="optionsModal" class="modal" style="display:none;">
+<!-- MODAL -->
+<div id="optionsModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
+
     <h3 id="modalProductName"></h3>
+
     <div id="sizeContainer"></div>
     <div id="colorContainer"></div>
-    <button id="confirmAdd" class="btn main-btn">Add To Cart</button>
+
+    <!-- ✅ QTY -->
+    <div style="margin-top:10px;">
+      <label>Qty:</label>
+      <input type="number" id="modalQty" min="1" value="1" style="width:80px;">
+    </div>
+
+    <button id="confirmAdd" class="btn main-btn" style="margin-top:10px;">
+      Add To Cart
+    </button>
   </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // Hero Slider
-  const slides = document.querySelectorAll(".slide");
-  let index = 0;
-  if (slides.length > 0) {
-    setInterval(() => {
-      slides[index].classList.remove("active");
-      index = (index + 1) % slides.length;
-      slides[index].classList.add("active");
-    }, 4000);
-  }
 
-  // Cart Modal
+  /* slider */
+  let index = 0;
+  const slides = document.querySelectorAll(".slide");
+  setInterval(() => {
+    slides[index].classList.remove("active");
+    index = (index + 1) % slides.length;
+    slides[index].classList.add("active");
+  }, 4000);
+
+  /* modal */
   const modal = document.getElementById("optionsModal");
   const modalName = document.getElementById("modalProductName");
   const sizeContainer = document.getElementById("sizeContainer");
   const colorContainer = document.getElementById("colorContainer");
   const confirmBtn = document.getElementById("confirmAdd");
+
   let currentProductId = null;
 
   function updateCartBadge(totalQuantity) {
-    document.querySelectorAll("#cart-count").forEach(el => {
-      el.textContent = totalQuantity || 0;
-    });
+    document.querySelectorAll("#cart-count")
+      .forEach(el => el.textContent = totalQuantity || 0);
   }
 
   document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const sizes = JSON.parse(btn.dataset.sizes);
-      const colors = JSON.parse(btn.dataset.colors);
+    btn.addEventListener("click", () => {
 
-      if (sizes.length || colors.length) {
-        currentProductId = btn.dataset.id;
-        modalName.textContent = btn.dataset.name;
+      const sizes = JSON.parse(btn.dataset.sizes || "[]");
+      const colors = JSON.parse(btn.dataset.colors || "[]");
 
-        sizeContainer.innerHTML = sizes.length
-          ? `<label>Size:</label><select id="modalSize">${sizes.map(s => `<option value="${s}">${s}</option>`).join('')}</select>`
-          : "";
-        colorContainer.innerHTML = colors.length
-          ? `<label>Color:</label><select id="modalColor">${colors.map(c => `<option value="${c}">${c}</option>`).join('')}</select>`
-          : "";
+      currentProductId = btn.dataset.id;
+      modalName.textContent = btn.dataset.name;
 
-        modal.style.display = "flex";
-      } else {
-        try {
-          const res = await fetch("/cart/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId: btn.dataset.id })
-          });
-          const data = await res.json();
-          if(data.success){
-            updateCartBadge(data.totalQuantity);
-            btn.textContent = "Added!";
-            setTimeout(() => btn.textContent = "Add To Cart", 2000);
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      sizeContainer.innerHTML = sizes.length
+        ? `<select id="modalSize">
+            ${sizes.map(s => `<option value="${s}">${s}</option>`).join("")}
+           </select>` : "";
+
+      colorContainer.innerHTML = colors.length
+        ? `<select id="modalColor">
+            ${colors.map(c => `<option value="${c}">${c}</option>`).join("")}
+           </select>` : "";
+
+      document.getElementById("modalQty").value = 1;
+
+      modal.style.display = "flex";
     });
   });
 
-  document.querySelector(".close").addEventListener("click", () => { modal.style.display = "none"; });
-  window.addEventListener("click", (e) => { if(e.target===modal) modal.style.display = "none"; });
+  document.querySelector(".close").onclick = () => modal.style.display = "none";
+  window.onclick = (e) => { if(e.target === modal) modal.style.display = "none"; };
 
   confirmBtn.addEventListener("click", async () => {
+
     const size = document.getElementById("modalSize")?.value || null;
     const color = document.getElementById("modalColor")?.value || null;
+    const qty = parseInt(document.getElementById("modalQty").value) || 1;
 
-    try {
-      const res = await fetch("/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: currentProductId, size, color })
-      });
-      const data = await res.json();
-      if(data.success){
-        updateCartBadge(data.totalQuantity);
-        modal.style.display = "none";
-      }
-    } catch (err) { console.error(err); }
+    const res = await fetch("/cart/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: currentProductId,
+        size,
+        color,
+        qty
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+      updateCartBadge(data.totalQuantity);
+      modal.style.display = "none";
+    }
   });
+
 });
 </script>
 
