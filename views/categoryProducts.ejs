@@ -1,318 +1,47 @@
-<form id="checkoutForm" onsubmit="event.preventDefault(); submitOrder();">
+<%- include("partials/header") %>
 
-  <div class="checkout">
+<h1 class="page-title"><%= category %></h1>
 
-    <!-- LEFT -->
-    <div class="checkout-left">
+    <div class="products-grid">
+      <% products.forEach(product => { %>
+<div class="product-card">
 
-      <h2>Contact</h2>
-      <input name="name" placeholder="Full Name" required>
-      <input name="email" placeholder="Email" type="email" required>
-      <input name="phone" placeholder="Phone" required>
+  <% if(product.salePrice < product.price && product.finalPrice){ %>
+    <div class="sale-badge">SALE</div>
+  <% } %>
 
-      <h2>Shipping</h2>
-      <input name="address" placeholder="Address" required>
-      <select name="city" id="citySelect" required>
-        <option value="">Select Governorate</option>
-        <% [
-  "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
-  "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
-  "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
-  "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
-  "Luxor","Qena","North Sinai","Sohag"
-].forEach(g => { %>
-          <option value="<%= g %>"><%= g %></option>
-        <% }) %>
-      </select>
+<img src="<%= product.images[0] %>" alt="<%= product.name %>">
 
-      <button type="submit" class="checkout-btn">Confirm Order</button>
+  <h3><%= product.name %></h3>
+
+  <p class="price">
+
+    <% if(product.salePrice < product.price && product.finalPrice){ %>
+
+      <span class="old-price">
+        <%= product.price %> EGP
+      </span>
+
+      <span class="sale-price">
+        <%= product.salePrice %> EGP
+      </span>
+
+    <% } else { %>
+
+      <span>
+        <%= product.price %> EGP
+      </span>
+
+    <% } %>
+
+  </p>
+<button onclick="addToCart('<%= product._id %>')" class="btn">
+Add To Cart
+</button>
+  <a href="/product/<%= product._id %>" class="btn">View</a>
+
+</div>
+      <% }) %>
     </div>
 
-    <!-- RIGHT -->
-    <div class="checkout-right">
-
-<% cartItems.forEach(item => { %>
-
-  <div class="order-item">
-    <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>" alt="Product">
-
-    <div>
-      <h4><%= item.name %></h4>
-
-      <% if(item.selectedSize) { %>
-        <p>Size: <%= item.selectedSize %></p>
-      <% } %>
-
-      <% if(item.selectedColor) { %>
-        <p>Color: <%= item.selectedColor %></p>
-      <% } %>
-
-      <p>Price: <%= item.selectedPrice %> EGP</p>
-      <p>Quantity: <%= item.quantity %></p>
-
-      <!-- hidden inputs -->
-      <input type="hidden" name="productId[]" value="<%= item._id %>">
-      <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
-      <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
-      <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
-<input type="hidden" name="color[]" value="<%= item.selectedColor %>">
-    </div>
-  </div>
-
-<% }) %>
-
-      <div class="price-box">
-        <div class="price-row">
-          <span>Subtotal</span>
-          <span id="subtotal"><%= subtotal %> EGP</span>
-        </div>
-
-        <div class="coupon-section">
-          <input type="text" id="couponCode" placeholder="Enter coupon code">
-          <button type="button" id="applyCoupon">Apply</button>
-          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
-        </div>
-
-        <div class="price-row">
-          <span>Discount</span>
-          <span id="discount">0 EGP</span>
-        </div>
-
-        <div class="price-row">
-          <span>Shipping</span>
-          <span id="shipping"><%= shipping %> EGP</span>
-          
-          <span id="message"><%= message %></span>
-        </div>
-
-        <div class="price-row total-row">
-          <span>Total</span>
-          <span id="total"><%= subtotal + shipping %> EGP</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</form>
-
-<script>
-async function updatePrices() {
-  const couponCode = document.getElementById("couponCode").value;
-  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
-  const governorate = document.getElementById("citySelect").value;
-  if(!governorate) return;
-
-  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-  const data = await res.json();
-
-  if(data.success) {
-    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage").textContent = data.message;
-  }
-}
-
-document.getElementById("citySelect").addEventListener('change', updatePrices);
-document.getElementById("applyCoupon").addEventListener('click', updatePrices);
-
-async function submitOrder() {
-  try {
-    const form = document.getElementById("checkoutForm");
-    const formData = new FormData(form);
-
-    // ✅ هات كل المنتجات
-    const productIds = formData.getAll("productId[]");
-    const quantities = formData.getAll("quantity[]");
-    const prices = formData.getAll("price[]");
-    const sizes = formData.getAll("size[]");
-    const colors = formData.getAll("color[]");
-
-    const products = productIds.map((id, i) => ({
-      product: id,
-      quantity: parseInt(quantities[i]),
-      price: parseFloat(prices[i]),
-      size: sizes[i] || null,
-      color: colors[i] || null
-    }));
-
-    // ✅ بيانات العميل
-    const data = Object.fromEntries(formData.entries());
-
-    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-    const total = parseFloat(document.getElementById("total").textContent) || 0;
-
-    const res = await fetch("/checkout/place-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
-      })
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      alert("Order placed ✅");
-      window.location.href = "/";
-    } else {
-      alert("Error ❌: " + (result.error || "Unknown error"));
-    }
-
-  } catch (err) {
-    console.error("Submit Error:", err);
-    alert("Something went wrong ❌");
-  }
-}
-</script>
-<style>
-/* ===== Checkout Page Layout ===== */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f7f8fc;
-  margin: 0;
-  padding: 0;
-}
-
-.checkout {
-  display: flex;
-  max-width: 1100px;
-  margin: 40px auto;
-  gap: 30px;
-}
-
-/* ===== Left Section ===== */
-.checkout-left {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.checkout-left h2 {
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
-}
-
-.checkout-left input {
-  width: 100%;
-  padding: 12px 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  outline: none;
-  transition: 0.2s;
-}
-
-.checkout-left input:focus {
-  border-color: #1e90ff;
-  box-shadow: 0 0 5px rgba(30,144,255,0.2);
-}
-
-.checkout-left .checkout-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #1e90ff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.checkout-left .checkout-btn:hover {
-  background-color: #0d6efd;
-}
-
-/* ===== Right Section ===== */
-.checkout-right {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.order-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.order-item img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-right: 15px;
-  border: 1px solid #eee;
-}
-
-.order-item h4 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.order-item p {
-  margin: 3px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.price-box {
-  border-top: 1px solid #eee;
-  padding-top: 15px;
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #333;
-}
-
-.total-row {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1e90ff;
-}
-#message {
-  font-weight: 700;
-  color: green;
-  margin-left: 10px;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 900px) {
-  .checkout {
-    flex-direction: column;
-  }
-  
-  .checkout-left, .checkout-right {
-    width: 100%;
-  }
-
-  .order-item img {
-    width: 60px;
-    height: 60px;
-  }
-}
-</style>
+<%- include("partials/footer") %>
