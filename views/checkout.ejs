@@ -124,7 +124,36 @@
   100% { transform: rotate(360deg); }
 }
 </style>
+
+<div id="popupAlert" style="
+  display:none;
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#000;
+  color:#fff;
+  padding:12px 20px;
+  border-radius:10px;
+  z-index:99999;
+  font-size:14px;
+">
+</div>
 <script>
+  function popupAlert(message, type = "success") {
+  const el = document.getElementById("popupAlert");
+
+  el.textContent = message;
+  el.style.display = "block";
+
+  el.style.background =
+    type === "error" ? "#e74c3c" :
+    type === "success" ? "#2ecc71" : "#000";
+
+  setTimeout(() => {
+    el.style.display = "none";
+  }, 2500);
+}
   function showLoading() {
   document.getElementById("loadingOverlay").style.display = "flex";
 }
@@ -200,15 +229,15 @@ async function submitOrder() {
     const result = await res.json();
 
     if (res.ok) {
-      popupAlert("Order submitted successfully! ");
+      popupAlert("Order placed successfully", "success");
       window.location.href = "/";
     } else {
-      alert("Error : " + (result.error || "Unknown error"));
+      popupAlert("Error : " + (result.error || "Unknown error"), "error");
     }
 
   } catch (err) {
     console.error("Submit Error:", err);
-    alert("Something went wrong ");
+    popupAlert("Something went wrong", "error");
   } finally {
     hideLoading();
   }
