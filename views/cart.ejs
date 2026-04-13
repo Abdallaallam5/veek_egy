@@ -2,146 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Cart</title>
   <style>
- body { 
-  font-family: Arial; 
-  margin:0; 
-  padding:0; 
-  background:#f4f4f4; 
-}
+    body { font-family: Arial; margin:0; padding:0; background:#f4f4f4; }
+    header { background:#000; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { margin:0; font-size:22px; }
+    #cart-count { background:red; color:white; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; }
 
-/* HEADER */
-header { 
-  background:#000; 
-  color:#fff; 
-  padding:12px 15px; 
-  display:flex; 
-  justify-content:space-between; 
-  align-items:center; 
-}
+    .cart-container { display:flex; flex-direction:column; gap:20px; max-width:800px; margin:20px auto; }
+    .cart-item { display:flex; gap:20px; align-items:center; border:1px solid #ccc; padding:10px; border-radius:10px; background:#fff; position:relative; }
+    .cart-item img { width:100px; height:100px; object-fit:cover; border-radius:10px; }
+    .cart-details h4 { margin:0; font-size:18px; }
+    .cart-details p { margin:5px 0; }
 
-header h1 { 
-  margin:0; 
-  font-size:20px; 
-}
+    .remove-btn { position:absolute; top:10px; right:10px; background:#dc3545; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; }
+    .remove-btn:hover { background:#c82333; }
 
-#cart-count { 
-  background:red; 
-  color:white; 
-  width:20px; 
-  height:20px; 
-  border-radius:50%; 
-  display:flex; 
-  align-items:center; 
-  justify-content:center; 
-  font-weight:bold; 
-}
-
-/* CONTAINER */
-.cart-container { 
-  display:flex; 
-  flex-direction:column; 
-  gap:15px; 
-  max-width:800px; 
-  margin:20px auto; 
-  padding:0 10px;
-}
-
-/* CART CARD (DESKTOP) */
-.cart-item { 
-  display:flex; 
-  gap:15px; 
-  align-items:center; 
-  background:#fff; 
-  border-radius:12px; 
-  padding:12px; 
-  position:relative; 
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
-
-.cart-item img { 
-  width:100px; 
-  height:100px; 
-  object-fit:cover; 
-  border-radius:10px; 
-}
-
-.cart-details h4 { 
-  margin:0; 
-  font-size:17px; 
-}
-
-.cart-details p { 
-  margin:4px 0; 
-  font-size:14px;
-}
-
-/* REMOVE BUTTON */
-.remove-btn { 
-  position:absolute; 
-  top:10px; 
-  right:10px; 
-  background:#dc3545; 
-  color:#fff; 
-  border:none; 
-  padding:6px 10px; 
-  border-radius:6px; 
-  cursor:pointer; 
-  font-size:12px;
-}
-
-/* CHECKOUT */
-.checkout-btn { 
-  align-self:flex-end; 
-  padding:10px 18px; 
-  background:#007bff; 
-  color:#fff; 
-  text-decoration:none; 
-  border-radius:8px; 
-}
-
-/* ===================== */
-/* MOBILE FIX (IMPORTANT) */
-/* ===================== */
-@media (max-width: 600px) {
+    .checkout-btn { align-self:flex-end; padding:10px 20px; background:#007bff; color:#fff; text-decoration:none; border-radius:5px; }
+    .checkout-btn:hover { background:#0056b3; }
+    @media (max-width: 768px) {
 
   .cart-container {
-    padding:0 10px;
+    padding: 10px;
   }
 
   .cart-item {
-    flex-direction:column;
-    align-items:flex-start;
-    padding:12px;
+    display: flex;
+    flex-direction: row; /* نخليه صف بس منظم */
+    gap: 10px;
+    padding: 10px;
+    align-items: flex-start;
   }
 
   .cart-item img {
-    width:100%;
-    height:180px;
-    border-radius:12px;
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    border-radius: 8px;
   }
 
-  .remove-btn {
-    position:static;
-    margin-top:10px;
-    width:100%;
-  }
-
-  .checkout-btn {
-    width:100%;
-    text-align:center;
+  .cart-details {
+    flex: 1;
   }
 
   .cart-details h4 {
-    font-size:16px;
-    margin-top:10px;
+    font-size: 15px;
+    margin-bottom: 5px;
   }
 
   .cart-details p {
-    font-size:13px;
+    font-size: 13px;
+    margin: 2px 0;
   }
-}  </style>
+
+  .remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .checkout-btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+  </style>
 </head>
 <body>
 
