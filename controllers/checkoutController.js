@@ -64,7 +64,7 @@ exports.getCheckout = async (req, res) => {
     let message = '';
 
     if (subtotal < 1499) {
-      shipping = 0;
+      shipping = 50;
     } else {
       message = "🎉 Free shipping applied!";
     }
@@ -97,28 +97,35 @@ exports.placeOrder = async (req, res) => {
       discount,
       total
     } = req.body;
-    function isGmail(email) {
-  return email.endsWith("@gmail.com");
-}
-if (!isGmail(customerEmail)) {
-  return res.status(400).json({ error: "Email must be Gmail" });
-}
+
+    const isGmail = (email) => email?.endsWith("@gmail.com");
+
+    if (!isGmail(customerEmail)) {
+      return res.status(400).json({ error: "Email must be Gmail" });
+    }
+
     if (!products || products.length === 0) {
       return res.status(400).json({ error: "No products in order" });
     }
 
-    // تحقق من المخزون
+    // ====== CHECK STOCK FIRST ======
     for (let item of products) {
       if (!mongoose.Types.ObjectId.isValid(item.product)) continue;
 
       const product = await Product.findById(item.product);
-      if (!product) return res.status(404).json({ error: "Product not found" });
 
-      if (parseInt(item.quantity) > product.stock) {
-        return res.status(400).json({ error: `Not enough stock for ${product.name}` });
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      if (product.stock < item.quantity) {
+        return res.status(400).json({
+          error: `Not enough stock for ${product.name}`
+        });
       }
     }
 
+    // ====== CREATE ORDER ======
     const order = new Order({
       products,
       governorate,
@@ -135,40 +142,46 @@ if (!isGmail(customerEmail)) {
 
     await order.save();
 
-    // نقص المخزون
+    // ====== DECREASE STOCK SAFELY ======
     for (let item of products) {
       if (!mongoose.Types.ObjectId.isValid(item.product)) continue;
 
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -parseInt(item.quantity) }
-      });
+      await Product.updateOne(
+        {
+          _id: item.product,
+          stock: { $gte: item.quantity } // حماية إضافية
+        },
+        {
+          $inc: { stock: -item.quantity }
+        }
+      );
     }
 
-    // زيادة استخدام الكوبون
+    // ====== COUPON USAGE ======
     if (couponCode) {
       const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+
       if (coupon) {
-        await Coupon.findByIdAndUpdate(coupon._id, {
-          $inc: { usedCount: 1 }
-        });
+        await Coupon.updateOne(
+          { _id: coupon._id },
+          { $inc: { usedCount: 1 } }
+        );
       }
     }
-const { sendOrderEmail } = require("../utils/mailer");
 
-if (!isGmail(customerEmail)) {
-  return res.status(400).json({ error: "Email must be Gmail" });
-}
+    // ====== EMAIL ======
+    const { sendOrderEmail } = require("../utils/mailer");
 
-// بعد حفظ الأوردر
-await sendOrderEmail(customerEmail, customerName);
-    // تفريغ الكارت
+    await sendOrderEmail(customerEmail, customerName);
+
+    // ====== CLEAR CART ======
     req.session.cart = [];
 
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
