@@ -93,8 +93,45 @@
     </div>
   </div>
 </form>
+<div id="loadingOverlay" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:18px;
+  flex-direction:column;
+">
+  <div style="
+    width:40px;
+    height:40px;
+    border:4px solid #fff;
+    border-top:4px solid transparent;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    margin-bottom:10px;
+  "></div>
 
+  Processing Order...
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 <script>
+  function showLoading() {
+  document.getElementById("loadingOverlay").style.display = "flex";
+}
+
+function hideLoading() {
+  document.getElementById("loadingOverlay").style.display = "none";
+}
 async function updatePrices() {
   const couponCode = document.getElementById("couponCode").value;
   const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
@@ -117,10 +154,11 @@ document.getElementById("applyCoupon").addEventListener('click', updatePrices);
 
 async function submitOrder() {
   try {
+    showLoading();
+
     const form = document.getElementById("checkoutForm");
     const formData = new FormData(form);
 
-    // ✅ هات كل المنتجات
     const productIds = formData.getAll("productId[]");
     const quantities = formData.getAll("quantity[]");
     const prices = formData.getAll("price[]");
@@ -135,7 +173,6 @@ async function submitOrder() {
       color: colors[i] || null
     }));
 
-    // ✅ بيانات العميل
     const data = Object.fromEntries(formData.entries());
 
     const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
@@ -163,18 +200,19 @@ async function submitOrder() {
     const result = await res.json();
 
     if (res.ok) {
-      alert("Order placed ✅");
+      popupAlert("Order submitted successfully! ");
       window.location.href = "/";
     } else {
-      alert("Error ❌: " + (result.error || "Unknown error"));
+      alert("Error : " + (result.error || "Unknown error"));
     }
 
   } catch (err) {
     console.error("Submit Error:", err);
-    alert("Something went wrong ❌");
+    alert("Something went wrong ");
+  } finally {
+    hideLoading();
   }
-}
-</script>
+}</script>
 <style>
 /* ===== Checkout Page Layout ===== */
 body {
