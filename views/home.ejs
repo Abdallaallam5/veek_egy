@@ -1,384 +1,332 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout</title>
 
 <style>
-/* ===== HERO ===== */
-.hero-slider {
-  position: relative;
-  height: 400px;
-  overflow: hidden;
-  margin-top: 90px;
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f8fc;
+  margin: 0;
+  padding: 0;
 }
 
-.slide {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: .6s;
-}
-
-.slide.active { opacity: 1; }
-
-.slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ===== CATEGORY ===== */
-.category-title {
-  font-size: 28px;
-  font-weight: 900;
-  margin: 40px 15px 20px;
-  padding-left: 20px;
-  position: relative;
-}
-
-.category-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  width: 8px;
-  height: 100%;
-  background: #000;
-  border-radius: 4px;
-}
-
-/* ===== GRID ===== */
-.products-grid {
-  display: grid;
-  gap: 20px;
-  margin: 40px 15px;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
-
-/* ===== CARD ===== */
-.product-card {
-  background: #fff;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  cursor: pointer;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-}
-
-.product-card img {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-}
-
-/* ===== PRICE ===== */
-.product-card .price {
-  margin: 0 15px 10px;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.old-price {
-  text-decoration: line-through;
-  color: #999;
-}
-
-.sale-price {
-  color: #e74c3c;
-}
-
-/* ===== BUTTONS ===== */
-.product-actions {
-  margin: 10px 15px 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.btn {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.main-btn {
-  background: #000;
-  color: #fff;
-}
-
-.view-btn {
-  background: #f5f5f5;
-  color: #333;
-}
-
-/* BADGES */
-.sale-badge,
-.out-of-stock {
-  position: absolute;
-  top: 10px;
-  padding: 6px 10px;
-  font-size: 11px;
-  border-radius: 20px;
-  color: #fff;
-}
-
-.sale-badge { left: 10px; background: #e74c3c; }
-.out-of-stock { right: 10px; background: #7f8c8d; }
-
-/* ===== MODAL ===== */
-.modal {
+/* ===== LOADING ===== */
+.loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
   display: none;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.modal-content {
+.loader {
   background: #fff;
-  padding: 20px;
+  padding: 25px;
   border-radius: 12px;
-  width: 320px;
-  position: relative;
+  text-align: center;
 }
 
-.close {
-  position: absolute;
-  right: 10px;
-  top: 10px;
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== CHECKOUT ===== */
+.checkout {
+  display: flex;
+  max-width: 1100px;
+  margin: 40px auto;
+  gap: 30px;
+}
+
+.checkout-left,
+.checkout-right {
+  flex: 1;
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.checkout-left h2 {
+  margin: 10px 0;
+}
+
+.checkout-left input,
+.checkout-left select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+/* BUTTON */
+.checkout-btn {
+  width: 100%;
+  padding: 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
 }
+
+/* ITEMS */
+.order-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.order-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.price-box {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.total-row {
+  font-weight: bold;
+  color: #000;
+}
+
+/* COUPON */
+.coupon {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.coupon input {
+  flex: 1;
+  padding: 10px;
+}
+
+.coupon button {
+  padding: 10px 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+/* MOBILE */
+@media (max-width:900px){
+  .checkout { flex-direction: column; margin: 10px; }
+}
 </style>
+</head>
 
-<div class="hero-slider">
-  <div class="slide active"><img src="/images/photo_2026-01-23_00-05-32.jpg"></div>
-  <div class="slide"><img src="/images/photo_2026-01-23_00-05-32 (2).jpg"></div>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="loader">
+    <div class="spinner"></div>
+    <p>Processing...</p>
+  </div>
 </div>
 
-<% productsByCategory.forEach(section => { %>
-  <div class="category-section">
-    <p class="category-title"><%= section.category.name %></p>
+<form id="checkoutForm" onsubmit="event.preventDefault(); submitOrder();">
 
-    <div class="products-grid">
+<div class="checkout">
 
-      <% section.products.forEach(product => { %>
+  <!-- LEFT -->
+  <div class="checkout-left">
+    <h2>Contact</h2>
 
-        <!-- الكارد كله clickable -->
-        <div class="product-card" data-href="/product/<%= product._id %>">
+    <input name="name" placeholder="Full Name" required>
+    <input name="email" placeholder="Email" required>
+    <input name="phone" placeholder="Phone" required>
 
-          <% if(product.stock === 0) { %>
-            <div class="out-of-stock">OUT</div>
-          <% } %>
+    <h2>Shipping</h2>
+    <input name="address" placeholder="Address" required>
 
-          <% if(product.salePrice && product.salePrice < product.price) { %>
-            <div class="sale-badge">SALE</div>
-          <% } %>
-
-          <img src="<%= product.images?.[0] || '/images/default.png' %>">
-
-          <h3 style="margin:10px 15px;"><%= product.name %></h3>
-
-          <p class="price">
-            <% if(product.salePrice && product.salePrice < product.price) { %>
-              <span class="old-price"><%= product.price %> EGP</span>
-              <span class="sale-price"><%= product.salePrice %> EGP</span>
-            <% } else { %>
-              <span><%= product.price %> EGP</span>
-            <% } %>
-          </p>
-
-          <div class="product-actions">
-
-            <button class="btn main-btn add-to-cart-btn"
-              data-id="<%= product._id %>"
-              data-name="<%= product.name %>"
-              data-sizes='<%= JSON.stringify(product.sizes || []) %>'
-              data-colors='<%= JSON.stringify(product.colors || []) %>'
-              onclick="event.stopPropagation()">
-              Add To Cart
-            </button>
-
-            <a class="btn view-btn"
-               href="/product/<%= product._id %>"
-               onclick="event.stopPropagation()">
-              View
-            </a>
-
-          </div>
-        </div>
-
+    <select name="city" id="citySelect" required>
+      <option value="">Select Governorate</option>
+      <% [
+        "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
+        "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
+        "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
+        "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
+        "Luxor","Qena","North Sinai","Sohag"
+      ].forEach(g => { %>
+        <option value="<%= g %>"><%= g %></option>
       <% }) %>
+    </select>
+
+    <button class="checkout-btn">Confirm Order</button>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="checkout-right">
+
+    <% cartItems.forEach(item => { %>
+      <div class="order-item">
+        <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>">
+
+        <div>
+          <h4><%= item.name %></h4>
+          <p><%= item.selectedPrice %> EGP</p>
+          <p>Qty: <%= item.quantity %></p>
+
+          <input type="hidden" name="productId[]" value="<%= item._id %>">
+          <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
+          <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
+        </div>
+      </div>
+    <% }) %>
+
+    <div class="price-box">
+
+      <div class="price-row">
+        <span>Subtotal</span>
+        <span id="subtotal"><%= subtotal %> EGP</span>
+      </div>
+
+      <div class="coupon">
+        <input id="couponCode" placeholder="Coupon">
+        <button type="button" id="applyCoupon">Apply</button>
+      </div>
+
+      <p id="couponMessage"></p>
+
+      <div class="price-row">
+        <span>Discount</span>
+        <span id="discount">0 EGP</span>
+      </div>
+
+      <div class="price-row">
+        <span>Shipping</span>
+        <span id="shipping"><%= shipping %> EGP</span>
+      </div>
+
+      <div class="price-row total-row">
+        <span>Total</span>
+        <span id="total"><%= subtotal + shipping %> EGP</span>
+      </div>
 
     </div>
   </div>
-<% }) %>
 
-<!-- MODAL -->
-<div id="optionsModal" class="modal">
-  <div class="modal-content">
-
-    <span class="close">&times;</span>
-
-    <h3 id="modalProductName"></h3>
-
-    <div id="sizeContainer"></div>
-    <div id="colorContainer"></div>
-
-    <!-- ✅ QTY -->
-    <div style="margin-top:10px;">
-      <label>Qty:</label>
-      <input type="number" id="modalQty" value="1" min="1" style="width:80px;">
-    </div>
-
-    <button id="confirmAdd" class="btn main-btn" style="margin-top:10px;">
-      Add To Cart
-    </button>
-
-  </div>
 </div>
+</form>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= HERO SLIDER ================= */
-  const slides = document.querySelectorAll(".slide");
-  let index = 0;
+/* ===== LOADING HELPERS ===== */
+function showLoading() {
+  document.getElementById("loading").style.display = "flex";
+}
+function hideLoading() {
+  document.getElementById("loading").style.display = "none";
+}
 
-  if (slides.length) {
-    setInterval(() => {
-      slides[index].classList.remove("active");
-      index = (index + 1) % slides.length;
-      slides[index].classList.add("active");
-    }, 4000);
-  }
+/* ===== UPDATE PRICES ===== */
+async function updatePrices() {
+  const couponCode = document.getElementById("couponCode").value;
+  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
+  const governorate = document.getElementById("citySelect").value;
 
-  /* ================= PRODUCT CARD CLICK ================= */
-  document.querySelectorAll(".product-card").forEach(card => {
-    card.addEventListener("click", (e) => {
+  if (!governorate) return;
 
-      // لو ضغط على زرار أو لينك ماينقلش
-      if (e.target.closest(".add-to-cart-btn") || e.target.closest(".btn")) return;
+  try {
+    showLoading();
 
-      const link = card.querySelector("a");
-      if (link) window.location.href = link.href;
-    });
-  });
+    const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
+    const data = await res.json();
 
-  /* ================= MODAL ================= */
-  const modal = document.getElementById("optionsModal");
-  const modalName = document.getElementById("modalProductName");
-  const sizeContainer = document.getElementById("sizeContainer");
-  const colorContainer = document.getElementById("colorContainer");
-  const confirmBtn = document.getElementById("confirmAdd");
-
-  let currentProductId = null;
-
-  /* ================= CART BADGE (FIX LIVE) ================= */
-  function updateCartBadge(qty) {
-    document.querySelectorAll("#cart-count").forEach(el => {
-      el.textContent = qty;
-    });
-  }
-
-  /* ================= ADD TO CART ================= */
-  document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      e.stopPropagation(); // مهم جداً
-
-      const sizes = JSON.parse(btn.dataset.sizes || "[]");
-      const colors = JSON.parse(btn.dataset.colors || "[]");
-
-      currentProductId = btn.dataset.id;
-
-      /* لو مفيش اختيار → أضف مباشرة */
-      if (sizes.length === 0 && colors.length === 0) {
-        try {
-          const res = await fetch("/cart/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId: currentProductId })
-          });
-
-          const data = await res.json();
-
-          if (data.success) {
-            updateCartBadge(data.totalQuantity);
-
-            btn.innerText = "Added ✓";
-            setTimeout(() => btn.innerText = "Add To Cart", 1200);
-          }
-        } catch (err) {
-          console.error(err);
-        }
-        return;
-      }
-
-      /* افتح المودال */
-      modalName.textContent = btn.dataset.name;
-
-      sizeContainer.innerHTML = sizes.length
-        ? `<label>Size</label>
-           <select id="modalSize">
-             ${sizes.map(s => `<option value="${s}">${s}</option>`).join("")}
-           </select>`
-        : "";
-
-      colorContainer.innerHTML = colors.length
-        ? `<label>Color</label>
-           <select id="modalColor">
-             ${colors.map(c => `<option value="${c}">${c}</option>`).join("")}
-           </select>`
-        : "";
-
-      modal.style.display = "flex";
-    });
-  });
-
-  /* ================= CLOSE MODAL ================= */
-  document.querySelector(".close").onclick = () => modal.style.display = "none";
-  window.onclick = (e) => {
-    if (e.target === modal) modal.style.display = "none";
-  };
-
-  /* ================= CONFIRM ADD ================= */
-  confirmBtn.addEventListener("click", async () => {
-
-    const size = document.getElementById("modalSize")?.value || null;
-    const color = document.getElementById("modalColor")?.value || null;
-
-    try {
-      const res = await fetch("/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: currentProductId,
-          size,
-          color,
-          qty: parseInt(document.getElementById("modalQty").value) || 1
-        })
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        updateCartBadge(data.totalQuantity);
-        modal.style.display = "none";
-      }
-
-    } catch (err) {
-      console.error(err);
+    if (data.success) {
+      document.getElementById("discount").textContent = data.discount + " EGP";
+      document.getElementById("shipping").textContent = data.shipping + " EGP";
+      document.getElementById("total").textContent = data.total + " EGP";
+      document.getElementById("couponMessage").textContent = data.message;
     }
-  });
 
-});
+  } finally {
+    hideLoading();
+  }
+}
+
+document.getElementById("citySelect").addEventListener("change", updatePrices);
+document.getElementById("applyCoupon").addEventListener("click", updatePrices);
+
+/* ===== SUBMIT ORDER ===== */
+async function submitOrder() {
+  try {
+    showLoading();
+
+    const form = document.getElementById("checkoutForm");
+    const formData = new FormData(form);
+
+    const productIds = formData.getAll("productId[]");
+    const quantities = formData.getAll("quantity[]");
+    const prices = formData.getAll("price[]");
+
+    const products = productIds.map((id, i) => ({
+      product: id,
+      quantity: parseInt(quantities[i]),
+      price: parseFloat(prices[i])
+    }));
+
+    const data = Object.fromEntries(formData.entries());
+
+    const res = await fetch("/checkout/place-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        products,
+        customerName: data.name,
+        customerEmail: data.email,
+        customerAddress: data.address,
+        governorate: data.city,
+        shipping: parseFloat(document.getElementById("shipping").textContent),
+        discount: parseFloat(document.getElementById("discount").textContent),
+        total: parseFloat(document.getElementById("total").textContent),
+        couponCode: document.getElementById("couponCode").value || null
+      })
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      window.location.href = "/";
+    } else {
+      alert(result.error || "Error");
+    }
+
+  } finally {
+    hideLoading();
+  }
+}
+
 </script>
 
-<%- include("partials/footer") %>
+</body>
+</html>
