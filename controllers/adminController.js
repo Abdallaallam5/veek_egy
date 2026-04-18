@@ -247,21 +247,25 @@ exports.postEditCategory = async (req, res) => {
 
 // ================= DELETE CATEGORY (FIXED) =================
 
+// ================= DELETE CATEGORY (FIXED COMPLETELY) =================
 exports.deleteCategory = async (req, res) => {
   try {
     const id = req.params.id;
 
     const category = await Category.findById(id);
-    if (!category) return res.status(404).send("Category not found");
+    if (!category) return res.status(404).json({ success: false, message: "Category not found" });
 
-    // 🔥 FIX: correct field is categories (array of ObjectIds)
-    await Product.deleteMany({ categories: category._id });
+    // 🔥 DELETE FROM PRODUCTS (FIXED)
+    await Product.updateMany(
+      { categories: category._id },
+      { $pull: { categories: category._id } }
+    );
 
     await Category.findByIdAndDelete(id);
 
-    res.redirect("/admin/categories");
+    res.json({ success: true, message: "Category deleted successfully" });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
