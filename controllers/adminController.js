@@ -1,196 +1,267 @@
-const router = require("express").Router();
-const mongoose = require("mongoose");
-const admin = require("../controllers/adminController");
-const auth = require("../middleware/adminAuth");
-const upload = require("../config/multer");
+const Admin = require("../models/Admin");
 const Product = require("../models/Product");
-const Coupon = require("../models/Coupon");
 const Category = require("../models/Category");
-const Order = require("../models/Order");
-const shippingController = require("../controllers/shippingController");
+const bcrypt = require("bcrypt");
 
-// ===== Admin Auth =====
-router.get("/signup", admin.signuppage);
-router.post("/signup", admin.signup);
-router.get("/login", admin.loginPage);
-router.post("/login", admin.login);
+// ================= AUTH =================
 
-// ===== Dashboard =====
-router.get("/dashboard", auth, admin.dashboard);
+exports.signuppage = (req, res) => {
+  res.render("admin/signup");
+};
 
-// ===== Products =====
-router.get("/products", auth, admin.productsPage);
-router.get("/add-product", auth, admin.add_productsPage);
-router.get("/products/list", auth, admin.getProducts);
+exports.signup = async (req, res) => {
+  const { email, password } = req.body;
 
-router.post(
-  "/products/add",
-  auth,
-  upload.array("images", 10),
-  admin.addProduct
-);
-router.get("/edit/:id", auth, admin.getEditProduct);
-router.post(
-  "/products/edit/:id",
-  auth,
-  upload.array("images"),
-  admin.postEditProduct
-);
-router.delete("/products/delete/:id", auth, admin.deleteProduct);
-
-// ===== Categories =====
-router.get("/categories", auth, admin.getCategories);
-router.post("/categories/add", upload.single("image"), auth, admin.postAddCategory);
-router.post("/categories/edit/:id", upload.single("image"), auth, admin.postEditCategory);
-router.delete("/categories/delete/:id", auth, admin.deleteCategory);
-
-// ===== Coupons =====
-router.get("/coupon", auth, async (req, res) => {
-  try {
-    const coupons = await Coupon.find().sort({ createdAt: -1 });
-    res.render("admin/coupon", { coupons });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  if (!email || !password) {
+    return res.json({ success: false, message: "Email and password are required" });
   }
-});
 
-// POST /admin/create-coupon
-// إنشاء أو تعديل كوبون
-router.post('/create-coupon', auth,async (req, res) => {
-  const { couponId, code, discountType, discountValue, maxUses, expiresAt } = req.body;
+  const existingAdmin = await Admin.findOne({ email });
 
-  try {
-    if(couponId){ 
-      await Coupon.findByIdAndUpdate(couponId, {
-        code,
-        discountType,
-        discountValue,
-        maxUses: maxUses || null,
-        expiresAt: expiresAt || null
-      });
-    } else { 
-      const newCoupon = new Coupon({
-        code,
-        discountType,
-        discountValue,
-        maxUses: maxUses || null,
-        expiresAt: expiresAt || null
-      });
-      await newCoupon.save();
-    }
-
-    res.redirect('/admin/coupon'); // ارجع لنفس الصفحة
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+  if (existingAdmin) {
+    return res.json({ success: false, message: "Admin already exists" });
   }
-});
 
-// حذف كوبون
-router.post('/delete-coupon/:id', auth, async (req, res) => {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await Admin.create({ email, password: hashedPassword });
+
+  res.json({ success: true });
+};
+
+exports.loginPage = (req, res) => {
+  res.render("admin/login");
+};
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.json({ success: false, message: "Email and password are required" });
+  }
+
+  const admin = await Admin.findOne({ email });
+
+  if (!admin) {
+    return res.json({ success: false, message: "Admin not found" });
+  }
+
+  const isMatch = await bcrypt.compare(password, admin.password);
+  if (!isMatch) {
+    return res.json({ success: false, message: "Incorrect password" });
+  }
+
+  req.session.admin = admin._id;
+  res.json({ success: true });
+};
+
+// ================= DASHBOARD =================
+
+exports.dashboard = (req, res) => {
+  res.render("admin/dashboard");
+};
+
+// ================= PRODUCTS =================
+
+exports.productsPage = (req, res) => {
+  res.render("admin/products");
+};
+
+exports.getProducts = async (req, res) => {
+  const products = await Product.find()
+    .sort({ createdAt: -1 })
+    .populate("categories", "name");
+
+  res.json(products);
+};
+
+exports.add_productsPage = async (req, res) => {
   try {
-    await Coupon.findByIdAndDelete(req.params.id);
-    res.redirect('/admin/coupon'); // ارجع لنفس الصفحة
+    const categories = await Category.find().sort({ createdAt: -1 });
+    res.render("admin/add-product", { categories });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server Error');
+    res.render("admin/add-product", { categories: [] });
   }
-});
+};
 
-// ===== Orders =====
+// ================= ADD PRODUCT (CLOUDINARY FIXED) =================
 
-// جلب كل الطلبات
-router.get("/orders", auth, async (req, res) => {
+exports.addProduct = async (req, res) => {
   try {
-    const orders = await Order.find()
-  .populate('products.product')
-  .sort({ createdAt: -1 });
+    let {
+      name,
+      description,
+      price,
+      salePrice,
+      sizes,
+      colors,
+      stock,
+      sku,
+      weight,
+      country,
+    } = req.body;
 
-// تأكد إن كل product موجود
-orders.forEach(order => {
-  order.products = order.products.filter(item => item.product != null);
-});
+    price = Number(price);
 
-res.render('admin/order', { orders });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
-});
+    // 🔥 CLOUDINARY FIX
+    const images = req.files ? req.files.map(file => file.path) : [];
+    const mainImage = images[0] || null;
 
-// جلب طلب واحد بالتفاصيل مع التحقق من ObjectId
-router.get("/orders/:id", auth, async (req, res) => {
-  try {
-    const { id } = req.params;
+    sizes = sizes ? sizes.split(",") : [];
+    colors = colors ? colors.split(",") : [];
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send("Invalid Order ID");
-    }
+    let categories = req.body.category || [];
+    if (!Array.isArray(categories)) categories = [categories];
 
-    const order = await Order.findById(id).populate("products.product");
+    await Product.create({
+      name,
+      description,
+      price,
+      salePrice: salePrice || null,
+      categories,
+      sizes,
+      colors,
+      stock,
+      sku,
+      weight,
+      country,
+      images,
+      mainImage,
+    });
 
-    if (!order) return res.status(404).send("Order not found");
-
-    res.json(order);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
-});
-// تغيير الحالة
-router.put('/orders/:id/status', async (req, res) => {
-  try {
-    const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { returnDocument: 'after' } // بديل new: true
-    );
-    if(!order) return res.status(404).json({ error: 'Order not found' });
-    res.json({ success: true, order });
-  } catch(err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// حذف الأوردر
-router.delete('/orders/:id', async (req, res) => {
-  try {
-    const order = await Order.findByIdAndDelete(req.params.id);
-    if(!order) return res.status(404).json({ error: 'Order not found' });
     res.json({ success: true });
-  } catch(err) {
+  } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.json({ success: false });
   }
-});
+};
 
-// ===== Shipping =====
+// ================= DELETE PRODUCT =================
 
-// قائمة محافظات مصر
-const egyptGovernorates = [
-  "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
-  "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
-  "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
-  "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
-  "Luxor","Qena","North Sinai","Sohag"
-];
+exports.deleteProduct = async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+};
 
-// 1️⃣ API لجلب المحافظات (ممكن تستخدمه في الـ frontend)
-router.get("/governorates", auth, (req, res) => {
-  res.json(egyptGovernorates);
-});
+// ================= SINGLE PRODUCT =================
 
-// 2️⃣ صفحة الإدارة للـ shipping
-router.get("/shipping-page", auth, (req, res) => {
-  res.render("admin/shipping", { governorates: egyptGovernorates });
-});
+exports.getSingleProduct = async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  res.render("admin/view_product", { product });
+};
 
-// 3️⃣ API لجلب أسعار الشحن الحالية
-router.get("/shipping", auth, shippingController.getShipping);
+// ================= EDIT PRODUCT =================
 
-// 4️⃣ API لتحديث أو إضافة سعر شحن
-router.post("/shipping", auth, shippingController.setShipping);
+exports.getEditProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    const categories = await Category.find().sort({ createdAt: -1 });
 
-module.exports = router;
+    if (!product) return res.redirect("/admin/products");
+
+    res.render("admin/edit-product", { product, categories });
+  } catch (err) {
+    console.error(err);
+    res.redirect("/admin/products");
+  }
+};
+
+exports.postEditProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.json({ success: false });
+
+    product.name = req.body.name;
+    product.description = req.body.description;
+    product.price = Number(req.body.price) || 0;
+    product.salePrice = req.body.salePrice || null;
+    product.stock = req.body.stock || 0;
+
+    let categories = req.body["category[]"] || req.body.category || [];
+    if (typeof categories === "string") categories = [categories];
+    product.categories = categories;
+
+    product.sizes = req.body.sizes ? req.body.sizes.split(",") : [];
+    product.colors = req.body.colors ? req.body.colors.split(",") : [];
+
+    // 🔥 CLOUDINARY UPDATE IMAGES
+    if (req.files && req.files.length > 0) {
+      const images = req.files.map(file => file.path);
+      product.images = images;
+      product.mainImage = images[0];
+    }
+
+    await product.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
+};
+
+// ================= CATEGORIES =================
+
+exports.getCategories = async (req, res) => {
+  const categories = await Category.find().sort({ createdAt: -1 });
+  res.render("admin/categories", { categories });
+};
+
+exports.postAddCategory = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+
+    let image = null;
+    if (req.file) image = req.file.path; // 🔥 CLOUDINARY FIX
+
+    const category = new Category({
+      name,
+      description,
+      image,
+    });
+
+    await category.save();
+    res.json({ success: true, category });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
+};
+
+exports.postEditCategory = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.json({ success: false });
+
+    category.name = req.body.name;
+    category.description = req.body.description;
+
+    if (req.file) category.image = req.file.path;
+
+    await category.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false });
+  }
+};
+
+// ================= DELETE CATEGORY (FIXED) =================
+
+exports.deleteCategory = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const category = await Category.findById(id);
+    if (!category) return res.status(404).send("Category not found");
+
+    // 🔥 FIX: correct field is categories (array of ObjectIds)
+    await Product.deleteMany({ categories: category._id });
+
+    await Category.findByIdAndDelete(id);
+
+    res.redirect("/admin/categories");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server Error");
+  }
+};
