@@ -11,11 +11,10 @@
 }
 /* ===== Checkout Page Layout ===== */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: Arial, sans-serif;
+  background-color: #f7f8fc;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
 }
 
 .checkout {
@@ -28,106 +27,84 @@ body {
 /* ===== Left Section ===== */
 .checkout-left {
   flex: 1;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 35px 30px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
+  background-color: #fff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border: 1px solid #e9ecef;
 }
 
 .checkout-left h2 {
   margin-bottom: 20px;
   color: #2c3e50;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  border-bottom: 2px solid #e8ecf4;
+  border-bottom: 2px solid #e9ecef;
   padding-bottom: 10px;
-  position: relative;
 }
 
-.checkout-left h2::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 50px;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-}
-
-/* ===== Custom Select & Input Styles ===== */
+/* ===== BEAUTIFUL SELECT & INPUTS ===== */
 .checkout-left input,
 .checkout-left select {
   width: 100%;
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  border: 2px solid #e1e8ed;
-  border-radius: 12px;
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 15px;
+  background: #fff;
   outline: none;
   transition: all 0.3s ease;
   font-family: inherit;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .checkout-left input:focus,
 .checkout-left select:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-  background: rgba(255, 255, 255, 1);
-  transform: translateY(-2px);
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+  transform: translateY(-1px);
 }
 
+/* ===== CUSTOM SELECT ARROW ===== */
 .checkout-left select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 16px center;
   background-repeat: no-repeat;
   background-size: 18px;
-  padding-right: 50px;
+  padding-right: 48px;
 }
 
 .checkout-left .checkout-btn {
   width: 100%;
-  padding: 18px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: #fff;
   border: none;
-  border-radius: 15px;
-  font-size: 18px;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,123,255,0.3);
 }
 
 .checkout-left .checkout-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-}
-
-.checkout-left .checkout-btn:active {
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,123,255,0.4);
 }
 
 /* ===== Right Section ===== */
 .checkout-right {
   flex: 1;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 35px 30px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  max-height: 600px;
-  overflow-y: auto;
+  background-color: #fff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border: 1px solid #e9ecef;
 }
 
 .order-item {
@@ -135,98 +112,94 @@ body {
   align-items: center;
   margin-bottom: 25px;
   padding: 20px;
-  background: rgba(248, 250, 252, 0.5);
-  border-radius: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .order-item:hover {
-  background: rgba(248, 250, 252, 0.8);
-  transform: translateX(5px);
+  background: #e9ecef;
+  transform: translateX(3px);
 }
 
 .order-item img {
-  width: 85px;
-  height: 85px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 15px;
-  margin-right: 20px;
-  border: 3px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  margin-right: 15px;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .order-item h4 {
   margin: 0 0 8px 0;
-  font-size: 18px;
+  font-size: 16px;
   color: #2c3e50;
   font-weight: 600;
-  line-height: 1.3;
 }
 
 .order-item p {
   margin: 4px 0;
-  font-size: 15px;
-  color: #64748b;
-  font-weight: 500;
+  font-size: 14px;
+  color: #6c757d;
 }
 
 .price-box {
-  border-top: 2px solid #e8ecf4;
-  padding-top: 25px;
+  border-top: 2px solid #e9ecef;
+  padding-top: 20px;
 }
 
 .price-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
-  font-size: 16px;
-  color: #2c3e50;
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: #495057;
   font-weight: 500;
 }
 
 .total-row {
   font-weight: 700;
-  font-size: 22px;
-  color: #667eea;
-  padding: 20px 0;
-  border-top: 2px solid #e8ecf4;
-  margin-top: 15px;
+  font-size: 20px;
+  color: #007bff;
+  padding: 15px 0;
+  border-top: 2px solid #dee2e6;
 }
 
 .coupon-section {
   display: flex;
   gap: 10px;
-  margin: 20px 0;
+  margin: 15px 0;
 }
 
 .coupon-section input {
   flex: 1;
-  padding: 14px 18px;
-  border: 2px solid #e1e8ed;
-  border-radius: 12px;
-  font-size: 15px;
-  background: rgba(255, 255, 255, 0.8);
+  padding: 12px 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
 .coupon-section button {
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 12px 20px;
+  background: #28a745;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .coupon-section button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  background: #218838;
+  transform: translateY(-1px);
 }
 
 #message {
   font-weight: 700;
-  color: #10b981;
+  color: #28a745;
   margin-left: 10px;
   font-size: 14px;
 }
@@ -235,102 +208,76 @@ body {
 #popupAlert {
   display: none;
   position: fixed;
-  top: 30px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.9);
+  background: #000;
   color: #fff;
-  padding: 16px 28px;
-  border-radius: 50px;
+  padding: 12px 24px;
+  border-radius: 25px;
   z-index: 99999;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 #loadingOverlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.6);
   z-index: 9999;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-size: 18px;
   flex-direction: column;
-  backdrop-filter: blur(5px);
 }
 
-/* ===== Responsive Design ===== */
+/* ===== Responsive ===== */
 @media (max-width: 900px) {
   .checkout {
     flex-direction: column;
-    margin: 20px 15px;
+    margin: 10px;
     gap: 20px;
   }
 
   .checkout-left,
   .checkout-right {
     padding: 25px 20px;
-    border-radius: 20px;
-    max-height: none;
+    border-radius: 12px;
   }
 
   .checkout-left h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .checkout-left input,
   .checkout-left select {
     padding: 14px 16px;
-    margin-bottom: 16px;
-    font-size: 16px;
-  }
-
-  .checkout-left select {
-    background-position: right 14px center;
-    padding-right: 45px;
-  }
-
-  .checkout-left .checkout-btn {
-    padding: 16px;
-    font-size: 17px;
-  }
-
-  .order-item {
-    padding: 18px 15px;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .order-item img {
-    width: 65px;
-    height: 65px;
-    margin-right: 15px;
-  }
-
-  .order-item h4 {
-    font-size: 16px;
-  }
-
-  .order-item p {
-    font-size: 14px;
-  }
-
-  .price-row {
     font-size: 15px;
   }
 
-  .total-row {
-    font-size: 20px;
+  .checkout-left select {
+    padding-right: 45px;
+    background-position: right 14px center;
+  }
+
+  .order-item {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 15px;
+  }
+
+  .order-item img {
+    width: 60px;
+    height: 60px;
   }
 
   .coupon-section {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .coupon-section button {
@@ -339,44 +286,18 @@ body {
 }
 
 @media (max-width: 480px) {
-  .checkout {
-    margin: 10px 10px;
-  }
-
   .checkout-left,
   .checkout-right {
-    padding: 20px 18px;
-  }
-
-  .order-item {
-    gap: 12px;
-    padding: 15px 12px;
+    padding: 20px 15px;
   }
 
   .order-item img {
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
   }
 
   .order-item h4 {
     font-size: 15px;
-  }
-
-  .order-item p {
-    font-size: 13px;
-  }
-
-  .price-row {
-    font-size: 14px;
-  }
-
-  .total-row {
-    font-size: 18px;
-  }
-
-  .checkout-left input,
-  .checkout-left select {
-    padding: 12px 14px;
   }
 }
 </style>
@@ -386,13 +307,13 @@ body {
 <div id="popupAlert"></div>
 <div id="loadingOverlay">
   <div style="
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top: 4px solid #fff;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #fff;
+    border-top: 4px solid transparent;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   "></div>
   Processing Order...
 </div>
@@ -402,14 +323,14 @@ body {
     <!-- LEFT -->
     <div class="checkout-left">
       <h2>Contact</h2>
-      <input name="name" placeholder="Full Name *" required>
-      <input name="email" placeholder="Email Address *" type="email" required>
-      <input name="phone" placeholder="Phone Number *" required>
+      <input name="name" placeholder="Full Name" required>
+      <input name="email" placeholder="Email" type="email" required>
+      <input name="phone" placeholder="Phone" required>
 
       <h2>Shipping</h2>
-      <input name="address" placeholder="Street Address *" required>
+      <input name="address" placeholder="Address" required>
       <select name="city" id="citySelect" required>
-        <option value="">Select Governorate *</option>
+        <option value="">Select Governorate</option>
         <% [
   "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
   "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
@@ -432,14 +353,13 @@ body {
         <div>
           <h4><%= item.name %></h4>
           <% if(item.selectedSize) { %>
-            <p>📏 Size: <%= item.selectedSize %></p>
+            <p>Size: <%= item.selectedSize %></p>
           <% } %>
           <% if(item.selectedColor) { %>
-            <p>🎨 Color: <%= item.selectedColor %></p>
+            <p>Color: <%= item.selectedColor %></p>
           <% } %>
-          <p>💰 Price: <%= item.selectedPrice %> EGP</p>
-          <p>📦 Quantity: <%= item.quantity %></p>
-          <!-- hidden inputs -->
+          <p>Price: <%= item.selectedPrice %> EGP</p>
+          <p>Quantity: <%= item.quantity %></p>
           <input type="hidden" name="productId[]" value="<%= item._id %>">
           <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
           <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
@@ -458,7 +378,7 @@ body {
         <div class="coupon-section">
           <input type="text" id="couponCode" placeholder="Enter Promo Code">
           <button type="button" id="applyCoupon">Apply</button>
-          <p id="couponMessage" style="color:#ef4444; font-size:14px; margin-top:8px; font-weight:500;"></p>
+          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
         </div>
 
         <div class="price-row">
@@ -482,45 +402,41 @@ body {
 </form>
 
 <script>
-function popupAlert(message, type = "success") {
+  function popupAlert(message, type = "success") {
   const el = document.getElementById("popupAlert");
+
   el.textContent = message;
   el.style.display = "block";
-  el.style.background = type === "error" ? 
-    "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" :
-    "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+
+  el.style.background =
+    type === "error" ? "#e74c3c" :
+    type === "success" ? "#2ecc71" : "#000";
+
   setTimeout(() => {
     el.style.display = "none";
-  }, 3000);
+  }, 2500);
 }
-
-function showLoading() {
+  function showLoading() {
   document.getElementById("loadingOverlay").style.display = "flex";
 }
 
 function hideLoading() {
   document.getElementById("loadingOverlay").style.display = "none";
 }
-
 async function updatePrices() {
   const couponCode = document.getElementById("couponCode").value;
   const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
   const governorate = document.getElementById("citySelect").value;
   if(!governorate) return;
 
-  try {
-    const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-    const data = await res.json();
+  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
+  const data = await res.json();
 
-    if(data.success) {
-      document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-      document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-      document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-      document.getElementById("couponMessage").textContent = data.message;
-      document.getElementById("couponMessage").style.color = data.message ? "#10b981" : "#ef4444";
-    }
-  } catch(err) {
-    console.error("Update prices error:", err);
+  if(data.success) {
+    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
+    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
+    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
+    document.getElementById("couponMessage").textContent = data.message;
   }
 }
 
@@ -530,6 +446,7 @@ document.getElementById("applyCoupon").addEventListener('click', updatePrices);
 async function submitOrder() {
   try {
     showLoading();
+
     const form = document.getElementById("checkoutForm");
     const formData = new FormData(form);
 
@@ -548,4 +465,43 @@ async function submitOrder() {
     }));
 
     const data = Object.fromEntries(formData.entries());
-    const shipping = parseFloat(document.getElementById("shipping").textContent
+
+    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
+    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
+    const total = parseFloat(document.getElementById("total").textContent) || 0;
+
+    const res = await fetch("/checkout/place-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        products,
+        customerName: data.name,
+        customerEmail: data.email,
+        customerAddress: data.address,
+        governorate: data.city,
+        shipping,
+        discount,
+        total,
+        couponCode: document.getElementById("couponCode").value || null
+      })
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      popupAlert("Order placed successfully", "success");
+      window.location.href = "/";
+    } else {
+      popupAlert("Error : " + (result.error || "Unknown error"), "error");
+    }
+
+  } catch (err) {
+    console.error("Submit Error:", err);
+    popupAlert("Something went wrong", "error");
+  } finally {
+    hideLoading();
+  }
+}
+</script>
