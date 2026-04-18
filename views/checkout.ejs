@@ -163,7 +163,36 @@ body {
     padding: 14px;
     font-size: 15px;
   }
+.checkout-left select {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  transition: 0.2s;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg fill='%23666' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
 
+.checkout-left select:focus {
+  border-color: #1e90ff;
+  box-shadow: 0 0 5px rgba(30,144,255,0.2);
+}
+
+/* موبايل */
+@media (max-width: 900px) {
+  .checkout-left select {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
   /* ===== ORDER ITEMS ===== */
   .order-item {
     flex-direction: row;
