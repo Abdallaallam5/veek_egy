@@ -432,13 +432,13 @@ body {
         <div>
           <h4><%= item.name %></h4>
           <% if(item.selectedSize) { %>
-            <p>Size: <%= item.selectedSize %></p>
+            <p>📏 Size: <%= item.selectedSize %></p>
           <% } %>
           <% if(item.selectedColor) { %>
-            <p>Color: <%= item.selectedColor %></p>
+            <p>🎨 Color: <%= item.selectedColor %></p>
           <% } %>
-          <p>Price: <%= item.selectedPrice %> EGP</p>
-          <p>Quantity: <%= item.quantity %></p>
+          <p>💰 Price: <%= item.selectedPrice %> EGP</p>
+          <p>📦 Quantity: <%= item.quantity %></p>
           <!-- hidden inputs -->
           <input type="hidden" name="productId[]" value="<%= item._id %>">
           <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
@@ -481,49 +481,46 @@ body {
   </div>
 </form>
 
-</body>
-</html>
-
-
-
-
-
 <script>
-  function popupAlert(message, type = "success") {
+function popupAlert(message, type = "success") {
   const el = document.getElementById("popupAlert");
-
   el.textContent = message;
   el.style.display = "block";
-
-  el.style.background =
-    type === "error" ? "#e74c3c" :
-    type === "success" ? "#2ecc71" : "#000";
-
+  el.style.background = type === "error" ? 
+    "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" :
+    "linear-gradient(135deg, #10b981 0%, #059669 100%)";
   setTimeout(() => {
     el.style.display = "none";
-  }, 2500);
+  }, 3000);
 }
-  function showLoading() {
+
+function showLoading() {
   document.getElementById("loadingOverlay").style.display = "flex";
 }
 
 function hideLoading() {
   document.getElementById("loadingOverlay").style.display = "none";
 }
+
 async function updatePrices() {
   const couponCode = document.getElementById("couponCode").value;
   const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
   const governorate = document.getElementById("citySelect").value;
   if(!governorate) return;
 
-  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
+    const data = await res.json();
 
-  if(data.success) {
-    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage").textContent = data.message;
+    if(data.success) {
+      document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
+      document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
+      document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
+      document.getElementById("couponMessage").textContent = data.message;
+      document.getElementById("couponMessage").style.color = data.message ? "#10b981" : "#ef4444";
+    }
+  } catch(err) {
+    console.error("Update prices error:", err);
   }
 }
 
@@ -533,7 +530,6 @@ document.getElementById("applyCoupon").addEventListener('click', updatePrices);
 async function submitOrder() {
   try {
     showLoading();
-
     const form = document.getElementById("checkoutForm");
     const formData = new FormData(form);
 
@@ -552,42 +548,4 @@ async function submitOrder() {
     }));
 
     const data = Object.fromEntries(formData.entries());
-
-    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-    const total = parseFloat(document.getElementById("total").textContent) || 0;
-
-    const res = await fetch("/checkout/place-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
-      })
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      popupAlert("Order placed successfully", "success");
-      window.location.href = "/";
-    } else {
-      popupAlert("Error : " + (result.error || "Unknown error"), "error");
-    }
-
-  } catch (err) {
-    console.error("Submit Error:", err);
-    popupAlert("Something went wrong", "error");
-  } finally {
-    hideLoading();
-  }
-}</script>  
+    const shipping = parseFloat(document.getElementById("shipping").textContent
