@@ -77,6 +77,64 @@ body {
   padding-right: 48px;
 }
 
+/* ===== COUPON SECTION IN LEFT ===== */
+.coupon-section-left {
+  margin-bottom: 25px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+  border: 2px dashed #007bff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.coupon-section-left h3 {
+  margin: 0 0 15px 0;
+  color: #007bff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.coupon-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.coupon-input-group input {
+  flex: 1;
+  margin-bottom: 0 !important;
+  border-radius: 25px;
+  padding: 14px 20px;
+  border: 2px solid #007bff;
+  font-weight: 500;
+}
+
+.coupon-input-group button {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+
+.coupon-input-group button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+}
+
+#couponMessage-left {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 20px;
+}
+
 .checkout-left .checkout-btn {
   width: 100%;
   padding: 16px;
@@ -167,36 +225,6 @@ body {
   border-top: 2px solid #dee2e6;
 }
 
-.coupon-section {
-  display: flex;
-  gap: 10px;
-  margin: 15px 0;
-}
-
-.coupon-section input {
-  flex: 1;
-  padding: 12px 15px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-.coupon-section button {
-  padding: 12px 20px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.coupon-section button:hover {
-  background: #218838;
-  transform: translateY(-1px);
-}
-
 #message {
   font-weight: 700;
   color: #28a745;
@@ -234,7 +262,7 @@ body {
   flex-direction: column;
 }
 
-/* ===== Responsive ===== */
+/* ===== Responsive - MOBILE PERFECT ===== */
 @media (max-width: 900px) {
   .checkout {
     flex-direction: column;
@@ -250,6 +278,26 @@ body {
 
   .checkout-left h2 {
     font-size: 20px;
+  }
+
+  /* ===== MOBILE COUPON PERFECT ===== */
+  .coupon-section-left {
+    padding: 18px 15px;
+  }
+
+  .coupon-input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .coupon-input-group input {
+    border-radius: 12px;
+  }
+
+  .coupon-input-group button {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
   }
 
   .checkout-left input,
@@ -274,21 +322,20 @@ body {
     width: 60px;
     height: 60px;
   }
-
-  .coupon-section {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .coupon-section button {
-    width: 100%;
-  }
 }
 
 @media (max-width: 480px) {
   .checkout-left,
   .checkout-right {
     padding: 20px 15px;
+  }
+
+  .coupon-section-left {
+    padding: 15px 12px;
+  }
+
+  .coupon-input-group button {
+    padding: 15px;
   }
 
   .order-item img {
@@ -326,6 +373,16 @@ body {
       <input name="name" placeholder="Full Name" required>
       <input name="email" placeholder="Email" type="email" required>
       <input name="phone" placeholder="Phone" required>
+
+      <!-- ===== COUPON MOVED HERE ===== -->
+      <div class="coupon-section-left">
+        <h3>🎁 Have a Promo Code?</h3>
+        <div class="coupon-input-group">
+          <input type="text" id="couponCode" placeholder="Enter coupon code">
+          <button type="button" id="applyCoupon">Apply Coupon</button>
+        </div>
+        <p id="couponMessage-left" style="color:#dc3545;"></p>
+      </div>
 
       <h2>Shipping</h2>
       <input name="address" placeholder="Address" required>
@@ -373,12 +430,6 @@ body {
         <div class="price-row">
           <span>Subtotal</span>
           <span id="subtotal"><%= subtotal %> EGP</span>
-        </div>
-
-        <div class="coupon-section">
-          <input type="text" id="couponCode" placeholder="Enter Promo Code">
-          <button type="button" id="applyCoupon">Apply</button>
-          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
         </div>
 
         <div class="price-row">
@@ -436,7 +487,8 @@ async function updatePrices() {
     document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
     document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
     document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage").textContent = data.message;
+    document.getElementById("couponMessage-left").textContent = data.message || '';
+    document.getElementById("couponMessage-left").style.color = data.message && data.discount > 0 ? '#28a745' : '#dc3545';
   }
 }
 
