@@ -342,6 +342,11 @@ body {
         <% }) %>
       </select>
 
+        <div class="coupon-section">
+          <input type="text" id="couponCode" placeholder="Enter Promo Code">
+          <button type="button" id="applyCoupon">Apply</button>
+          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
+        </div>
       <button type="submit" class="checkout-btn">Confirm Order</button>
     </div>
 
@@ -375,11 +380,6 @@ body {
           <span id="subtotal"><%= subtotal %> EGP</span>
         </div>
 
-        <div class="coupon-section">
-          <input type="text" id="couponCode" placeholder="Enter Promo Code">
-          <button type="button" id="applyCoupon">Apply</button>
-          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
-        </div>
 
         <div class="price-row">
           <span>Discount</span>
