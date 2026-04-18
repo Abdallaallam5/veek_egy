@@ -374,15 +374,7 @@ body {
       <input name="email" placeholder="Email" type="email" required>
       <input name="phone" placeholder="Phone" required>
 
-      <!-- ===== COUPON MOVED HERE ===== -->
-      <div class="coupon-section-left">
-        <h3> Have a Promo Code?</h3>
-        <div class="coupon-input-group">
-          <input type="text" id="couponCode" placeholder="Enter coupon code">
-          <button type="button" id="applyCoupon">Apply Coupon</button>
-        </div>
-        <p id="couponMessage-left" style="color:#dc3545;"></p>
-      </div>
+     
 
       <h2>Shipping</h2>
       <input name="address" placeholder="Address" required>
@@ -398,7 +390,15 @@ body {
           <option value="<%= g %>"><%= g %></option>
         <% }) %>
       </select>
-
+ <!-- ===== COUPON MOVED HERE ===== -->
+      <div class="coupon-section-left">
+        <h3> Have a Promo Code?</h3>
+        <div class="coupon-input-group">
+          <input type="text" id="couponCode" placeholder="Enter coupon code">
+          <button type="button" id="applyCoupon">Apply Coupon</button>
+        </div>
+        <p id="couponMessage-left" style="color:#dc3545;"></p>
+      </div>
       <button type="submit" class="checkout-btn">Confirm Order</button>
     </div>
 
