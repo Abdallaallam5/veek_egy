@@ -114,6 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.getElementById("addCategoryBtn");
   let editId = null;
 
+  // 🔥 FIX: Check if elements exist
+  if (!modal || !categoryName || !categoryDesc || !categoryImage || !saveBtn || !closeBtn || !addBtn) {
+    console.error("Required elements not found!");
+    return;
+  }
+
   // Open modal for Add
   addBtn.addEventListener("click", () => {
     editId = null;
@@ -121,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
     categoryDesc.value = "";
     categoryImage.value = "";
     document.getElementById("modalTitle").innerText = "Add Category";
-    document.getElementById("couponMessage-left").style.color = '#dc3545';
     modal.style.display = "flex";
   });
 
@@ -130,8 +135,11 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = "none";
   });
 
+  // Close on backdrop click
   modal.addEventListener("click", (e) => {
-    if(e.target === modal) modal.style.display = "none";
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
   });
 
   // Save Add/Edit
@@ -140,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const desc = categoryDesc.value.trim();
     const imageFile = categoryImage.files[0];
 
-    if(!name) {
+    if (!name) {
       alert("Enter category name");
       return;
     }
@@ -148,113 +156,127 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", desc);
-    if(imageFile) formData.append("image", imageFile);
+    if (imageFile) formData.append("image", imageFile);
 
     try {
-      if(editId){
-        // 🔥 EDIT
+      if (editId) {
+        // EDIT
         const res = await fetch(`/admin/categories/edit/${editId}`, {
           method: "POST",
           body: formData
         });
         const data = await res.json();
         
-        if(data.success){
+        if (data.success) {
           const tr = document.querySelector(`tr[data-id="${editId}"]`);
-          tr.querySelector(".cat-name").innerText = name;
-          tr.querySelector(".cat-desc").innerText = desc;
+          if (tr) {
+            tr.querySelector(".cat-name").textContent = name;
+            tr.querySelector(".cat-desc").textContent = desc;
 
-          if(data.category?.image){
-            const imgPath = data.category.image.replace(/^public[\\\/]/, '').replace(/\\/g, '/');
-            let imgCell = tr.querySelector("td:first-child img");
-            if(!imgCell){
-              imgCell = document.createElement("img");
-              tr.querySelector("td:first-child").innerHTML = "";
-              tr.querySelector("td:first-child").appendChild(imgCell);
+            // 🔥 FIX: Safe image update
+            if (data.category?.image) {
+              const imgPath = data.category.image.replace(/^public[\\\/]/, '').replace(/\\/g, '/');
+              let imgCell = tr.querySelector("td:first-child img");
+              if (!imgCell) {
+                imgCell = document.createElement("img");
+                imgCell.width = 60;
+                imgCell.style.borderRadius = "8px";
+                imgCell.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+                tr.querySelector("td:first-child").innerHTML = "";
+                tr.querySelector("td:first-child").appendChild(imgCell);
+              }
+              imgCell.src = `/${imgPath}`;
             }
-            imgCell.src = `/${imgPath}`;
-            imgCell.width = 60;
-            imgCell.style.borderRadius = "8px";
           }
-          
           alert("Category updated successfully!");
           modal.style.display = "none";
         } else {
-          alert("Update failed!");
+          alert("Update failed: " + (data.message || "Unknown error"));
         }
       } else {
-        // 🔥 ADD NEW
+        // ADD NEW
         const res = await fetch("/admin/categories/add", {
           method: "POST",
           body: formData
         });
         const data = await res.json();
         
-        if(data.success){
+        if (data.success && data.category) {
           const tbody = document.querySelector("#categoriesTable tbody");
-          const tr = document.createElement("tr");
-          tr.dataset.id = data.category._id;
+          if (tbody) {
+            const tr = document.createElement("tr");
+            tr.dataset.id = data.category._id;
 
-          let imgTag = "";
-          if(data.category.image){
-            const imgPath = data.category.image.replace(/^public[\\\/]/, '').replace(/\\/g, '/');
-            imgTag = `<img src="/${imgPath}" width="60" style="border-radius:8px;">`;
+            let imgTag = "";
+            if (data.category.image) {
+              const imgPath = data.category.image.replace(/^public[\\\/]/, '').replace(/\\/g, '/');
+              imgTag = `<img src="/${imgPath}" width="60" style="border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">`;
+            }
+
+            tr.innerHTML = `
+              <td>${imgTag}</td>
+              <td class="cat-name">${data.category.name}</td>
+              <td class="cat-desc">${data.category.description || ''}</td>
+              <td>
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+              </td>
+            `;
+            tbody.prepend(tr);
+            alert("Category added successfully!");
+            modal.style.display = "none";
           }
-
-          tr.innerHTML = `
-            <td>${imgTag}</td>
-            <td class="cat-name">${data.category.name}</td>
-            <td class="cat-desc">${data.category.description || ''}</td>
-            <td>
-              <button class="edit-btn">Edit</button>
-              <button class="delete-btn">Delete</button>
-            </td>
-          `;
-          
-          tbody.prepend(tr); // Add to top
-          modal.style.display = "none";
-          alert("Category added successfully!");
         } else {
-          alert("Failed to add category!");
+          alert("Failed to add category: " + (data.message || "Unknown error"));
         }
       }
-    } catch(err) {
-      console.error(err);
-      alert("Network error!");
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Network error! Check console for details.");
     }
   });
 
-  // 🔥 EDIT/DELETE Buttons
+  // 🔥 FIXED: Event delegation for buttons (Safe & Works Always)
   document.addEventListener("click", async (e) => {
-    if(e.target.classList.contains("edit-btn")){
+    // EDIT Button
+    if (e.target.classList.contains("edit-btn")) {
       const tr = e.target.closest("tr");
+      if (!tr || !tr.dataset.id) return;
+      
       editId = tr.dataset.id;
-      categoryName.value = tr.querySelector(".cat-name").innerText;
-      categoryDesc.value = tr.querySelector(".cat-desc").innerText;
+      const name = tr.querySelector(".cat-name")?.textContent || "";
+      const desc = tr.querySelector(".cat-desc")?.textContent || "";
+      
+      categoryName.value = name;
+      categoryDesc.value = desc;
       document.getElementById("modalTitle").innerText = "Edit Category";
       modal.style.display = "flex";
     }
 
-    if(e.target.classList.contains("delete-btn")){
+    // DELETE Button
+    if (e.target.classList.contains("delete-btn")) {
       const tr = e.target.closest("tr");
-      const id = tr.dataset.id;
+      if (!tr || !tr.dataset.id) return;
       
-      if(confirm("Are you sure you want to delete this category?")){
+      const id = tr.dataset.id;
+      const name = tr.querySelector(".cat-name")?.textContent || "";
+      
+      if (confirm(`Delete "${name}"? This cannot be undone!`)) {
         try {
           const res = await fetch(`/admin/categories/delete/${id}`, {
             method: "DELETE"
           });
           const data = await res.json();
           
-          if(data.success){
+          if (data.success) {
             tr.remove();
             alert("Category deleted successfully!");
           } else {
-            alert(data.message || "Delete failed!");
+            alert("Delete failed: " + (data.message || "Unknown error"));
           }
-        } catch(err) {
-          console.error(err);
-          alert("Delete failed!");
+        } catch (err) {
+          console.error("Delete error:", err);
+          alert("Delete failed! Check console.");
         }
       }
     }
