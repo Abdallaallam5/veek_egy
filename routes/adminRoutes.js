@@ -39,12 +39,11 @@ router.post(
 router.delete("/products/delete/:id", auth, admin.deleteProduct);
 
 // ===== Categories =====
-router.get("/categories", auth, admin.getCategories);
 router.post(
   "/categories/add",
   auth,
- 
-  admin.postAddCategory
+  upload.single("image"),
+  adminController.postAddCategory
 );
 router.post("/categories/edit/:id", auth, admin.postEditCategory);
 router.delete("/categories/delete/:id", auth, admin.deleteCategory);
