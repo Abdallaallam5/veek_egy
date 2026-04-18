@@ -207,8 +207,8 @@ exports.getCategories = async (req, res) => {
 };
 
 exports.postAddCategory = async (req, res) => {
-  console.log(req.file);
-console.log(req.body);
+  console.log("file:".req.file);
+console.log("body:".req.body);
   try {
     const { name, description } = req.body;
 
