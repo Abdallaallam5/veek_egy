@@ -43,7 +43,7 @@ router.post(
   "/categories/add",
   auth,
   upload.single("image"),
-  adminController.postAddCategory
+  admin.postAddCategory
 );
 router.post("/categories/edit/:id", auth, admin.postEditCategory);
 router.delete("/categories/delete/:id", auth, admin.deleteCategory);
