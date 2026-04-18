@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-  @keyframes spin {
+  
+<style>
+@keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
 /* ===== Checkout Page Layout ===== */
 body {
   font-family: Arial, sans-serif;
@@ -43,7 +45,6 @@ body {
   padding-bottom: 10px;
 }
 
-/* ===== BEAUTIFUL SELECT & INPUTS ===== */
 .checkout-left input,
 .checkout-left select {
   width: 100%;
@@ -55,18 +56,15 @@ body {
   background: #fff;
   outline: none;
   transition: all 0.3s ease;
-  font-family: inherit;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .checkout-left input:focus,
 .checkout-left select:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-  transform: translateY(-1px);
 }
 
-/* ===== CUSTOM SELECT ARROW ===== */
+/* ===== SELECT ===== */
 .checkout-left select {
   cursor: pointer;
   appearance: none;
@@ -77,96 +75,7 @@ body {
   padding-right: 48px;
 }
 
-.checkout-left .checkout-btn {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-}
-
-.checkout-left .checkout-btn:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,123,255,0.4);
-}
-
-/* ===== Right Section ===== */
-.checkout-right {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  border: 1px solid #e9ecef;
-}
-
-.order-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.order-item:hover {
-  background: #e9ecef;
-  transform: translateX(3px);
-}
-
-.order-item img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-right: 15px;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.order-item h4 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.order-item p {
-  margin: 4px 0;
-  font-size: 14px;
-  color: #6c757d;
-}
-
-.price-box {
-  border-top: 2px solid #e9ecef;
-  padding-top: 20px;
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 15px;
-  color: #495057;
-  font-weight: 500;
-}
-
-.total-row {
-  font-weight: 700;
-  font-size: 20px;
-  color: #007bff;
-  padding: 15px 0;
-  border-top: 2px solid #dee2e6;
-}
-
+/* ===== COUPON (DESKTOP) ===== */
 .coupon-section {
   display: flex;
   gap: 10px;
@@ -189,52 +98,37 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s;
 }
 
 .coupon-section button:hover {
   background: #218838;
-  transform: translateY(-1px);
 }
 
-#message {
-  font-weight: 700;
-  color: #28a745;
-  margin-left: 10px;
-  font-size: 14px;
-}
-
-/* ===== Popup & Loading ===== */
-#popupAlert {
-  display: none;
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #000;
+/* ===== BUTTON ===== */
+.checkout-left .checkout-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: #fff;
-  padding: 12px 24px;
-  border-radius: 25px;
-  z-index: 99999;
-  font-size: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  cursor: pointer;
 }
 
-#loadingOverlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
-  flex-direction: column;
+/* ===== RIGHT ===== */
+.checkout-right {
+  flex: 1;
+  background-color: #fff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border: 1px solid #e9ecef;
 }
 
-/* ===== Responsive ===== */
+/* ===== MOBILE FIX ===== */
 @media (max-width: 900px) {
   .checkout {
     flex-direction: column;
@@ -244,64 +138,38 @@ body {
 
   .checkout-left,
   .checkout-right {
-    padding: 25px 20px;
-    border-radius: 12px;
+    padding: 22px 18px;
   }
 
-  .checkout-left h2 {
-    font-size: 20px;
-  }
-
-  .checkout-left input,
-  .checkout-left select {
-    padding: 14px 16px;
-    font-size: 15px;
-  }
-
-  .checkout-left select {
-    padding-right: 45px;
-    background-position: right 14px center;
-  }
-
-  .order-item {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 18px 15px;
-  }
-
-  .order-item img {
-    width: 60px;
-    height: 60px;
-  }
-
+  /* 🔥 COUPON MOBILE IMPROVED */
   .coupon-section {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .coupon-section input {
+    width: 100%;
+    font-size: 15px;
+    padding: 14px;
+    border-radius: 10px;
   }
 
   .coupon-section button {
     width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .checkout-left,
-  .checkout-right {
-    padding: 20px 15px;
-  }
-
-  .order-item img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .order-item h4 {
+    padding: 14px;
     font-size: 15px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.25);
+  }
+
+  .coupon-section button:active {
+    transform: scale(0.98);
   }
 }
-</style>
-</head>
+
+</style></head>
 <body>
   
 <div id="popupAlert"></div>
