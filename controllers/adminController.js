@@ -209,7 +209,7 @@ exports.getCategories = async (req, res) => {
 const cloudinary = require("cloudinary").v2;
 
 const formidable = require('formidable');
-const cloudinary = require("cloudinary").v2;
+
 const fs = require('fs').promises; // للحذف المؤقت
 
 exports.postAddCategory = async (req, res) => {
