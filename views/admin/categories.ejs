@@ -22,13 +22,21 @@
         <% if (categories && categories.length > 0) { %>
           <% categories.forEach(c => { %>
             <tr data-id="<%= c._id %>">
-              <td>
-                <% if(c.image){ %>
-                  <img src="<%= c.image %>" alt="<%= c.name %>" width="60" style="border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-                <% } else { %>
-                  <div style="width:60px;height:60px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">No Image</div>
-                <% } %>
-              </td>
+             <td>
+  <% if (c.image) { %>
+    <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.12);">
+      <img 
+        src="<%= c.image.startsWith('http') ? c.image : '/' + c.image %>" 
+        alt="<%= c.name %>" 
+        style="width:100%;height:100%;object-fit:cover;display:block;"
+      >
+    </div>
+  <% } else { %>
+    <div style="width:60px;height:60px;background:#eee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;">
+      No Image
+    </div>
+  <% } %>
+</td>
               <td class="cat-name" style="font-weight:600;"><%= c.name %></td>
               <td class="cat-desc"><%= c.description || 'No description' %></td>
               <td>0</td>
