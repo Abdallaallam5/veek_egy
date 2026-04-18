@@ -42,8 +42,8 @@ router.delete("/products/delete/:id", auth, admin.deleteProduct);
 router.get("/categories", auth, admin.getCategories);
 router.post(
   "/categories/add",
-  upload.single("image"),
   auth,
+  upload.single("image"),
   admin.postAddCategory
 );
 router.post("/categories/edit/:id", upload.single("image"), auth, admin.postEditCategory);
