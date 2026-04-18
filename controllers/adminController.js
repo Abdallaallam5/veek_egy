@@ -207,15 +207,16 @@ exports.getCategories = async (req, res) => {
 };
 
 exports.postAddCategory = async (req, res) => {
-  console.log("file:", req.file);
-  console.log("body:", req.body);
-
   try {
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
     const { name, description } = req.body;
 
     let image = null;
-    if (req.file) {
-      image = req.file.path; // Cloudinary URL
+
+    if (req.file && req.file.path) {
+      image = req.file.path;
     }
 
     const category = await Category.create({
@@ -227,14 +228,14 @@ exports.postAddCategory = async (req, res) => {
     return res.json({ success: true, category });
 
   } catch (err) {
-    console.error("ADD CATEGORY ERROR:", err);
+    console.error("CATEGORY ERROR:", err);
+
     return res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message || "Server error"
     });
   }
-};
-exports.postEditCategory = async (req, res) => {
+};exports.postEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) return res.json({ success: false });
