@@ -214,13 +214,13 @@ exports.postAddCategory = async (req, res) => {
 
     let image = null;
 
-    if (req.file) {
+    if (req.file && req.file.buffer) {
       const result = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { folder: "categories" },
-          (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
           }
         );
 
@@ -236,17 +236,17 @@ exports.postAddCategory = async (req, res) => {
       image,
     });
 
-    res.json({ success: true, category });
+    return res.json({ success: true, category });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
+    console.log("❌ CATEGORY ERROR:", err);
+
+    return res.status(500).json({
       success: false,
-      message: err.message
+      message: err.message || "Server error"
     });
   }
-};
-exports.postEditCategory = async (req, res) => {
+};exports.postEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) return res.json({ success: false });
