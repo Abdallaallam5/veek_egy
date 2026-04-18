@@ -208,22 +208,39 @@ exports.getCategories = async (req, res) => {
 
 exports.postAddCategory = async (req, res) => {
   try {
+    console.log("Add Category Request:", req.body, req.file); // 🔥 DEBUG
+    
     const { name, description } = req.body;
+    
+    if (!name) {
+      return res.json({ success: false, message: "Name is required" });
+    }
 
-    let image = null;
-    if (req.file) image = req.file.path; // 🔥 CLOUDINARY FIX
+    const categoryData = {
+      name: name.trim(),
+      description: description?.trim() || ""
+    };
 
-    const category = new Category({
-      name,
-      description,
-      image,
-    });
+    // 🔥 SAFE CLOUDINARY CHECK
+    if (req.file) {
+      categoryData.image = req.file.path;
+      console.log("Image uploaded:", req.file.path);
+    }
 
+    const category = new Category(categoryData);
     await category.save();
-    res.json({ success: true, category });
+
+    console.log("Category created:", category);
+    res.json({ 
+      success: true, 
+      category: category.toObject() 
+    });
   } catch (err) {
-    console.error(err);
-    res.json({ success: false });
+    console.error("Add Category Error:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message 
+    });
   }
 };
 
