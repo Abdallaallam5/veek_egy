@@ -37,6 +37,7 @@ router.delete("/products/delete/:id", auth, admin.deleteProduct);
 router.get("/categories", auth, admin.getCategories);
 router.post("/categories/add", upload.single("image"), auth, admin.postAddCategory);
 router.post("/categories/edit/:id", upload.single("image"), auth, admin.postEditCategory);
+// 🔥 FIXED DELETE ROUTE
 router.delete("/categories/delete/:id", auth, admin.deleteCategory);
 
 // ===== Coupons =====
