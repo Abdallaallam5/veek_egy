@@ -1,97 +1,117 @@
-const Admin = require("../models/Admin")
-const Product = require("../models/Product")
+const Admin = require("../models/Admin");
+const Product = require("../models/Product");
+const Category = require("../models/Category");
 const bcrypt = require("bcrypt");
-exports.signuppage=(req,res)=>{
- res.render("admin/signup")
-}
+
+// ================= AUTH =================
+
+exports.signuppage = (req, res) => {
+  res.render("admin/signup");
+};
 
 exports.signup = async (req, res) => {
-    const { email, password } = req.body; // تصحيح هنا
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.json({ success: false, message: "Email and password are required" });
-    }
+  if (!email || !password) {
+    return res.json({ success: false, message: "Email and password are required" });
+  }
 
-    const existingAdmin = await Admin.findOne({ email });
+  const existingAdmin = await Admin.findOne({ email });
 
-    if (existingAdmin) {
-        return res.json({ success: false, message: "Admin already exists" });
-    }
+  if (existingAdmin) {
+    return res.json({ success: false, message: "Admin already exists" });
+  }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // الآن password موجودة
-    await Admin.create({ email, password: hashedPassword });
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await Admin.create({ email, password: hashedPassword });
 
-    res.json({ success: true });
+  res.json({ success: true });
 };
-exports.loginPage=(req,res)=>{
- res.render("admin/login")
-}
+
+exports.loginPage = (req, res) => {
+  res.render("admin/login");
+};
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.json({ success: false, message: "Email and password are required" });
-    }
+  if (!email || !password) {
+    return res.json({ success: false, message: "Email and password are required" });
+  }
 
-    const admin = await Admin.findOne({ email }); // البحث فقط بالـ email
+  const admin = await Admin.findOne({ email });
 
-    if (!admin) {
-        return res.json({ success: false, message: "Admin not found" });
-    }
+  if (!admin) {
+    return res.json({ success: false, message: "Admin not found" });
+  }
 
-    const isMatch = await bcrypt.compare(password, admin.password); // المقارنة مع الباسورد المشفر
-    if (!isMatch) {
-        return res.json({ success: false, message: "Incorrect password" });
-    }
+  const isMatch = await bcrypt.compare(password, admin.password);
+  if (!isMatch) {
+    return res.json({ success: false, message: "Incorrect password" });
+  }
 
-    req.session.admin = admin._id; // تخزين الـ id في الجلسة
-    res.json({ success: true });
+  req.session.admin = admin._id;
+  res.json({ success: true });
 };
 
-exports.dashboard=(req,res)=>{
- res.render("admin/dashboard")
-}
+// ================= DASHBOARD =================
 
-// PAGE
-exports.productsPage = (req,res)=>{
-  res.render("admin/products")
-}
+exports.dashboard = (req, res) => {
+  res.render("admin/dashboard");
+};
 
-// GET ALL
-exports.getProducts = async (req,res)=>{
-    const products = await Product.find()
-      .sort({ createdAt: -1 })
-      .populate("categories", "name");
-  res.json(products)
-}
-exports.add_productsPage = async (req,res)=>{
-try {
+// ================= PRODUCTS =================
+
+exports.productsPage = (req, res) => {
+  res.render("admin/products");
+};
+
+exports.getProducts = async (req, res) => {
+  const products = await Product.find()
+    .sort({ createdAt: -1 })
+    .populate("categories", "name");
+
+  res.json(products);
+};
+
+exports.add_productsPage = async (req, res) => {
+  try {
     const categories = await Category.find().sort({ createdAt: -1 });
     res.render("admin/add-product", { categories });
   } catch (err) {
     console.error(err);
     res.render("admin/add-product", { categories: [] });
   }
-}
+};
 
+// ================= ADD PRODUCT (CLOUDINARY FIXED) =================
 
-// ADD
-// controllers/adminController.js
 exports.addProduct = async (req, res) => {
   try {
-    let { name, description, price, salePrice, sizes, colors, stock, sku, weight, country } = req.body;
-    
-    
+    let {
+      name,
+      description,
+      price,
+      salePrice,
+      sizes,
+      colors,
+      stock,
+      sku,
+      weight,
+      country,
+    } = req.body;
+
     price = Number(price);
 
-    const images = req.files.map(f => "/uploads/" + f.filename);
-    const mainImage = images[0];
+    // 🔥 CLOUDINARY FIX
+    const images = req.files ? req.files.map(file => file.path) : [];
+    const mainImage = images[0] || null;
 
     sizes = sizes ? sizes.split(",") : [];
     colors = colors ? colors.split(",") : [];
-let categories = req.body.category || []; // Express هيرجع array لو اخترت أكتر من واحدة
-if (!Array.isArray(categories)) categories = [categories]; // لو checkbox واحد بس
+
+    let categories = req.body.category || [];
+    if (!Array.isArray(categories)) categories = [categories];
 
     await Product.create({
       name,
@@ -106,7 +126,7 @@ if (!Array.isArray(categories)) categories = [categories]; // لو checkbox وا
       weight,
       country,
       images,
-      mainImage
+      mainImage,
     });
 
     res.json({ success: true });
@@ -116,26 +136,29 @@ if (!Array.isArray(categories)) categories = [categories]; // لو checkbox وا
   }
 };
 
-// DELETE
-exports.deleteProduct = async (req,res)=>{
-  await Product.findByIdAndDelete(req.params.id)
-  res.json({success:true})
-}
+// ================= DELETE PRODUCT =================
 
-// GET SINGLE
-exports.getSingleProduct = async (req,res)=>{
-  const product = await Product.findById(req.params.id)
-  res.render("admin/view_product",{product})
-}
+exports.deleteProduct = async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+};
 
-// UPDATE
+// ================= SINGLE PRODUCT =================
 
-// صفحة تعديل المنتج (GET)
+exports.getSingleProduct = async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  res.render("admin/view_product", { product });
+};
+
+// ================= EDIT PRODUCT =================
+
 exports.getEditProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-        const categories = await Category.find().sort({ createdAt: -1 });
+    const categories = await Category.find().sort({ createdAt: -1 });
+
     if (!product) return res.redirect("/admin/products");
+
     res.render("admin/edit-product", { product, categories });
   } catch (err) {
     console.error(err);
@@ -143,61 +166,59 @@ exports.getEditProduct = async (req, res) => {
   }
 };
 
-// تحديث المنتج (POST)
 exports.postEditProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.json({ success: false });
 
-    // تحديث البيانات الأساسية
     product.name = req.body.name;
     product.description = req.body.description;
     product.price = Number(req.body.price) || 0;
     product.salePrice = req.body.salePrice || null;
     product.stock = req.body.stock || 0;
 
-    // ======= تحديث الـ categories =======
-    // ممكن يكون array أو string
-    let categories = req.body['category[]'] || req.body.category || [];
+    let categories = req.body["category[]"] || req.body.category || [];
     if (typeof categories === "string") categories = [categories];
     product.categories = categories;
 
-    // ======= تحديث الـ sizes و colors =======
     product.sizes = req.body.sizes ? req.body.sizes.split(",") : [];
     product.colors = req.body.colors ? req.body.colors.split(",") : [];
 
-    // ======= تحديث الصور =======
+    // 🔥 CLOUDINARY UPDATE IMAGES
     if (req.files && req.files.length > 0) {
-      const images = req.files.map(f => "/uploads/" + f.filename);
-      product.mainImage = images[0];
+      const images = req.files.map(file => file.path);
       product.images = images;
+      product.mainImage = images[0];
     }
 
     await product.save();
     res.json({ success: true });
-
   } catch (err) {
     console.error(err);
     res.json({ success: false });
   }
 };
-const Category = require("../models/Category");
 
-// جلب كل الفئات
+// ================= CATEGORIES =================
+
 exports.getCategories = async (req, res) => {
-  
   const categories = await Category.find().sort({ createdAt: -1 });
   res.render("admin/categories", { categories });
 };
 
-// إضافة فئة جديدة
 exports.postAddCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    let image = null;
-    if (req.file) image = "/uploads/" + req.file.filename;
 
-    const category = new Category({ name, description, image });
+    let image = null;
+    if (req.file) image = req.file.path; // 🔥 CLOUDINARY FIX
+
+    const category = new Category({
+      name,
+      description,
+      image,
+    });
+
     await category.save();
     res.json({ success: true, category });
   } catch (err) {
@@ -206,7 +227,6 @@ exports.postAddCategory = async (req, res) => {
   }
 };
 
-// تعديل فئة
 exports.postEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -214,6 +234,7 @@ exports.postEditCategory = async (req, res) => {
 
     category.name = req.body.name;
     category.description = req.body.description;
+
     if (req.file) category.image = req.file.path;
 
     await category.save();
@@ -224,7 +245,8 @@ exports.postEditCategory = async (req, res) => {
   }
 };
 
-// حذف فئة
+// ================= DELETE CATEGORY (FIXED) =================
+
 exports.deleteCategory = async (req, res) => {
   try {
     const id = req.params.id;
@@ -232,11 +254,11 @@ exports.deleteCategory = async (req, res) => {
     const category = await Category.findById(id);
     if (!category) return res.status(404).send("Category not found");
 
-    // 1️⃣ مسح كل المنتجات اللي فيها الكاتيجوري
-    await Product.deleteMany({ category: category.name });
+    // 🔥 FIX: correct field is categories (array of ObjectIds)
+    await Product.deleteMany({ categories: category._id });
 
-    // 2️⃣ مسح الكاتيجوري نفسها
-await Category.findByIdAndDelete(category)
+    await Category.findByIdAndDelete(id);
+
     res.redirect("/admin/categories");
   } catch (err) {
     console.log(err);
