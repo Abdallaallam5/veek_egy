@@ -2,7 +2,7 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const admin = require("../controllers/adminController");
 const auth = require("../middleware/adminAuth");
-const upload = require("../middleware/upload");
+const upload = require("../config/multer");
 const Product = require("../models/Product");
 const Coupon = require("../models/Coupon");
 const Category = require("../models/Category");
@@ -25,7 +25,12 @@ router.get("/products/list", auth, admin.getProducts);
 
 router.post("/products/add", auth, upload.array("images", 10), admin.addProduct);
 router.get("/edit/:id", auth, admin.getEditProduct);
-router.post("/products/edit/:id", upload.array("images"), auth, admin.postEditProduct);
+router.post(
+  "/products/edit/:id",
+  auth,
+  upload.array("images"),
+  admin.postEditProduct
+);
 router.delete("/products/delete/:id", auth, admin.deleteProduct);
 
 // ===== Categories =====
@@ -46,7 +51,7 @@ router.get("/coupon", auth, async (req, res) => {
 
 // POST /admin/create-coupon
 // إنشاء أو تعديل كوبون
-router.post('/create-coupon', async (req, res) => {
+router.post('/create-coupon', auth,async (req, res) => {
   const { couponId, code, discountType, discountValue, maxUses, expiresAt } = req.body;
 
   try {
@@ -77,7 +82,7 @@ router.post('/create-coupon', async (req, res) => {
 });
 
 // حذف كوبون
-router.post('/delete-coupon/:id', async (req, res) => {
+router.post('/delete-coupon/:id', auth, async (req, res) => {
   try {
     await Coupon.findByIdAndDelete(req.params.id);
     res.redirect('/admin/coupon'); // ارجع لنفس الصفحة
