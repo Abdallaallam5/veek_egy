@@ -208,45 +208,83 @@ exports.getCategories = async (req, res) => {
 
 const cloudinary = require("cloudinary").v2;
 
+const formidable = require('formidable');
+const cloudinary = require("cloudinary").v2;
+const fs = require('fs').promises; // للحذف المؤقت
+
 exports.postAddCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    // 🔥 VERCEL FIX: استخدم formidable بدل multer
+    const form = formidable({
+      uploadDir: './public/tmp', // مجلد مؤقت
+      keepExtensions: true,
+      maxFileSize: 5 * 1024 * 1024, // 5MB
+    });
 
-    let image = null;
+    const [fields, files] = await form.parse(req);
 
-    if (req.file && req.file.buffer) {
+    const name = fields.name?.[0];
+    const description = fields.description?.[0];
+    const imageFile = files.image?.[0];
+
+    if (!name) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Category name is required' 
+      });
+    }
+
+    let imageUrl = null;
+
+    // 🔥 UPLOAD TO CLOUDPARY
+    if (imageFile) {
       const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "categories" },
+        cloudinary.uploader.upload(
+          imageFile.filepath,
+          { 
+            folder: "veek/categories",
+            resource_type: "image"
+          },
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
           }
         );
-
-        stream.end(req.file.buffer);
       });
 
-      image = result.secure_url;
+      imageUrl = result.secure_url;
+      
+      // 🔥 حذف الملف المؤقت
+      await fs.unlink(imageFile.filepath).catch(console.error);
     }
 
     const category = await Category.create({
-      name,
-      description,
-      image,
+      name: name.toString(),
+      description: description?.toString() || '',
+      image: imageUrl,
+      productsCount: 0
     });
 
-    return res.json({ success: true, category });
+    res.json({ 
+      success: true, 
+      category: {
+        _id: category._id,
+        name: category.name,
+        description: category.description,
+        image: category.image
+      }
+    });
 
   } catch (err) {
-    console.log("❌ CATEGORY ERROR:", err);
-
-    return res.status(500).json({
-      success: false,
-      message: err.message || "Server error"
+    console.error("❌ CATEGORY ERROR:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Server error" 
     });
   }
-};exports.postEditCategory = async (req, res) => {
+};
+
+exports.postEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) return res.json({ success: false });
