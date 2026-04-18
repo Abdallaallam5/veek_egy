@@ -43,10 +43,10 @@ router.get("/categories", auth, admin.getCategories);
 router.post(
   "/categories/add",
   auth,
-  upload.single("image"),
+ 
   admin.postAddCategory
 );
-router.post("/categories/edit/:id", upload.single("image"), auth, admin.postEditCategory);
+router.post("/categories/edit/:id", auth, admin.postEditCategory);
 router.delete("/categories/delete/:id", auth, admin.deleteCategory);
 
 // ===== Coupons =====
