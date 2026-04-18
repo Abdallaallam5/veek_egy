@@ -2,281 +2,529 @@
 <%- include("partials/header") %>
 
 <div class="admin-content">
-
-  <h1>Categories</h1>
-  <button id="addCategoryBtn">+ Add Category</button>
-
-  <table id="categoriesTable">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% categories.forEach(c => { 
-          if(c.image){
-            c.image = c.image.replace(/^public[\\\/]/, '').replace(/\\/g,'/');
-          } %>
-        <tr data-id="<%= c._id %>">
-          <td>
-            <% if(c.image){ %>
-              <img src="<%= c.image %>" width="60" />
-            <% } %>
-          </td>
-          <td class="cat-name"><%= c.name %></td>
-          <td class="cat-desc"><%= c.description %></td>
-          <td>
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
-
-  <!-- Add/Edit Modal -->
-  <div id="categoryModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
-    <div style="background:white;padding:20px;border-radius:12px;width:350px;">
-      <h3 id="modalTitle">Add Category</h3>
-      <input type="text" id="categoryName" placeholder="Category Name" style="width:100%;margin-bottom:10px;padding:8px;">
-      <textarea id="categoryDesc" placeholder="Description" style="width:100%;margin-bottom:10px;padding:8px;"></textarea>
-      <input type="file" id="categoryImage" style="margin-bottom:10px;">
-      <button id="saveCategoryBtn" style="background:#4cd137;color:white;padding:10px 20px;border:none;border-radius:8px;">Save</button>
-      <button id="closeModalBtn" style="background:#dcdde1;padding:10px 20px;border:none;border-radius:8px;margin-left:10px;">Cancel</button>
-    </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;">
+    <h1>🗂️ Categories</h1>
+    <button id="addCategoryBtn" class="primary-btn">+ Add New Category</button>
   </div>
 
+  <div class="table-container">
+    <table id="categoriesTable">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Products Count</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (categories && categories.length > 0) { %>
+          <% categories.forEach(c => { %>
+            <tr data-id="<%= c._id %>">
+              <td>
+                <% if(c.image){ %>
+                  <img src="<%= c.image %>" alt="<%= c.name %>" width="60" style="border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                <% } else { %>
+                  <div style="width:60px;height:60px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">No Image</div>
+                <% } %>
+              </td>
+              <td class="cat-name" style="font-weight:600;"><%= c.name %></td>
+              <td class="cat-desc"><%= c.description || 'No description' %></td>
+              <td>0</td>
+              <td>
+                <button class="edit-btn" title="Edit">✏️</button>
+                <button class="delete-btn" title="Delete">🗑️</button>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" style="text-align:center;padding:40px;color:#999;">
+              <div style="font-size:48px;margin-bottom:10px;">📂</div>
+              No categories found. Add your first category!
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 🔥 MODERN MODAL -->
+  <div id="categoryModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add New Category</h3>
+        <button class="close-btn" id="closeModalBtn">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" id="categoryName" placeholder="Enter category name" maxlength="100">
+        </div>
+        
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="categoryDesc" placeholder="Enter description (optional)" maxlength="500" rows="3"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Image (Optional)</label>
+          <div class="image-upload-area" id="imageUploadArea">
+            <div class="upload-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                <path d="M14 2v6h6"/>
+                <circle cx="13.5" cy="13.5" r="2.5"/>
+              </svg>
+              <p>Click to upload image or drag & drop</p>
+              <small>JPG, PNG up to 5MB</small>
+            </div>
+            <input type="file" id="categoryImage" accept="image/*" style="display:none;">
+            <img id="imagePreview" style="display:none;">
+            <input type="hidden" id="imageUrl">
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button id="saveCategoryBtn" class="btn-primary">Save Category</button>
+        <button id="cancelBtn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
 .admin-content {
   margin-left: 220px;
   padding: 30px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+  transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+}
+
+.table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
 #categoriesTable {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
 }
 
-#categoriesTable th, #categoriesTable td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
+#categoriesTable th {
+  background: #f8f9fa;
+  padding: 20px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
 }
 
-img {
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+#categoriesTable td {
+  padding: 20px 16px;
+  border-bottom: 1px solid #f1f3f4;
 }
 
-button {
+tr:hover {
+  background: #f8f9ff;
+}
+
+/* Buttons */
+.edit-btn, .delete-btn {
   padding: 8px 12px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-#addCategoryBtn {
-  background-color: #4cd137;
-  color: white;
+  font-size: 14px;
+  margin-right: 6px;
+  transition: all 0.2s;
 }
 
 .edit-btn {
-  background-color: #487eb0;
+  background: #17a2b8;
   color: white;
-  margin-right:5px;
 }
 
 .delete-btn {
-  background-color: #e84118;
+  background: #dc3545;
   color: white;
+}
+
+.edit-btn:hover { background: #138496; transform: scale(1.05); }
+.delete-btn:hover { background: #c82333; transform: scale(1.05); }
+
+/* 🔥 MODAL STYLES */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  padding: 25px 25px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.image-upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafbfc;
+}
+
+.image-upload-area:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.upload-placeholder svg {
+  color: #adb5bd;
+  margin-bottom: 12px;
+}
+
+.upload-placeholder p {
+  margin: 0 0 4px 0;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+#imagePreview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.modal-footer {
+  padding: 20px 25px 25px;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary, .btn-secondary {
+  flex: 1;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(40,167,69,0.4);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+@media (max-width: 768px) {
+  .admin-content { margin-left: 0; padding: 20px; }
+  .modal-content { margin: 20px; width: calc(100% - 40px); }
 }
 </style>
 
 <script>
+// 🔥 VERCEL READY - NO MULTER NEEDED
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("categoryModal");
   const categoryName = document.getElementById("categoryName");
   const categoryDesc = document.getElementById("categoryDesc");
   const categoryImage = document.getElementById("categoryImage");
+  const imageUploadArea = document.getElementById("imageUploadArea");
+  const imagePreview = document.getElementById("imagePreview");
+  const imageUrlInput = document.getElementById("imageUrl");
   const saveBtn = document.getElementById("saveCategoryBtn");
   const closeBtn = document.getElementById("closeModalBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
   const addBtn = document.getElementById("addCategoryBtn");
+  
   let editId = null;
 
-  // 🔥 FIX: Check if elements exist
-  if (!modal || !categoryName || !categoryDesc || !categoryImage || !saveBtn || !closeBtn || !addBtn) {
-    console.error("Required elements not found!");
-    return;
-  }
-
-  // Open modal for Add
-  addBtn.addEventListener("click", () => {
+  // Open Add Modal
+  addBtn?.addEventListener("click", () => {
     editId = null;
-    categoryName.value = "";
-    categoryDesc.value = "";
-    categoryImage.value = "";
-    document.getElementById("modalTitle").innerText = "Add Category";
+    resetForm();
+    document.getElementById("modalTitle").textContent = "Add New Category";
     modal.style.display = "flex";
   });
 
-  // Close modal
-  closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
+  // Close Modal
+  const closeModal = () => modal.style.display = "none";
+  closeBtn?.addEventListener("click", closeModal);
+  cancelBtn?.addEventListener("click", closeModal);
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
   });
 
-  // Close on backdrop click
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.style.display = "none";
+  // Image Upload
+  const resetImage = () => {
+    imagePreview.style.display = "none";
+    imageUrlInput.value = "";
+    imageUploadArea.classList.remove("has-image");
+  };
+
+  const resetForm = () => {
+    categoryName.value = "";
+    categoryDesc.value = "";
+    resetImage();
+  };
+
+  // Drag & Drop + Click Upload
+  const handleImageUpload = (file) => {
+    if (file && file.type.startsWith('image/') && file.size < 5 * 1024 * 1024) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = "block";
+        imageUploadArea.classList.add("has-image");
+        // Base64 للـ Vercel (بدون Cloudinary)
+        imageUrlInput.value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid image (JPG/PNG, max 5MB)");
     }
-  });
+  };
 
-  // Save Add/Edit
-  saveBtn.addEventListener("click", async () => {
+  imageUploadArea?.addEventListener("click", () => categoryImage.click());
+  categoryImage?.addEventListener("change", (e) => handleImageUpload(e.target.files[0]));
+
+  // Drag & Drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+    imageUploadArea?.addEventListener(event, preventDefaults, false);
+  });
+  ['dragenter', 'dragover'].forEach(event => {
+    imageUploadArea?.addEventListener(event, highlight, false);
+  });
+  ['dragleave', 'drop'].forEach(event => {
+    imageUploadArea?.addEventListener(event, unhighlight, false);
+  });
+  imageUploadArea?.addEventListener('drop', handleDrop, false);
+
+  function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+  function highlight(e) { imageUploadArea.classList.add('highlight'); }
+  function unhighlight(e) { imageUploadArea.classList.remove('highlight'); }
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleImageUpload(files[0]);
+  }
+
+  // Save Category
+  saveBtn?.addEventListener("click", async () => {
     const name = categoryName.value.trim();
-    const desc = categoryDesc.value.trim();
-    const imageFile = categoryImage.files[0];
+    const description = categoryDesc.value.trim();
+    const image = imageUrlInput.value;
 
     if (!name) {
-      alert("Enter category name");
+      alert("Category name is required!");
+      categoryName.focus();
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", desc);
-    if (imageFile) formData.append("image", imageFile);
+    const payload = { name, description };
+    if (image) payload.image = image;
 
     try {
-      if (editId) {
-        // EDIT
-        const res = await fetch(`/admin/categories/edit/${editId}`, {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-          const tr = document.querySelector(`tr[data-id="${editId}"]`);
-          if (tr) {
-            tr.querySelector(".cat-name").textContent = name;
-            tr.querySelector(".cat-desc").textContent = desc;
+      const url = editId 
+        ? `/admin/categories/edit/${editId}`
+        : '/admin/categories/add';
+      
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-            // 🔥 FIX: Safe image update
-            if (data.category?.image) {
-              const imgPath = data.category.image.replace(/^public[\\\/]/, '').replace(/\\/g, '/');
-              let imgCell = tr.querySelector("td:first-child img");
-              if (!imgCell) {
-                imgCell = document.createElement("img");
-                imgCell.width = 60;
-                imgCell.style.borderRadius = "8px";
-                imgCell.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
-                tr.querySelector("td:first-child").innerHTML = "";
-                tr.querySelector("td:first-child").appendChild(imgCell);
-              }
-              imgCell.src = `/${imgPath}`;
-            }
+      const data = await res.json();
+
+      if (data.success) {
+        if (editId) {
+          // Update row
+          const row = document.querySelector(`tr[data-id="${editId}"]`);
+          row.querySelector('.cat-name').textContent = name;
+          row.querySelector('.cat-desc').textContent = description || 'No description';
+          if (image) {
+            const img = row.querySelector('img');
+            img.src = image;
+            img.style.display = 'block';
           }
-          alert("Category updated successfully!");
-          modal.style.display = "none";
         } else {
-          alert("Update failed: " + (data.message || "Unknown error"));
+          // Add new row
+          location.reload(); // Simple reload للـ Vercel
         }
+        closeModal();
+        alert(editId ? 'Category updated!' : 'Category added!');
       } else {
-        // ADD NEW
-        const res = await fetch("/admin/categories/add", {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-        
-        if (data.success && data.category) {
-          const tbody = document.querySelector("#categoriesTable tbody");
-          if (tbody) {
-            const tr = document.createElement("tr");
-            tr.dataset.id = data.category._id;
-
-            let imgTag = "";
-            if (data.category.image) {
-              const imgPath = data.category.image.replace(/^public[\\\/]/, '').replace(/\\/g, '/');
-              imgTag = `<img src="/${imgPath}" width="60" style="border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">`;
-            }
-
-            tr.innerHTML = `
-              <td>${imgTag}</td>
-              <td class="cat-name">${data.category.name}</td>
-              <td class="cat-desc">${data.category.description || ''}</td>
-              <td>
-                <button class="edit-btn">Edit</button>
-                <button class="delete-btn">Delete</button>
-              </td>
-            `;
-            tbody.prepend(tr);
-            alert("Category added successfully!");
-            modal.style.display = "none";
-          }
-        } else {
-          alert("Failed to add category: " + (data.message || "Unknown error"));
-        }
+        alert(`Error: ${data.message || 'Something went wrong'}`);
       }
-    } catch (err) {
-      console.error("Error:", err);
-      alert("Network error! Check console for details.");
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Network error! Check console.');
     }
   });
 
-  // 🔥 FIXED: Event delegation for buttons (Safe & Works Always)
-  document.addEventListener("click", async (e) => {
-    // EDIT Button
-    if (e.target.classList.contains("edit-btn")) {
-      const tr = e.target.closest("tr");
-      if (!tr || !tr.dataset.id) return;
+  // Edit/Delete Actions
+  document.addEventListener('click', async (e) => {
+    const row = e.target.closest('tr[data-id]');
+    if (!row) return;
+
+    const id = row.dataset.id;
+
+    // Edit
+    if (e.target.classList.contains('edit-btn')) {
+      editId = id;
+      document.getElementById("modalTitle").textContent = "Edit Category";
       
-      editId = tr.dataset.id;
-      const name = tr.querySelector(".cat-name")?.textContent || "";
-      const desc = tr.querySelector(".cat-desc")?.textContent || "";
+      const name = row.querySelector('.cat-name').textContent;
+      const desc = row.querySelector('.cat-desc').textContent;
+      const imgSrc = row.querySelector('img')?.src;
       
       categoryName.value = name;
-      categoryDesc.value = desc;
-      document.getElementById("modalTitle").innerText = "Edit Category";
-      modal.style.display = "flex";
+      categoryDesc.value = desc === 'No description' ? '' : desc;
+      if (imgSrc) {
+        imagePreview.src = imgSrc;
+        imagePreview.style.display = 'block';
+        imageUrlInput.value = imgSrc;
+      }
+      
+      modal.style.display = 'flex';
     }
 
-    // DELETE Button
-    if (e.target.classList.contains("delete-btn")) {
-      const tr = e.target.closest("tr");
-      if (!tr || !tr.dataset.id) return;
-      
-      const id = tr.dataset.id;
-      const name = tr.querySelector(".cat-name")?.textContent || "";
-      
-      if (confirm(`Delete "${name}"? This cannot be undone!`)) {
+    // Delete
+    if (e.target.classList.contains('delete-btn')) {
+      if (confirm(`Delete "${row.querySelector('.cat-name').textContent}"?`)) {
         try {
-          const res = await fetch(`/admin/categories/delete/${id}`, {
-            method: "DELETE"
-          });
+          const res = await fetch(`/admin/categories/delete/${id}`, { method: 'DELETE' });
           const data = await res.json();
-          
           if (data.success) {
-            tr.remove();
-            alert("Category deleted successfully!");
+            row.remove();
+            alert('Category deleted!');
           } else {
-            alert("Delete failed: " + (data.message || "Unknown error"));
+            alert(data.message || 'Delete failed');
           }
-        } catch (err) {
-          console.error("Delete error:", err);
-          alert("Delete failed! Check console.");
+        } catch (error) {
+          alert('Delete failed!');
         }
       }
     }
