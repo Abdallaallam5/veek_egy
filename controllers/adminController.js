@@ -206,129 +206,46 @@ exports.getCategories = async (req, res) => {
   res.render("admin/categories", { categories });
 };
 
-const cloudinary = require("cloudinary").v2;
-
-const formidable = require('formidable');
-
-const fs = require('fs').promises; // للحذف المؤقت
-
 exports.postAddCategory = async (req, res) => {
   try {
-    // 🔥 VERCEL FIX: استخدم formidable بدل multer
-    const form = formidable({
-      uploadDir: './public/tmp', // مجلد مؤقت
-      keepExtensions: true,
-      maxFileSize: 5 * 1024 * 1024, // 5MB
+    const { name, description } = req.body;
+
+    let image = null;
+    if (req.file) image = req.file.path; // 🔥 CLOUDINARY FIX
+
+    const category = new Category({
+      name,
+      description,
+      image,
     });
 
-    const [fields, files] = await form.parse(req);
-
-    const name = fields.name?.[0];
-    const description = fields.description?.[0];
-    const imageFile = files.image?.[0];
-
-    if (!name) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Category name is required' 
-      });
-    }
-
-    let imageUrl = null;
-
-    // 🔥 UPLOAD TO CLOUDPARY
-    if (imageFile) {
-      const result = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(
-          imageFile.filepath,
-          { 
-            folder: "veek/categories",
-            resource_type: "image"
-          },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-      });
-
-      imageUrl = result.secure_url;
-      
-      // 🔥 حذف الملف المؤقت
-      await fs.unlink(imageFile.filepath).catch(console.error);
-    }
-
-    const category = await Category.create({
-      name: name.toString(),
-      description: description?.toString() || '',
-      image: imageUrl,
-      productsCount: 0
-    });
-
-    res.json({ 
-      success: true, 
-      category: {
-        _id: category._id,
-        name: category.name,
-        description: category.description,
-        image: category.image
-      }
-    });
-
+    await category.save();
+    res.json({ success: true, category });
   } catch (err) {
-    console.error("❌ CATEGORY ERROR:", err);
-    res.status(500).json({ 
-      success: false, 
-      message: err.message || "Server error" 
-    });
+    console.error(err);
+    res.json({ success: false });
   }
 };
+
 exports.postEditCategory = async (req, res) => {
   try {
-    const form = formidable({
-      uploadDir: './public/tmp',
-      keepExtensions: true,
-      maxFileSize: 5 * 1024 * 1024,
-    });
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.json({ success: false });
 
-    const [fields, files] = await form.parse(req);
-    const categoryId = req.params.id;
+    category.name = req.body.name;
+    category.description = req.body.description;
 
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res.json({ success: false, message: 'Category not found' });
-    }
-
-    // Update fields
-    category.name = fields.name?.[0]?.toString() || category.name;
-    category.description = fields.description?.[0]?.toString() || category.description;
-
-    // Update image if new file
-    const imageFile = files.image?.[0];
-    if (imageFile) {
-      const result = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(
-          imageFile.filepath,
-          { folder: "veek/categories" },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-      });
-
-      category.image = result.secure_url;
-      await fs.unlink(imageFile.filepath).catch(console.error);
-    }
+    if (req.file) category.image = req.file.path;
 
     await category.save();
     res.json({ success: true });
-
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: err.message });
+    res.json({ success: false });
   }
-};// ================= DELETE CATEGORY (FIXED) =================
+};
+
+// ================= DELETE CATEGORY (FIXED) =================
 
 exports.deleteCategory = async (req, res) => {
   try {
