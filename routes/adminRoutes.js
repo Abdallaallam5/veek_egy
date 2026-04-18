@@ -23,7 +23,12 @@ router.get("/products", auth, admin.productsPage);
 router.get("/add-product", auth, admin.add_productsPage);
 router.get("/products/list", auth, admin.getProducts);
 
-router.post("/products/add", auth, upload.array("images", 10), admin.addProduct);
+router.post(
+  "/products/add",
+  auth,
+  upload.array("images", 10),
+  admin.addProduct
+);
 router.get("/edit/:id", auth, admin.getEditProduct);
 router.post(
   "/products/edit/:id",
@@ -34,10 +39,9 @@ router.post(
 router.delete("/products/delete/:id", auth, admin.deleteProduct);
 
 // ===== Categories =====
-// ===== Categories =====
 router.get("/categories", auth, admin.getCategories);
-router.post("/categories/add", auth, singleUpload.single("image"), admin.postAddCategory);
-router.post("/categories/edit/:id", auth, singleUpload.single("image"), admin.postEditCategory);
+router.post("/categories/add", upload.single("image"), auth, admin.postAddCategory);
+router.post("/categories/edit/:id", upload.single("image"), auth, admin.postEditCategory);
 router.delete("/categories/delete/:id", auth, admin.deleteCategory);
 
 // ===== Coupons =====
