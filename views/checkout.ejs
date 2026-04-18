@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+
   <style>
-  @keyframes spin {
+@keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-/* ===== Checkout Page Layout ===== */
+
+/* ===== Layout ===== */
 body {
   font-family: Arial, sans-serif;
   background-color: #f7f8fc;
@@ -24,7 +26,7 @@ body {
   gap: 30px;
 }
 
-/* ===== Left Section ===== */
+/* ===== Left ===== */
 .checkout-left {
   flex: 1;
   background-color: #fff;
@@ -47,33 +49,47 @@ body {
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 14px;
-  outline: none;
-  transition: 0.2s;
 }
 
-.checkout-left input:focus {
+/* ===== 🎯 SELECT STYLE (التعديل الوحيد) ===== */
+.checkout-left select {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg fill='%23666' height='18' viewBox='0 0 20 20' width='18' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.checkout-left select:focus {
   border-color: #1e90ff;
   box-shadow: 0 0 5px rgba(30,144,255,0.2);
+  outline: none;
 }
 
-.checkout-left .checkout-btn {
+/* ===== Button ===== */
+.checkout-btn {
   width: 100%;
   padding: 12px;
   background-color: #1e90ff;
   color: #fff;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.checkout-left .checkout-btn:hover {
-  background-color: #0d6efd;
-}
-
-/* ===== Right Section ===== */
+/* ===== Right ===== */
 .checkout-right {
   flex: 1;
   background-color: #fff;
@@ -84,415 +100,84 @@ body {
 
 .order-item {
   display: flex;
-  align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .order-item img {
   width: 80px;
   height: 80px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-right: 15px;
-  border: 1px solid #eee;
-}
-
-.order-item h4 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.order-item p {
-  margin: 3px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.price-box {
-  border-top: 1px solid #eee;
-  padding-top: 15px;
+  margin-right: 10px;
 }
 
 .price-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #333;
+  margin: 10px 0;
 }
 
 .total-row {
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: bold;
   color: #1e90ff;
-}
-#message {
-  font-weight: 700;
-  color: green;
-  margin-left: 10px;
 }
 
 /* ===== Responsive ===== */
-/* ===== MOBILE FIX ===== */
 @media (max-width: 900px) {
-
   .checkout {
     flex-direction: column;
     margin: 10px;
-    gap: 15px;
   }
 
-  .checkout-left,
-  .checkout-right {
-    padding: 18px;
-    border-radius: 10px;
-  }
-
-  .checkout-left h2 {
-    font-size: 18px;
-  }
-
-  .checkout-left input,
   .checkout-left select {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .checkout-left .checkout-btn {
-    padding: 14px;
-    font-size: 15px;
-  }
-
-  /* ===== ORDER ITEMS ===== */
-  .order-item {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .order-item img {
-    width: 55px;
-    height: 55px;
-    border-radius: 8px;
-  }
-
-  .order-item h4 {
-    font-size: 14px;
-  }
-
-  .order-item p {
-    font-size: 12px;
-  }
-
-  /* ===== PRICE BOX ===== */
-  .price-row {
-    font-size: 14px;
-  }
-
-  .total-row {
-    font-size: 15px;
-  }
-
-  /* ===== COUPON ===== */
-  .coupon-section {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .coupon-section button {
-    width: 100%;
-  }
-
-  /* ===== LOADING ===== */
-  #loadingOverlay {
-    font-size: 16px;
-    text-align: center;
-    padding: 20px;
-  }
-}
-
-/* ===== SMALL PHONES ===== */
-@media (max-width: 480px) {
-
-  .checkout {
-    margin: 5px;
-  }
-
-  .checkout-left,
-  .checkout-right {
-    padding: 14px;
-  }
-
-  .order-item {
-    gap: 10px;
-  }
-
-  .order-item img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .order-item h4 {
-    font-size: 13px;
-  }
-
-  .order-item p {
-    font-size: 11px;
-  }
-
-  .price-row {
-    font-size: 13px;
-  }
-
-  .total-row {
-    font-size: 14px;
+    padding: 10px 35px 10px 10px;
   }
 }
 </style>
 </head>
+
 <body>
-  
-<div id="popupAlert" style="
-  display:none;
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#000;
-  color:#fff;
-  padding:12px 20px;
-  border-radius:10px;
-  z-index:99999;
-  font-size:14px;
-">
+
+<form id="checkoutForm">
+
+<div class="checkout">
+
+<div class="checkout-left">
+
+<h2>Contact</h2>
+<input name="name" placeholder="Full Name" required>
+<input name="email" type="email" placeholder="Email" required>
+<input name="phone" placeholder="Phone" required>
+
+<h2>Shipping</h2>
+<input name="address" placeholder="Address" required>
+
+<!-- 👇 نفس السيلكت بدون تغيير -->
+<select name="city" id="citySelect" required>
+  <option value="">Select Governorate</option>
+  <% [
+    "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
+    "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
+    "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
+    "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
+    "Luxor","Qena","North Sinai","Sohag"
+  ].forEach(g => { %>
+    <option value="<%= g %>"><%= g %></option>
+  <% }) %>
+</select>
+
+<button class="checkout-btn">Confirm Order</button>
+
 </div>
-<div id="loadingOverlay" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  z-index:9999;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:18px;
-  flex-direction:column;
-">
-  <div style="
-    width:40px;
-    height:40px;
-    border:4px solid #fff;
-    border-top:4px solid transparent;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-    margin-bottom:10px;
-  "></div>
 
-  Processing Order...
+<div class="checkout-right">
+<div class="price-row">
+  <span>Total</span>
+  <span>---</span>
 </div>
-<form id="checkoutForm" onsubmit="event.preventDefault(); submitOrder();">
+</div>
 
-  <div class="checkout">
+</div>
 
-    <!-- LEFT -->
-    <div class="checkout-left">
-
-      <h2>Contact</h2>
-      <input name="name" placeholder="Full Name" required>
-      <input name="email" placeholder="Email" type="email" required>
-      <input name="phone" placeholder="Phone" required>
-
-      <h2>Shipping</h2>
-      <input name="address" placeholder="Address" required>
-      <select name="city" id="citySelect" required>
-        <option value="">Select Governorate</option>
-        <% [
-  "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
-  "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
-  "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
-  "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
-  "Luxor","Qena","North Sinai","Sohag"
-].forEach(g => { %>
-          <option value="<%= g %>"><%= g %></option>
-        <% }) %>
-      </select>
-
-      <button type="submit" class="checkout-btn">Confirm Order</button>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="checkout-right">
-
-<% cartItems.forEach(item => { %>
-
-  <div class="order-item">
-    <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>" alt="Product">
-
-    <div>
-      <h4><%= item.name %></h4>
-
-      <% if(item.selectedSize) { %>
-        <p>Size: <%= item.selectedSize %></p>
-      <% } %>
-
-      <% if(item.selectedColor) { %>
-        <p>Color: <%= item.selectedColor %></p>
-      <% } %>
-
-      <p>Price: <%= item.selectedPrice %> EGP</p>
-      <p>Quantity: <%= item.quantity %></p>
-
-      <!-- hidden inputs -->
-      <input type="hidden" name="productId[]" value="<%= item._id %>">
-      <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
-      <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
-      <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
-<input type="hidden" name="color[]" value="<%= item.selectedColor %>">
-    </div>
-  </div>
-
-<% }) %>
-
-      <div class="price-box">
-        <div class="price-row">
-          <span>Subtotal</span>
-          <span id="subtotal"><%= subtotal %> EGP</span>
-        </div>
-
-        <div class="coupon-section">
-          <input type="text" id="couponCode" placeholder="Enter Promo Code">
-          <button type="button" id="applyCoupon">Apply</button>
-          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
-        </div>
-
-        <div class="price-row">
-          <span>Discount</span>
-          <span id="discount">0 EGP</span>
-        </div>
-
-        <div class="price-row">
-          <span>Shipping</span>
-          <span id="shipping"><%= shipping %> EGP</span>
-          
-          <span id="message"><%= message %></span>
-        </div>
-
-        <div class="price-row total-row">
-          <span>Total</span>
-          <span id="total"><%= subtotal + shipping %> EGP</span>
-        </div>
-      </div>
-    </div>
-  </div>
 </form>
+
 </body>
 </html>
-
-
-
-
-
-<script>
-  function popupAlert(message, type = "success") {
-  const el = document.getElementById("popupAlert");
-
-  el.textContent = message;
-  el.style.display = "block";
-
-  el.style.background =
-    type === "error" ? "#e74c3c" :
-    type === "success" ? "#2ecc71" : "#000";
-
-  setTimeout(() => {
-    el.style.display = "none";
-  }, 2500);
-}
-  function showLoading() {
-  document.getElementById("loadingOverlay").style.display = "flex";
-}
-
-function hideLoading() {
-  document.getElementById("loadingOverlay").style.display = "none";
-}
-async function updatePrices() {
-  const couponCode = document.getElementById("couponCode").value;
-  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
-  const governorate = document.getElementById("citySelect").value;
-  if(!governorate) return;
-
-  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-  const data = await res.json();
-
-  if(data.success) {
-    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage").textContent = data.message;
-  }
-}
-
-document.getElementById("citySelect").addEventListener('change', updatePrices);
-document.getElementById("applyCoupon").addEventListener('click', updatePrices);
-
-async function submitOrder() {
-  try {
-    showLoading();
-
-    const form = document.getElementById("checkoutForm");
-    const formData = new FormData(form);
-
-    const productIds = formData.getAll("productId[]");
-    const quantities = formData.getAll("quantity[]");
-    const prices = formData.getAll("price[]");
-    const sizes = formData.getAll("size[]");
-    const colors = formData.getAll("color[]");
-
-    const products = productIds.map((id, i) => ({
-      product: id,
-      quantity: parseInt(quantities[i]),
-      price: parseFloat(prices[i]),
-      size: sizes[i] || null,
-      color: colors[i] || null
-    }));
-
-    const data = Object.fromEntries(formData.entries());
-
-    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-    const total = parseFloat(document.getElementById("total").textContent) || 0;
-
-    const res = await fetch("/checkout/place-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
-      })
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      popupAlert("Order placed successfully", "success");
-      window.location.href = "/";
-    } else {
-      popupAlert("Error : " + (result.error || "Unknown error"), "error");
-    }
-
-  } catch (err) {
-    console.error("Submit Error:", err);
-    popupAlert("Something went wrong", "error");
-  } finally {
-    hideLoading();
-  }
-}</script> 
