@@ -11,10 +11,11 @@
 }
 /* ===== Checkout Page Layout ===== */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f7f8fc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 .checkout {
@@ -27,286 +28,388 @@ body {
 /* ===== Left Section ===== */
 .checkout-left {
   flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 35px 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .checkout-left h2 {
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 600;
+  border-bottom: 2px solid #e8ecf4;
+  padding-bottom: 10px;
+  position: relative;
 }
 
-.checkout-left input {
+.checkout-left h2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+/* ===== Custom Select & Input Styles ===== */
+.checkout-left input,
+.checkout-left select {
   width: 100%;
-  padding: 12px 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   outline: none;
-  transition: 0.2s;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-.checkout-left input:focus {
-  border-color: #1e90ff;
-  box-shadow: 0 0 5px rgba(30,144,255,0.2);
+.checkout-left input:focus,
+.checkout-left select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
+.checkout-left select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 16px center;
+  background-repeat: no-repeat;
+  background-size: 18px;
+  padding-right: 50px;
 }
 
 .checkout-left .checkout-btn {
   width: 100%;
-  padding: 12px;
-  background-color: #1e90ff;
+  padding: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 .checkout-left .checkout-btn:hover {
-  background-color: #0d6efd;
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.checkout-left .checkout-btn:active {
+  transform: translateY(-1px);
 }
 
 /* ===== Right Section ===== */
 .checkout-right {
   flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 35px 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .order-item {
   display: flex;
   align-items: center;
   margin-bottom: 25px;
+  padding: 20px;
+  background: rgba(248, 250, 252, 0.5);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+.order-item:hover {
+  background: rgba(248, 250, 252, 0.8);
+  transform: translateX(5px);
 }
 
 .order-item img {
-  width: 80px;
-  height: 80px;
+  width: 85px;
+  height: 85px;
   object-fit: cover;
-  border-radius: 6px;
-  margin-right: 15px;
-  border: 1px solid #eee;
+  border-radius: 15px;
+  margin-right: 20px;
+  border: 3px solid rgba(255,255,255,0.5);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .order-item h4 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  color: #333;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #2c3e50;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .order-item p {
-  margin: 3px 0;
-  font-size: 14px;
-  color: #555;
+  margin: 4px 0;
+  font-size: 15px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .price-box {
-  border-top: 1px solid #eee;
-  padding-top: 15px;
+  border-top: 2px solid #e8ecf4;
+  padding-top: 25px;
 }
 
 .price-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #333;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #2c3e50;
+  font-weight: 500;
 }
 
 .total-row {
   font-weight: 700;
-  font-size: 16px;
-  color: #1e90ff;
+  font-size: 22px;
+  color: #667eea;
+  padding: 20px 0;
+  border-top: 2px solid #e8ecf4;
+  margin-top: 15px;
 }
+
+.coupon-section {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.coupon-section input {
+  flex: 1;
+  padding: 14px 18px;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.coupon-section button {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.coupon-section button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
 #message {
   font-weight: 700;
-  color: green;
+  color: #10b981;
   margin-left: 10px;
+  font-size: 14px;
 }
 
-/* ===== Responsive ===== */
-/* ===== MOBILE FIX ===== */
-@media (max-width: 900px) {
+/* ===== Popup & Loading ===== */
+#popupAlert {
+  display: none;
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  padding: 16px 28px;
+  border-radius: 50px;
+  z-index: 99999;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  backdrop-filter: blur(20px);
+}
 
+#loadingOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-direction: column;
+  backdrop-filter: blur(5px);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 900px) {
   .checkout {
     flex-direction: column;
-    margin: 10px;
-    gap: 15px;
+    margin: 20px 15px;
+    gap: 20px;
   }
 
   .checkout-left,
   .checkout-right {
-    padding: 18px;
-    border-radius: 10px;
+    padding: 25px 20px;
+    border-radius: 20px;
+    max-height: none;
   }
 
   .checkout-left h2 {
-    font-size: 18px;
+    font-size: 22px;
   }
 
   .checkout-left input,
   .checkout-left select {
-    padding: 10px;
-    font-size: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+
+  .checkout-left select {
+    background-position: right 14px center;
+    padding-right: 45px;
   }
 
   .checkout-left .checkout-btn {
-    padding: 14px;
-    font-size: 15px;
+    padding: 16px;
+    font-size: 17px;
   }
 
-  /* ===== ORDER ITEMS ===== */
   .order-item {
+    padding: 18px 15px;
     flex-direction: row;
     align-items: flex-start;
-    gap: 12px;
+    gap: 15px;
   }
 
   .order-item img {
-    width: 55px;
-    height: 55px;
-    border-radius: 8px;
+    width: 65px;
+    height: 65px;
+    margin-right: 15px;
   }
 
   .order-item h4 {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .order-item p {
-    font-size: 12px;
-  }
-
-  /* ===== PRICE BOX ===== */
-  .price-row {
     font-size: 14px;
   }
 
-  .total-row {
+  .price-row {
     font-size: 15px;
   }
 
-  /* ===== COUPON ===== */
+  .total-row {
+    font-size: 20px;
+  }
+
   .coupon-section {
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
 
   .coupon-section button {
     width: 100%;
   }
-
-  /* ===== LOADING ===== */
-  #loadingOverlay {
-    font-size: 16px;
-    text-align: center;
-    padding: 20px;
-  }
 }
 
-/* ===== SMALL PHONES ===== */
 @media (max-width: 480px) {
-
   .checkout {
-    margin: 5px;
+    margin: 10px 10px;
   }
 
   .checkout-left,
   .checkout-right {
-    padding: 14px;
+    padding: 20px 18px;
   }
 
   .order-item {
-    gap: 10px;
+    gap: 12px;
+    padding: 15px 12px;
   }
 
   .order-item img {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
   }
 
   .order-item h4 {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .order-item p {
-    font-size: 11px;
-  }
-
-  .price-row {
     font-size: 13px;
   }
 
-  .total-row {
+  .price-row {
     font-size: 14px;
+  }
+
+  .total-row {
+    font-size: 18px;
+  }
+
+  .checkout-left input,
+  .checkout-left select {
+    padding: 12px 14px;
   }
 }
 </style>
 </head>
 <body>
   
-<div id="popupAlert" style="
-  display:none;
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#000;
-  color:#fff;
-  padding:12px 20px;
-  border-radius:10px;
-  z-index:99999;
-  font-size:14px;
-">
-</div>
-<div id="loadingOverlay" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  z-index:9999;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:18px;
-  flex-direction:column;
-">
+<div id="popupAlert"></div>
+<div id="loadingOverlay">
   <div style="
-    width:40px;
-    height:40px;
-    border:4px solid #fff;
-    border-top:4px solid transparent;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-    margin-bottom:10px;
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
   "></div>
-
   Processing Order...
 </div>
+
 <form id="checkoutForm" onsubmit="event.preventDefault(); submitOrder();">
-
   <div class="checkout">
-
     <!-- LEFT -->
     <div class="checkout-left">
-
       <h2>Contact</h2>
-      <input name="name" placeholder="Full Name" required>
-      <input name="email" placeholder="Email" type="email" required>
-      <input name="phone" placeholder="Phone" required>
+      <input name="name" placeholder="Full Name *" required>
+      <input name="email" placeholder="Email Address *" type="email" required>
+      <input name="phone" placeholder="Phone Number *" required>
 
       <h2>Shipping</h2>
-      <input name="address" placeholder="Address" required>
+      <input name="address" placeholder="Street Address *" required>
       <select name="city" id="citySelect" required>
-        <option value="">Select Governorate</option>
+        <option value="">Select Governorate *</option>
         <% [
   "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
   "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
@@ -323,35 +426,27 @@ body {
 
     <!-- RIGHT -->
     <div class="checkout-right">
-
 <% cartItems.forEach(item => { %>
-
-  <div class="order-item">
-    <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>" alt="Product">
-
-    <div>
-      <h4><%= item.name %></h4>
-
-      <% if(item.selectedSize) { %>
-        <p>Size: <%= item.selectedSize %></p>
-      <% } %>
-
-      <% if(item.selectedColor) { %>
-        <p>Color: <%= item.selectedColor %></p>
-      <% } %>
-
-      <p>Price: <%= item.selectedPrice %> EGP</p>
-      <p>Quantity: <%= item.quantity %></p>
-
-      <!-- hidden inputs -->
-      <input type="hidden" name="productId[]" value="<%= item._id %>">
-      <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
-      <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
-      <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
-<input type="hidden" name="color[]" value="<%= item.selectedColor %>">
-    </div>
-  </div>
-
+      <div class="order-item">
+        <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>" alt="Product">
+        <div>
+          <h4><%= item.name %></h4>
+          <% if(item.selectedSize) { %>
+            <p>Size: <%= item.selectedSize %></p>
+          <% } %>
+          <% if(item.selectedColor) { %>
+            <p>Color: <%= item.selectedColor %></p>
+          <% } %>
+          <p>Price: <%= item.selectedPrice %> EGP</p>
+          <p>Quantity: <%= item.quantity %></p>
+          <!-- hidden inputs -->
+          <input type="hidden" name="productId[]" value="<%= item._id %>">
+          <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
+          <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
+          <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
+          <input type="hidden" name="color[]" value="<%= item.selectedColor %>">
+        </div>
+      </div>
 <% }) %>
 
       <div class="price-box">
@@ -363,7 +458,7 @@ body {
         <div class="coupon-section">
           <input type="text" id="couponCode" placeholder="Enter Promo Code">
           <button type="button" id="applyCoupon">Apply</button>
-          <p id="couponMessage" style="color:red; font-size:13px; margin-top:5px;"></p>
+          <p id="couponMessage" style="color:#ef4444; font-size:14px; margin-top:8px; font-weight:500;"></p>
         </div>
 
         <div class="price-row">
@@ -374,7 +469,6 @@ body {
         <div class="price-row">
           <span>Shipping</span>
           <span id="shipping"><%= shipping %> EGP</span>
-          
           <span id="message"><%= message %></span>
         </div>
 
@@ -386,6 +480,7 @@ body {
     </div>
   </div>
 </form>
+
 </body>
 </html>
 
