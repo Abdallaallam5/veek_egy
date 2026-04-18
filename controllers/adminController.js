@@ -254,7 +254,21 @@ exports.postAddCategory = async (req, res) => {
     category.name = req.body.name;
     category.description = req.body.description;
 
-    if (req.file) category.image = req.file.path;
+   if (req.file && req.file.buffer) {
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "categories" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+
+    stream.end(req.file.buffer);
+  });
+
+  category.image = result.secure_url;
+}
 
     await category.save();
     res.json({ success: true });
