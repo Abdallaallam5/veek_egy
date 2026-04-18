@@ -206,17 +206,28 @@ exports.getCategories = async (req, res) => {
   res.render("admin/categories", { categories });
 };
 
+const cloudinary = require("cloudinary").v2;
+
 exports.postAddCategory = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-
     const { name, description } = req.body;
 
     let image = null;
 
-    if (req.file && req.file.path) {
-      image = req.file.path;
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "categories" },
+          (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+
+      image = result.secure_url;
     }
 
     const category = await Category.create({
@@ -225,17 +236,17 @@ exports.postAddCategory = async (req, res) => {
       image,
     });
 
-    return res.json({ success: true, category });
+    res.json({ success: true, category });
 
   } catch (err) {
-    console.error("CATEGORY ERROR:", err);
-
-    return res.status(500).json({
+    console.log(err);
+    res.status(500).json({
       success: false,
-      message: err.message || "Server error"
+      message: err.message
     });
   }
-};exports.postEditCategory = async (req, res) => {
+};
+exports.postEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) return res.json({ success: false });
