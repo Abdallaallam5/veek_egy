@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
         imagePreview.style.display = "block";
         imageUploadArea.classList.add("has-image");
         // Base64 للـ Vercel (بدون Cloudinary)
-        imageUrlInput.value = e.target.result;
+        
       };
       reader.readAsDataURL(file);
     } else {
@@ -440,56 +440,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Save Category
   saveBtn?.addEventListener("click", async () => {
-    const name = categoryName.value.trim();
-    const description = categoryDesc.value.trim();
-    const image = imageUrlInput.value;
+  const name = categoryName.value.trim();
+  const description = categoryDesc.value.trim();
+  const file = categoryImage.files[0];
 
-    if (!name) {
-      alert("Category name is required!");
-      categoryName.focus();
-      return;
+  if (!name) return alert("Category name required");
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("description", description);
+
+  if (file) {
+    formData.append("image", file);
+  }
+
+  try {
+    const url = editId 
+      ? `/admin/categories/edit/${editId}`
+      : '/admin/categories/add';
+
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData // 🔥 مهم جدًا
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      location.reload();
+    } else {
+      alert("Error");
     }
 
-    const payload = { name, description };
-    if (image) payload.image = image;
-
-    try {
-      const url = editId 
-        ? `/admin/categories/edit/${editId}`
-        : '/admin/categories/add';
-      
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        if (editId) {
-          // Update row
-          const row = document.querySelector(`tr[data-id="${editId}"]`);
-          row.querySelector('.cat-name').textContent = name;
-          row.querySelector('.cat-desc').textContent = description || 'No description';
-          if (image) {
-            const img = row.querySelector('img');
-            img.src = image;
-            img.style.display = 'block';
-          }
-        } else {
-          // Add new row
-          location.reload(); // Simple reload للـ Vercel
-        }
-        closeModal();
-        alert(editId ? 'Category updated!' : 'Category added!');
-      } else {
-        alert(`Error: ${data.message || 'Something went wrong'}`);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Network error! Check console.');
-    }
+  } catch (err) {
+    console.error(err);
+    alert("Network error");
+  }
   });
 
   // Edit/Delete Actions
