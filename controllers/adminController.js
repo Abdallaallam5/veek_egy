@@ -283,40 +283,52 @@ exports.postAddCategory = async (req, res) => {
     });
   }
 };
-
 exports.postEditCategory = async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
-    if (!category) return res.json({ success: false });
+    const form = formidable({
+      uploadDir: './public/tmp',
+      keepExtensions: true,
+      maxFileSize: 5 * 1024 * 1024,
+    });
 
-    category.name = req.body.name;
-    category.description = req.body.description;
+    const [fields, files] = await form.parse(req);
+    const categoryId = req.params.id;
 
-   if (req.file && req.file.buffer) {
-  const result = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: "categories" },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      }
-    );
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.json({ success: false, message: 'Category not found' });
+    }
 
-    stream.end(req.file.buffer);
-  });
+    // Update fields
+    category.name = fields.name?.[0]?.toString() || category.name;
+    category.description = fields.description?.[0]?.toString() || category.description;
 
-  category.image = result.secure_url;
-}
+    // Update image if new file
+    const imageFile = files.image?.[0];
+    if (imageFile) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload(
+          imageFile.filepath,
+          { folder: "veek/categories" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+      });
+
+      category.image = result.secure_url;
+      await fs.unlink(imageFile.filepath).catch(console.error);
+    }
 
     await category.save();
     res.json({ success: true });
+
   } catch (err) {
     console.error(err);
-    res.json({ success: false });
+    res.status(500).json({ success: false, message: err.message });
   }
-};
-
-// ================= DELETE CATEGORY (FIXED) =================
+};// ================= DELETE CATEGORY (FIXED) =================
 
 exports.deleteCategory = async (req, res) => {
   try {
