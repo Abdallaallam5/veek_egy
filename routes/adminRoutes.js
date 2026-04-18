@@ -39,6 +39,7 @@ router.post(
 router.delete("/products/delete/:id", auth, admin.deleteProduct);
 
 // ===== Categories =====
+router.get("/categories", auth, admin.getCategories);
 router.post(
   "/categories/add",
   auth,
