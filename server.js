@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const path = require("path");
+const multer = require("multer-storage-cloudinary"); 
+const cloudinary = require("cloudinary").v2;
 
 require("dotenv").config();
 
 const app = express();
-
+app.use(express.static("public"));
 // Session
 app.use(session({
   secret: "veek_secret",
