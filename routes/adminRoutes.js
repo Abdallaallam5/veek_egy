@@ -2,7 +2,7 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const admin = require("../controllers/adminController");
 const auth = require("../middleware/adminAuth");
-const upload = require("../config/multer");
+const upload = require("../middleware/multer");
 const Product = require("../models/Product");
 const Coupon = require("../models/Coupon");
 const Category = require("../models/Category");
@@ -38,17 +38,23 @@ router.post(
 );
 router.delete("/products/delete/:id", auth, admin.deleteProduct);
 
-// ===== Categories =====
 router.get("/categories", auth, admin.getCategories);
+
 router.post(
   "/categories/add",
   auth,
   upload.single("image"),
   admin.postAddCategory
 );
-router.post("/categories/edit/:id", auth, admin.postEditCategory);
-router.delete("/categories/delete/:id", auth, admin.deleteCategory);
 
+router.post(
+  "/categories/edit/:id",
+  auth,
+  upload.single("image"),
+  admin.postEditCategory
+);
+
+router.delete("/categories/delete/:id", auth, admin.deleteCategory);
 // ===== Coupons =====
 router.get("/coupon", auth, async (req, res) => {
   try {
