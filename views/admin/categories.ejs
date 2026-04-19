@@ -112,9 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("saveCategoryBtn");
   const closeBtn = document.getElementById("closeModalBtn");
   const addBtn = document.getElementById("addCategoryBtn");
+
   let editId = null;
 
-  // Open modal for Add
+  // ================= OPEN =================
   addBtn.addEventListener("click", () => {
     editId = null;
     categoryName.value = "";
@@ -124,103 +125,136 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = "flex";
   });
 
-  // Close modal
+  // ================= CLOSE =================
   closeBtn.addEventListener("click", () => {
     modal.style.display = "none";
   });
 
-  // Save Add/Edit
+  // ================= SAVE =================
   saveBtn.addEventListener("click", async () => {
     const name = categoryName.value.trim();
     const desc = categoryDesc.value.trim();
     const imageFile = categoryImage.files[0];
 
-    if(!name) return alert("Enter category name");
+    if (!name) return alert("Enter category name");
 
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", desc);
-    if(imageFile) formData.append("image", imageFile);
 
-    if(editId){
-      // Edit
-      const res = await fetch(`/admin/categories/edit/${editId}`, {
-        method:"POST",
-        body: formData
-      });
-      const data = await res.json();
-      if(data.success){
-        const tr = document.querySelector(`tr[data-id="${editId}"]`);
-        tr.querySelector(".cat-name").innerText = name;
-        tr.querySelector(".cat-desc").innerText = desc;
+    // 🔥 مهم: ابعت اسم الكاتيجوري للـ multer folder
+    formData.append("category", name);
 
-        if(data.category && data.category.image){
-          const imgPath = data.category.image.replace(/^public[\\\/]/,'').replace(/\\/g,'/');
-          let img = tr.querySelector("td img");
-          if(!img){
-            img = document.createElement("img");
-            tr.querySelector("td").appendChild(img);
-          }
-          img.src = "/" + imgPath;
-          img.width = 60;
-        }
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
 
-        modal.style.display = "none";
+    try {
+      let url = "/admin/categories/add";
+
+      if (editId) {
+        url = `/admin/categories/edit/${editId}`;
       }
-    } else {
-      // Add
-      const res = await fetch("/admin/categories/add", {
-        method:"POST",
-        body: formData
+
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData,
       });
+
       const data = await res.json();
-      if(data.success){
+
+      if (!data.success) {
+        return alert(data.error || "Error");
+      }
+
+      // ================= ADD =================
+      if (!editId) {
         const tbody = document.querySelector("#categoriesTable tbody");
+
         const tr = document.createElement("tr");
         tr.dataset.id = data.category._id;
 
         let imgTag = "";
-        if(data.category.image){
-          const imgPath = data.category.image.replace(/^public[\\\/]/,'').replace(/\\/g,'/');
-          imgTag = `<img src="/${imgPath}" width="60">`;
+
+        if (data.category.image) {
+          // LOCAL PATH FIX
+          imgTag = `<img src="${data.category.image}" width="60">`;
         }
 
         tr.innerHTML = `
           <td>${imgTag}</td>
           <td class="cat-name">${data.category.name}</td>
-          <td class="cat-desc">${data.category.description}</td>
+          <td class="cat-desc">${data.category.description || ""}</td>
           <td>
             <button class="edit-btn">Edit</button>
             <button class="delete-btn">Delete</button>
           </td>
         `;
+
         tbody.appendChild(tr);
-        modal.style.display = "none";
       }
+
+      // ================= EDIT =================
+      else {
+        const tr = document.querySelector(`tr[data-id="${editId}"]`);
+
+        tr.querySelector(".cat-name").innerText = name;
+        tr.querySelector(".cat-desc").innerText = desc;
+
+        if (data.category.image) {
+          let img = tr.querySelector("img");
+
+          if (!img) {
+            img = document.createElement("img");
+            tr.querySelector("td").appendChild(img);
+          }
+
+          img.src = data.category.image;
+          img.width = 60;
+        }
+      }
+
+      modal.style.display = "none";
+
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
     }
   });
 
-  // Edit/Delete row buttons
-  document.querySelector("#categoriesTable tbody").addEventListener("click", async (e) => {
-    const tr = e.target.closest("tr");
-    if(!tr) return;
-    const id = tr.dataset.id;
+  // ================= EDIT / DELETE =================
+  document.querySelector("#categoriesTable tbody")
+    .addEventListener("click", async (e) => {
+      const tr = e.target.closest("tr");
+      if (!tr) return;
 
-    if(e.target.classList.contains("edit-btn")){
-      editId = id;
-      categoryName.value = tr.querySelector(".cat-name").innerText;
-      categoryDesc.value = tr.querySelector(".cat-desc").innerText;
-      document.getElementById("modalTitle").innerText = "Edit Category";
-      modal.style.display = "flex";
-    }
+      const id = tr.dataset.id;
 
-    if(e.target.classList.contains("delete-btn")){
-      if(confirm("Delete this category?")){
-        await fetch(`/admin/categories/delete/${id}`, { method:"DELETE" });
-        tr.remove();
+      // EDIT
+      if (e.target.classList.contains("edit-btn")) {
+        editId = id;
+
+        categoryName.value = tr.querySelector(".cat-name").innerText;
+        categoryDesc.value = tr.querySelector(".cat-desc").innerText;
+
+        document.getElementById("modalTitle").innerText = "Edit Category";
+        modal.style.display = "flex";
       }
-    }
-  });
 
+      // DELETE
+      if (e.target.classList.contains("delete-btn")) {
+        if (!confirm("Delete this category?")) return;
+
+        try {
+          await fetch(`/admin/categories/delete/${id}`, {
+            method: "DELETE",
+          });
+
+          tr.remove();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    });
 });
 </script>
