@@ -88,51 +88,32 @@ exports.add_productsPage = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
   try {
-    let {
+    const {
       name,
       description,
       price,
-      salePrice,
-      sizes,
-      colors,
-      stock,
-      sku,
-      weight,
-      country,
+      category,
     } = req.body;
 
-    price = Number(price);
+    const cat = category.toLowerCase().replace(/\s+/g, "-");
 
-    // 🔥 CLOUDINARY FIX
-    const images = req.files ? req.files.map(file => file.path) : [];
-    const mainImage = images[0] || null;
+    const images = req.files.map(file =>
+      `/images/categories/${cat}/${file.filename}`
+    );
 
-    sizes = sizes ? sizes.split(",") : [];
-    colors = colors ? colors.split(",") : [];
-
-    let categories = req.body.category || [];
-    if (!Array.isArray(categories)) categories = [categories];
-
-    await Product.create({
+    const product = await Product.create({
       name,
       description,
       price,
-      salePrice: salePrice || null,
-      categories,
-      sizes,
-      colors,
-      stock,
-      sku,
-      weight,
-      country,
+      categories: category,
       images,
-      mainImage,
+      mainImage: images[0],
     });
 
-    res.json({ success: true });
+    res.json({ success: true, product });
   } catch (err) {
     console.error(err);
-    res.json({ success: false });
+    res.json({ success: false, error: err.message });
   }
 };
 
@@ -206,24 +187,30 @@ exports.getCategories = async (req, res) => {
   res.render("admin/categories", { categories });
 };
 
+// admin.js
 exports.postAddCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
     let image = null;
-    if (req.file) image = req.file.path; // 🔥 CLOUDINARY FIX
 
-    const category = new Category({
+    if (req.file) {
+      const category = name.toLowerCase().replace(/\s+/g, "-");
+      image = `/images/categories/${category}/${req.file.filename}`;
+    }
+
+    const categoryDoc = new Category({
       name,
       description,
       image,
     });
 
-    await category.save();
-    res.json({ success: true, category });
+    await categoryDoc.save();
+
+    res.json({ success: true, category: categoryDoc });
   } catch (err) {
     console.error(err);
-    res.json({ success: false });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
@@ -235,9 +222,13 @@ exports.postEditCategory = async (req, res) => {
     category.name = req.body.name;
     category.description = req.body.description;
 
-    if (req.file) category.image = req.file.path;
+    if (req.file) {
+      const name = req.body.name.toLowerCase().replace(/\s+/g, "-");
+      category.image = `/images/categories/${name}/${req.file.filename}`;
+    }
 
     await category.save();
+
     res.json({ success: true });
   } catch (err) {
     console.error(err);
