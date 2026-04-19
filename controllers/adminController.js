@@ -95,7 +95,7 @@ exports.addProduct = async (req, res) => {
       category,
     } = req.body;
 
-    const cat = category.toLowerCase().replace(/\s+/g, "-");
+   const cat = (req.body.category || "general").toLowerCase().replace(/\s+/g, "-");
 
     const images = req.files.map(file =>
       `/images/categories/${cat}/${file.filename}`
