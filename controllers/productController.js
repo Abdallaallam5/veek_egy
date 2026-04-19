@@ -19,7 +19,7 @@ exports.getHome = async (req, res) => {
       categories.map(async (cat) => {
 
         const products = await Product.find({ categories: cat._id })
-          .limit(4)
+          .limit(10)
           .lean();
 
         const formattedProducts = products.map((p) => {
