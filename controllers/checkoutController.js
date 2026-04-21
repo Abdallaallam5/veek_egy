@@ -45,16 +45,21 @@ exports.getCheckout = async (req, res) => {
       const products = await Product.find({ _id: { $in: productIds } });
 
       // دمج البيانات مع السيشن
-      cartItems = products.map(p => {
-        const sessionItem = cart.find(c => c.product === p._id.toString());
-        return {
-          ...p._doc,
-          quantity: sessionItem.quantity,
-          selectedSize: sessionItem.size,
-          selectedColor: sessionItem.color,
-          selectedPrice: p.salePrice || p.price
-        };
-      });
+cartItems = [];
+
+for (let p of products) {
+  const matchedItems = cart.filter(c => c.product === p._id.toString());
+
+  for (let item of matchedItems) {
+    cartItems.push({
+      ...p._doc,
+      quantity: item.quantity,
+      selectedSize: item.size,
+      selectedColor: item.color,
+      selectedPrice: p.salePrice || p.price
+    });
+  }
+}
     }
 
     // حساب subtotal
@@ -81,9 +86,7 @@ exports.getCheckout = async (req, res) => {
     console.error(err);
     res.status(500).send("Server Error");
   }
-};
-
-// POST Place Order
+};// POST Place Order
 exports.placeOrder = async (req, res) => {
   try {
     const {
