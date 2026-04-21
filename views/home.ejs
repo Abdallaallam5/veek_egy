@@ -156,6 +156,33 @@
   top: 10px;
   cursor: pointer;
 }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: .4s;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: #e74c3c;
+}
+
+.toast.success {
+  background: #2ecc71;
+}
 /* ===== MOBILE GRID ===== */
 @media (max-width: 900px) {
   .products-grid {
@@ -328,10 +355,20 @@
 
   </div>
 </div>
-
+<div id="toast" class="toast"></div>
 <script>
+  
 document.addEventListener("DOMContentLoaded", () => {
+function showToast(message, type = "error") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
 
+  toast.className = `toast show ${type}`;
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
   /* ================= HERO SLIDER ================= */
   const slides = document.querySelectorAll(".slide");
   let index = 0;
@@ -393,12 +430,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const data = await res.json();
 
-          if (data.success) {
-            updateCartBadge(data.totalQuantity);
+if (data.success) {
+  updateCartBadge(data.totalQuantity);
 
-            btn.innerText = "Added ✓";
-            setTimeout(() => btn.innerText = "Add To Cart", 1200);
-          }
+  btn.innerText = "Added ✓";
+  setTimeout(() => btn.innerText = "Add To Cart", 1200);
+} else {
+  showToast(data.error || "Error");
+}
         } catch (err) {
           console.error(err);
         }
@@ -452,10 +491,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      if (data.success) {
-        updateCartBadge(data.totalQuantity);
-        modal.style.display = "none";
-      }
+if (data.success) {
+  updateCartBadge(data.totalQuantity);
+  modal.style.display = "none";
+} else {
+  showToast(data.error || "Something went wrong");
+}
 
     } catch (err) {
       console.error(err);
