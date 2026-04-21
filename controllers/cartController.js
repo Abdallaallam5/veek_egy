@@ -2,46 +2,61 @@ const Product = require('../models/Product');
 
 exports.addToCart = async (req, res) => {
   try {
-const { productId, size, color,qty } = req.body;
+    const { productId, size, color, qty } = req.body;
 
-if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
-  return res.json({ success: false, error: "Invalid product id" });
-}
+    if (!productId || !/^[0-9a-fA-F]{24}$/.test(productId)) {
+      return res.json({ success: false, error: "Invalid product id" });
+    }
+
+    const quantityToAdd = parseInt(qty) || 1;
 
     if (!req.session.cart) req.session.cart = [];
-
     const cart = req.session.cart;
 
+    // ✅ إجمالي الكارت
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    if (totalQuantity + quantityToAdd > 10) {
+      return res.json({
+        success: false,
+        error: "Cart limit is 10 items"
+      });
+    }
+
+    // ✅ شوف المنتج موجود بنفس الـ variation ولا لأ
     const existing = cart.find(item =>
       item.product === productId &&
       item.size === size &&
-      item.color === color&&
-      item.quantity === qty
+      item.color === color
     );
 
     if (existing) {
-      existing.quantity += 1;
+      if (existing.quantity + quantityToAdd > 10) {
+        return res.json({
+          success: false,
+          error: "Max 10 per product"
+        });
+      }
+
+      existing.quantity += quantityToAdd;
     } else {
       cart.push({
         product: productId,
-        quantity: qty,
+        quantity: quantityToAdd,
         size,
         color
       });
     }
 
-    // احسب العدد الكلي للكارت
-    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const newTotal = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-    res.json({ success: true, totalQuantity });
+    res.json({ success: true, totalQuantity: newTotal });
 
   } catch (err) {
     console.error(err);
     res.json({ success: false });
   }
-};
-
-exports.getCart = async (req, res) => {
+};exports.getCart = async (req, res) => {
   try {
     const cart = req.session.cart || [];
 
