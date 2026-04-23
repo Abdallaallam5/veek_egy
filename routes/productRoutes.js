@@ -46,12 +46,10 @@ router.get('/:id/check-options', async (req, res) => {
     res.status(500).json({ hasOptions: false });
   }
 });
-router.get('/faq', (req, res) => {
-  res.render('faq');
+router.get('/help', (req, res) => {
+  res.render('help');
 });
-router.get('/faq', (req, res) => {
-  res.render('faq');
-});
+
 router.get('/size-guide', (req, res) => {
   res.render('size-guide');
 });
