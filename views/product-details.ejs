@@ -62,9 +62,25 @@
           <input id="qty" name="qty" type="number" value="1" min="1">
           <button type="button" onclick="changeQty(1)">+</button>
         </div>
-        <div>
-          <a href="/size-guide"><p>Size Guide</p></a>
-        </div>
+<div>
+  <a 
+    href="/size-guide" 
+    style="
+      display:inline-block;
+      color:#111;
+      font-size:15px;
+      font-weight:600;
+      text-decoration:none;
+      border-bottom:1px solid #111;
+      padding-bottom:2px;
+      transition:0.3s;
+    "
+    onmouseover="this.style.color='#0d6efd';this.style.borderColor='#0d6efd';"
+    onmouseout="this.style.color='#111';this.style.borderColor='#111';"
+  >
+    Size Guide
+  </a>
+</div>
         <!-- Buttons -->
         <button id="confirmAdd" class="btn-cart">Add to cart</button>
         <button class="btn-buy">Buy it now</button>
