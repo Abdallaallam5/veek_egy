@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-/* cart badge */
+/* ================= CART COUNT ================= */
 #cart-count{
   position:absolute;
   top:-8px;
@@ -26,7 +26,7 @@
   font-weight:bold;
 }
 
-/* top bar */
+/* ================= TOP BAR ================= */
 .top-bar{
   width:100%;
   background:#000;
@@ -41,9 +41,9 @@
   position:fixed;
   top:0;
   z-index:2000;
-  height:34px;
+  min-height:34px;
   letter-spacing:.5px;
-  overflow:hidden;
+  flex-wrap:wrap;
 }
 
 .sale-text{
@@ -51,14 +51,14 @@
 }
 
 .bar-divider{
-  opacity:.4;
+  opacity:.45;
 }
 
 #countdown{
   color:#fff;
 }
 
-/* navbar */
+/* ================= NAVBAR ================= */
 .navbar{
   width:100%;
   background:#111;
@@ -73,17 +73,17 @@
   height:56px;
 }
 
-/* logo */
 .logo{
   font-size:22px;
   font-weight:500;
 }
 
-/* links */
+/* nav links */
 .mobile-nav-links{
   list-style:none;
   display:flex;
   gap:25px;
+  margin:0;
 }
 
 .mobile-nav-links a{
@@ -105,7 +105,12 @@
   position:relative;
 }
 
-/* menu */
+.nav-icons a{
+  color:#fff;
+  text-decoration:none;
+}
+
+/* menu button */
 .mobile-menu-btn{
   display:none;
   font-size:28px;
@@ -125,7 +130,12 @@
   z-index:999;
 }
 
-/* mobile */
+/* body spacing */
+body{
+  padding-top:90px;
+}
+
+/* ================= MOBILE ================= */
 @media(max-width:768px){
 
   .top-bar{
@@ -183,18 +193,15 @@
     transform:translateY(-50%);
   }
 }
-
-/* spacing */
-body{
-  padding-top:90px;
-}
 </style>
 </head>
 
 <body>
 
-<!-- TOP BAR -->
+<!-- ================= TOP BAR ================= -->
 <div class="top-bar">
+  <span>FREE SHIPPING OVER 1499 EGP!</span>
+  <span class="bar-divider">|</span>
   <span class="sale-text">UP TO SALE 20% OFF</span>
   <span class="bar-divider">|</span>
   <span id="countdown">Loading...</span>
@@ -203,7 +210,7 @@ body{
 <!-- overlay -->
 <div class="overlay" id="overlay"></div>
 
-<!-- navbar -->
+<!-- ================= NAVBAR ================= -->
 <nav class="navbar">
 
   <div class="logo">Veek</div>
@@ -220,7 +227,7 @@ body{
   </ul>
 
   <div class="nav-icons">
-    <a href="/cart" class="icon">
+    <a href="/cart">
       <i class="fa fa-shopping-bag"></i>
       <span id="cart-count"><%= cartCount %></span>
     </a>
@@ -228,68 +235,105 @@ body{
 
 </nav>
 
+<!-- ================= JS ================= -->
 <script>
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener("DOMContentLoaded", function(){
 
-  /* mobile menu */
-  const menuBtn = document.getElementById('mobileMenuBtn');
-  const navLinks = document.getElementById('mobileNavLinks');
-  const overlay = document.getElementById('overlay');
+  /* ========== MOBILE MENU ========== */
+  const menuBtn = document.getElementById("mobileMenuBtn");
+  const navLinks = document.getElementById("mobileNavLinks");
+  const overlay = document.getElementById("overlay");
 
-  menuBtn.addEventListener('click', function(){
-    const active = navLinks.classList.contains('active');
+  menuBtn.addEventListener("click", function(){
+
+    const active = navLinks.classList.contains("active");
 
     if(active){
-      menuBtn.innerHTML = '☰';
-      navLinks.classList.remove('active');
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
+      menuBtn.innerHTML = "☰";
+      navLinks.classList.remove("active");
+      overlay.style.display = "none";
+      document.body.style.overflow = "";
     }else{
-      menuBtn.innerHTML = '✕';
-      navLinks.classList.add('active');
-      overlay.style.display = 'block';
-      document.body.style.overflow = 'hidden';
+      menuBtn.innerHTML = "✕";
+      navLinks.classList.add("active");
+      overlay.style.display = "block";
+      document.body.style.overflow = "hidden";
     }
+
   });
 
-  overlay.addEventListener('click', function(){
-    menuBtn.innerHTML = '☰';
-    navLinks.classList.remove('active');
-    overlay.style.display = 'none';
-    document.body.style.overflow = '';
+  overlay.addEventListener("click", function(){
+    menuBtn.innerHTML = "☰";
+    navLinks.classList.remove("active");
+    overlay.style.display = "none";
+    document.body.style.overflow = "";
   });
 
-  /* countdown يبدأ بعد ساعتين وينتهي بعد يومين */
-  const countdownEl = document.getElementById('countdown');
-
+  /* ========== COUNTDOWN يبدأ 11 مساءً ========== */
+  const countdownEl = document.getElementById("countdown");
   const now = new Date();
-  const startDate = new Date(now.getTime() + (2 * 60 * 60 * 1000));
-  const endDate = new Date(startDate.getTime() + (2 * 24 * 60 * 60 * 1000));
+
+  let startDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,0,0,0
+  );
+
+  /* لو الساعة عدت 11 مساء يبدأ بكرة */
+  if(now > startDate){
+    startDate.setDate(startDate.getDate() + 1);
+  }
+
+  /* يومين من وقت البداية */
+  const endDate = new Date(
+    startDate.getTime() + (2 * 24 * 60 * 60 * 1000)
+  );
 
   function updateCountdown(){
 
     const current = new Date();
-    const diff = endDate - current;
+
+    /* قبل بداية السيل */
+    if(current < startDate){
+
+      let diff = startDate - current;
+
+      let h = Math.floor(diff / (1000*60*60));
+      let m = Math.floor((diff / (1000*60)) % 60);
+      let s = Math.floor((diff / 1000) % 60);
+
+      countdownEl.innerHTML =
+        "STARTS IN " +
+        String(h).padStart(2,"0") + "H : " +
+        String(m).padStart(2,"0") + "M : " +
+        String(s).padStart(2,"0") + "S";
+
+      return;
+    }
+
+    /* بعد البداية */
+    let diff = endDate - current;
 
     if(diff <= 0){
       countdownEl.innerHTML = "SALE ENDED";
       return;
     }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const mins = Math.floor((diff / (1000 * 60)) % 60);
-    const secs = Math.floor((diff / 1000) % 60);
+    let d = Math.floor(diff / (1000*60*60*24));
+    let h = Math.floor((diff / (1000*60*60)) % 24);
+    let m = Math.floor((diff / (1000*60)) % 60);
+    let s = Math.floor((diff / 1000) % 60);
 
     countdownEl.innerHTML =
-      days + "D : " +
-      String(hours).padStart(2,'0') + "H : " +
-      String(mins).padStart(2,'0') + "M : " +
-      String(secs).padStart(2,'0') + "S";
+      d + "D : " +
+      String(h).padStart(2,"0") + "H : " +
+      String(m).padStart(2,"0") + "M : " +
+      String(s).padStart(2,"0") + "S";
   }
 
   updateCountdown();
-  setInterval(updateCountdown,1000);
+  setInterval(updateCountdown, 1000);
 
 });
 </script>
