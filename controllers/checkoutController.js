@@ -89,17 +89,18 @@ for (let p of products) {
 };// POST Place Order
 exports.placeOrder = async (req, res) => {
   try {
-    const {
-      products,
-      governorate,
-      customerName,
-      customerEmail,
-      customerAddress,
-      couponCode,
-      shipping,
-      discount,
-      total
-    } = req.body;
+const {
+  products,
+  governorate,
+  customerName,
+  customerEmail,
+  customerNumber,
+  customerAddress,
+  couponCode,
+  shipping,
+  discount,
+  total
+} = req.body;
 
     const isGmail = (email) => email?.endsWith("@gmail.com");
 
@@ -134,6 +135,7 @@ exports.placeOrder = async (req, res) => {
       governorate,
       customerName,
       customerEmail,
+      customerNumber,
       customerAddress,
       shipping: Number(shipping) || 0,
       discount: Number(discount) || 0,
