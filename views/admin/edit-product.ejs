@@ -81,7 +81,7 @@ img { max-width:100%; border-radius:10px; margin-top:10px; box-shadow:0 2px 8px 
         <% }) %>
       </div>
       <div class="colors">
-        <% ["Black","White","Bink"].forEach(color => { %>
+        <% ["Black","White","Bink","silver"].forEach(color => { %>
           <label>
             <input type="checkbox" value="<%= color %>" 
               <%= product.colors.includes(color) ? "checked" : "" %>> <%= color %>
