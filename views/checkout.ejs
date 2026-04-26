@@ -527,17 +527,18 @@ async function submitOrder() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
-      })
+body: JSON.stringify({
+  products,
+  customerName: data.name,
+  customerEmail: data.email,
+  customerNumber: data.phone,
+  customerAddress: data.address,
+  governorate: data.city,
+  shipping,
+  discount,
+  total,
+  couponCode: document.getElementById("couponCode").value || null
+})
     });
 
     const result = await res.json();
