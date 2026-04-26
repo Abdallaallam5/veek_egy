@@ -14,7 +14,7 @@ const OrderSchema = new mongoose.Schema({
     finalPrice: { type: Number, default: 0 }, // totalPrice + shippingPrice - discount
     governorate: String, // المحافظة اللي اختارها العميل
     customerName: String,
-    customerEmail: String,
+    customerEmail: { type: String, required: true },
     customerNumber: { type: Number, required: true },
     customerAddress: String,
     status: { type: String, default: 'pending' },
