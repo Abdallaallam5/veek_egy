@@ -15,6 +15,7 @@ const OrderSchema = new mongoose.Schema({
     governorate: String, // المحافظة اللي اختارها العميل
     customerName: String,
     customerEmail: String,
+    customerNumber: Number,
     customerAddress: String,
     status: { type: String, default: 'pending' },
 
