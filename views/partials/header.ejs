@@ -1,193 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Veek</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
+<meta charset="UTF-8">
+<title>Veek</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-/* Top Bar */
-#cart-count {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  background: red;
-  color: white;
-  font-size: 12px;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+/* cart badge */
+#cart-count{
+  position:absolute;
+  top:-8px;
+  right:-10px;
+  background:red;
+  color:#fff;
+  font-size:12px;
+  min-width:18px;
+  height:18px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
 }
 
-.top-bar {
-  width: 100%;
-  background: #f5f5f5;
-  color: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 6px 0;
-  font-size: 12px;
-  letter-spacing: 1px;
-  font-weight: bold;
-  position: fixed;
-  top: 0;
-  z-index: 2000;
-  height: 34px;
+/* top bar */
+.top-bar{
+  width:100%;
+  background:#000;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  padding:6px 12px;
+  font-size:12px;
+  font-weight:700;
+  position:fixed;
+  top:0;
+  z-index:2000;
+  height:34px;
+  letter-spacing:.5px;
+  overflow:hidden;
 }
 
-/* Navbar */
-.navbar {
-  width: 100%;
-  background: #000;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 5%;
-  position: fixed;
-  top: 34px;
-  z-index: 1000;
-  height: 56px;
+.sale-text{
+  color:#ffd700;
 }
 
-/* Logo */
-.logo {
-  font-size: 22px;
-  font-weight: 500;
+.bar-divider{
+  opacity:.4;
 }
 
-/* Links */
-.mobile-nav-links {
-  list-style: none;
-  display: flex;
-  gap: 25px;
+#countdown{
+  color:#fff;
 }
 
-.mobile-nav-links a {
-  text-decoration: none;
-  color: white;
-  font-size: 14px;
-  transition: 0.3s;
+/* navbar */
+.navbar{
+  width:100%;
+  background:#111;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 5%;
+  position:fixed;
+  top:34px;
+  z-index:1000;
+  height:56px;
 }
 
-.mobile-nav-links a:hover {
-  opacity: 0.7;
+/* logo */
+.logo{
+  font-size:22px;
+  font-weight:500;
 }
 
-/* Icons */
-.nav-icons {
-  display: flex;
-  gap: 15px;
-  font-size: 14px;
-  position: relative;
+/* links */
+.mobile-nav-links{
+  list-style:none;
+  display:flex;
+  gap:25px;
 }
 
-/* Menu Toggle */
-.mobile-menu-btn {
-  display: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: white;
-  background: none;
-  border: none;
-  padding: 0;
+.mobile-nav-links a{
+  text-decoration:none;
+  color:#fff;
+  font-size:14px;
+  transition:.3s;
 }
 
-/* Overlay */
-.overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0,0,0,0.6);
-  z-index: 999;
+.mobile-nav-links a:hover{
+  opacity:.7;
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
-  .mobile-menu-btn {
-    display:contents;
+/* icons */
+.nav-icons{
+  display:flex;
+  gap:15px;
+  font-size:14px;
+  position:relative;
+}
+
+/* menu */
+.mobile-menu-btn{
+  display:none;
+  font-size:28px;
+  cursor:pointer;
+  color:#fff;
+  background:none;
+  border:none;
+  padding:0;
+}
+
+/* overlay */
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:999;
+}
+
+/* mobile */
+@media(max-width:768px){
+
+  .top-bar{
+    font-size:10px;
+    gap:6px;
+    padding:6px 8px;
   }
 
-  .mobile-nav-links {
-    position: fixed;
-    top: 90px; /* top-bar + navbar */
-    right: -100%;
-    width: 280px;
-    height: calc(100vh - 90px);
-    background: #000;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0;
-    transition: right 0.4s ease;
-    z-index: 1001;
-    padding: 40px 20px;
-    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+  .mobile-menu-btn{
+    display:block;
   }
 
-  .mobile-nav-links.active {
-    right: 0;
+  .mobile-nav-links{
+    position:fixed;
+    top:90px;
+    right:-100%;
+    width:280px;
+    height:calc(100vh - 90px);
+    background:#000;
+    flex-direction:column;
+    align-items:center;
+    gap:0;
+    transition:right .4s ease;
+    z-index:1001;
+    padding:40px 20px;
+    box-shadow:-5px 0 20px rgba(0,0,0,.5);
   }
 
-  .mobile-nav-links li {
-    width: 100%;
-    margin-bottom: 15px;
+  .mobile-nav-links.active{
+    right:0;
   }
 
-  .mobile-nav-links a {
-    display: block;
-    padding: 15px 20px;
-    width: 100%;
-    font-size: 18px;
-    text-align: center;
-    border-bottom: 1px solid #333;
+  .mobile-nav-links li{
+    width:100%;
+    margin-bottom:15px;
   }
 
-  .mobile-nav-links a:hover {
-    background: #333;
+  .mobile-nav-links a{
+    display:block;
+    width:100%;
+    padding:15px 20px;
+    font-size:18px;
+    text-align:center;
+    border-bottom:1px solid #333;
   }
 
-  .nav-icons {
-    position: absolute;
-    right: 80px;
-    top: 50%;
-    transform: translateY(-50%);
+  .mobile-nav-links a:hover{
+    background:#333;
+  }
+
+  .nav-icons{
+    position:absolute;
+    right:80px;
+    top:50%;
+    transform:translateY(-50%);
   }
 }
 
-/* Body spacing */
-body {
-  padding-top: 90px;
-}</style>
+/* spacing */
+body{
+  padding-top:90px;
+}
+</style>
 </head>
 
 <body>
-<!-- Top Bar -->
-<div class="top-bar">FREE SHIPPING OVER 1499 EGP!</div>
 
-<!-- Overlay -->
-<div class="overlay" id="overlay" style="display: none;"></div>
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span class="sale-text">UP TO SALE 20% OFF</span>
+  <span class="bar-divider">|</span>
+  <span id="countdown">Loading...</span>
+</div>
 
-<!-- Navbar -->
-<!-- Navbar -->
+<!-- overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- navbar -->
 <nav class="navbar">
+
   <div class="logo">Veek</div>
 
-  <!-- غيرنا الاسم -->
   <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
 
-  <!-- غيرنا الاسم -->
   <ul class="mobile-nav-links" id="mobileNavLinks">
     <li><a href="/">Home</a></li>
     <li><a href="/collections">Collections</a></li>
@@ -203,25 +225,26 @@ body {
       <span id="cart-count"><%= cartCount %></span>
     </a>
   </div>
+
 </nav>
 
-<!-- باقي محتوى الصفحة -->
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function(){
+
+  /* mobile menu */
   const menuBtn = document.getElementById('mobileMenuBtn');
   const navLinks = document.getElementById('mobileNavLinks');
   const overlay = document.getElementById('overlay');
 
-  menuBtn.addEventListener('click', function() {
-    const isActive = navLinks.classList.contains('active');
-    
-    if (isActive) {
+  menuBtn.addEventListener('click', function(){
+    const active = navLinks.classList.contains('active');
+
+    if(active){
       menuBtn.innerHTML = '☰';
       navLinks.classList.remove('active');
       overlay.style.display = 'none';
       document.body.style.overflow = '';
-    } else {
+    }else{
       menuBtn.innerHTML = '✕';
       navLinks.classList.add('active');
       overlay.style.display = 'block';
@@ -229,21 +252,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  overlay.addEventListener('click', function() {
+  overlay.addEventListener('click', function(){
     menuBtn.innerHTML = '☰';
     navLinks.classList.remove('active');
     overlay.style.display = 'none';
     document.body.style.overflow = '';
   });
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      menuBtn.innerHTML = '☰';
-      navLinks.classList.remove('active');
-      overlay.style.display = 'none';
-      document.body.style.overflow = '';
+  /* countdown يبدأ بعد ساعتين وينتهي بعد يومين */
+  const countdownEl = document.getElementById('countdown');
+
+  const now = new Date();
+  const startDate = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+  const endDate = new Date(startDate.getTime() + (2 * 24 * 60 * 60 * 1000));
+
+  function updateCountdown(){
+
+    const current = new Date();
+    const diff = endDate - current;
+
+    if(diff <= 0){
+      countdownEl.innerHTML = "SALE ENDED";
+      return;
     }
-  });
-});</script>
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+
+    countdownEl.innerHTML =
+      days + "D : " +
+      String(hours).padStart(2,'0') + "H : " +
+      String(mins).padStart(2,'0') + "M : " +
+      String(secs).padStart(2,'0') + "S";
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown,1000);
+
+});
+</script>
+
 </body>
 </html>
