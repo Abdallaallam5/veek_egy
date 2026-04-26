@@ -19,7 +19,7 @@ router.get("/sale", async (req, res) => {
   try {
     const products = await Product.find({
       salePrice: { $exists: true }
-    }.sort({ createdAt: -1 }));
+    }).sort({ createdAt: -1 });
 
     // فلترة في السيرفر
     const saleProducts = products.filter(p => p.salePrice < p.price);
