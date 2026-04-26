@@ -1,15 +1,17 @@
-const Product = require("../models/Product");
-const Category= require("../models/Category");
+  const Product = require("../models/Product");
+const Category = require("../models/Category");
 const mongoose = require("mongoose");
+const connectDB = require("../config/db");
 
 /* ========================= */
 /* Home Page */
 /* ========================= */
 exports.getHome = async (req, res) => {
   try {
-    // جلب الكاتيجوريز + ترتيب الأحدث أولاً
+    await connectDB();
+
     const categories = await Category.find()
-      .sort({ createdAt: -1 }) // 👈 أهم تعديل هنا
+      .sort({ createdAt: -1 })
       .lean();
 
     const cart = req.session.cart || [];
@@ -67,6 +69,8 @@ exports.getHome = async (req, res) => {
 /* ========================= */
 exports.getNewArrivals = async (req, res) => {
   try {
+    await connectDB();
+
     const products = await Product.find({ isNewArrival: true });
 
     products.forEach(p => {
@@ -85,6 +89,8 @@ exports.getNewArrivals = async (req, res) => {
 /* ========================= */
 exports.getProductDetails = async (req, res) => {
   try {
+    await connectDB();
+
     const id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(id)) return res.redirect("/");
@@ -106,6 +112,8 @@ exports.getProductDetails = async (req, res) => {
 /* All Products */
 /* ========================= */
 exports.getProducts = async (req, res) => {
+  await connectDB();
+
   const products = await Product.find();
 
   products.forEach(p => {
@@ -120,8 +128,10 @@ exports.getProducts = async (req, res) => {
 /* ========================= */
 exports.getCollections = async (req, res) => {
   try {
+    await connectDB();
+
     const categories = await Category.find()
-      .sort({ createdAt: -1 }) // 👈 الأحدث أولاً
+      .sort({ createdAt: -1 })
       .lean();
 
     res.render("collections", { categories });
@@ -135,30 +145,27 @@ exports.getCollections = async (req, res) => {
 /* ========================= */
 /* Category Products */
 /* ========================= */
-
-
 exports.getCategoryProducts = async (req, res) => {
   try {
-    const categoryId = req.params.category; // ده المفروض يكون ObjectId
+    await connectDB();
 
-    // تحقق إنه ObjectId صالح
-    const mongoose = require("mongoose");
+    const categoryId = req.params.category;
+
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
       return res.status(400).send("Invalid category id");
     }
 
-    // جلب المنتجات اللي تحتوي الكاتيجوري
     const products = await Product.find({ categories: categoryId });
 
     products.forEach(p => {
       p.finalPrice = p.getFinalPrice ? p.getFinalPrice() : p.price;
     });
 
-    // جلب اسم الكاتيجوري
     const categoryDoc = await Category.findById(categoryId);
     const categoryName = categoryDoc ? categoryDoc.name : "Unknown";
 
     res.render("categoryProducts", { category: categoryName, products });
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
@@ -170,14 +177,15 @@ exports.getCategoryProducts = async (req, res) => {
 /* ========================= */
 exports.getProductSale = async (req, res) => {
   try {
-    // جلب المنتجات اللي عليها خصم
+    await connectDB();
+
     const products = await Product.find({
       $or: [
         { saleType: { $exists: true, $ne: null } },
         { discountValue: { $gt: 0 } }
       ]
     })
-      .sort({ createdAt: -1 }) // 👈 الأحدث أولاً (اختياري)
+      .sort({ createdAt: -1 })
       .lean();
 
     const formattedProducts = products.map((p) => {
