@@ -203,8 +203,7 @@ body{
   <span>FREE SHIPPING OVER 1499 EGP!</span>
   <span class="bar-divider">|</span>
   <span class="sale-text">UP TO SALE 20% OFF</span>
-  <span class="bar-divider">|</span>
-  <span id="countdown">Loading...</span>
+
 </div>
 
 <!-- overlay -->
@@ -269,73 +268,7 @@ document.addEventListener("DOMContentLoaded", function(){
     document.body.style.overflow = "";
   });
 
-  /* ========== COUNTDOWN يبدأ 11 مساءً ========== */
-  const countdownEl = document.getElementById("countdown");
-  const now = new Date();
-
-  let startDate = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    23,0,0,0
-  );
-
-  /* لو الساعة عدت 11 مساء يبدأ بكرة */
-  if(now > startDate){
-    startDate.setDate(startDate.getDate() + 1);
-  }
-
-  /* يومين من وقت البداية */
-  const endDate = new Date(
-    startDate.getTime() + (2 * 24 * 60 * 60 * 1000)
-  );
-
-  function updateCountdown(){
-
-    const current = new Date();
-
-    /* قبل بداية السيل */
-    if(current < startDate){
-
-      let diff = startDate - current;
-
-      let h = Math.floor(diff / (1000*60*60));
-      let m = Math.floor((diff / (1000*60)) % 60);
-      let s = Math.floor((diff / 1000) % 60);
-
-      countdownEl.innerHTML =
-        "STARTS IN " +
-        String(h).padStart(2,"0") + "H : " +
-        String(m).padStart(2,"0") + "M : " +
-        String(s).padStart(2,"0") + "S";
-
-      return;
-    }
-
-    /* بعد البداية */
-    let diff = endDate - current;
-
-    if(diff <= 0){
-      countdownEl.innerHTML = "SALE ENDED";
-      return;
-    }
-
-    let d = Math.floor(diff / (1000*60*60*24));
-    let h = Math.floor((diff / (1000*60*60)) % 24);
-    let m = Math.floor((diff / (1000*60)) % 60);
-    let s = Math.floor((diff / 1000) % 60);
-
-    countdownEl.innerHTML =
-      d + "D : " +
-      String(h).padStart(2,"0") + "H : " +
-      String(m).padStart(2,"0") + "M : " +
-      String(s).padStart(2,"0") + "S";
-  }
-
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-});
+  
 </script>
 
 </body>
