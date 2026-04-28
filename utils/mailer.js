@@ -22,3 +22,18 @@ exports.sendOrderEmail = async (toEmail, name) => {
     `
   });
 };
+const sendAdminOrderEmail = async (adminEmail, order) => {
+  await transporter.sendMail({
+    from: '"Shop System" <no-reply@yourapp.com>',
+    to: adminEmail,
+    subject: "🛒 New Order Received",
+    html: `
+      <h3>New Order Alert</h3>
+      <p><b>Name:</b> ${order.customerName}</p>
+      <p><b>Email:</b> ${order.customerEmail}</p>
+      <p><b>Total:</b> ${order.totalPrice}</p>
+    `
+  });
+};
+
+module.exports = { sendOrderEmail, sendAdminOrderEmail };
