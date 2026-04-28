@@ -175,9 +175,13 @@ const {
     }
 
     // ====== EMAIL ======
-    const { sendOrderEmail } = require("../utils/mailer");
+    const { sendOrderEmail, sendAdminOrderEmail } = require("../utils/mailer");
+const ADMIN_EMAIL = "Veekegy@gmail.com";
+await sendOrderEmail(customerEmail, customerName);
 
-    await sendOrderEmail(customerEmail, customerName);
+await sendAdminOrderEmail(ADMIN_EMAIL, order);
+
+    
 
     // ====== CLEAR CART ======
     req.session.cart = [];
