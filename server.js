@@ -35,9 +35,9 @@ const cartCountMiddleware = require('./middleware/cartCount');
 app.use(cartCountMiddleware);
 
 // MongoDB
-const uri = "mongodb+srv://lomadoma80_db_user:UdX7mkJLQngHWVIK@cluster0.brwmhlm.mongodb.net/veek_db?retryWrites=true&w=majority";
 
-mongoose.connect(uri)
+
+await mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected successfully"))
   .catch(err => console.log("MongoDB connection error:", err));
 
