@@ -1,47 +1,26 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: category }) %>
 
-<h1 class="page-title"><%= category %></h1>
+<div class="container">
+  <header class="page-hero">
+    <span class="eyebrow"><a href="/collections">Collections</a> / <%= category %></span>
+    <h1 class="display page-hero__title lines">
+      <span class="line"><span><%= category %><sup class="section-head__count"><%= String(products.length).padStart(2, '0') %></sup></span></span>
+    </h1>
+  </header>
 
-    <div class="products-grid">
+  <% if (!products.length) { %>
+    <div class="empty-state">
+      <p class="display">Nothing here yet</p>
+      <p>This collection is being restocked. Check back soon.</p>
+      <a href="/collections" class="btn">All collections</a>
+    </div>
+  <% } else { %>
+    <div class="grid" style="padding-bottom:clamp(56px,8vw,110px)">
       <% products.forEach(product => { %>
-<div class="product-card">
-
-  <% if(product.salePrice < product.price && product.finalPrice){ %>
-    <div class="sale-badge">SALE</div>
-  <% } %>
-
-<img src="<%= product.images[0] %>" alt="<%= product.name %>">
-
-  <h3><%= product.name %></h3>
-
-  <p class="price">
-
-    <% if(product.salePrice < product.price && product.finalPrice){ %>
-
-      <span class="old-price">
-        <%= product.price %> EGP
-      </span>
-
-      <span class="sale-price">
-        <%= product.salePrice %> EGP
-      </span>
-
-    <% } else { %>
-
-      <span>
-        <%= product.price %> EGP
-      </span>
-
-    <% } %>
-
-  </p>
-<button onclick="addToCart('<%= product._id %>')" class="btn">
-Add To Cart
-</button>
-  <a href="/product/<%= product._id %>" class="btn">View</a>
-
-</div>
+        <%- include('partials/product-card', { product }) %>
       <% }) %>
     </div>
+  <% } %>
+</div>
 
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

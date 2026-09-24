@@ -1,0 +1,52 @@
+<%
+  /* expects: product, (optional) i */
+  const price = Number(product.price) || 0;
+  const sale = Number(product.salePrice) || 0;
+  const onSale = sale > 0 && sale < price;
+  const nowPrice = onSale ? sale : price;
+  const off = onSale ? Math.round((1 - sale / price) * 100) : 0;
+  const imgs = (product.images || []).filter(Boolean);
+  const soldOut = product.stock !== undefined && product.stock !== null && Number(product.stock) <= 0;
+  const href = '/product/' + product._id;
+%>
+<article class="card <%= soldOut ? 'is-soldout' : '' %>" data-reveal>
+  <div class="card__visual">
+  <a class="card__media" href="<%= href %>" aria-label="<%= product.name %>">
+    <img src="<%= imgs[0] || '/images/photo_2026-01-06_18-49-05.jpg' %>" alt="<%= product.name %>" loading="lazy" decoding="async">
+    <% if (imgs[1]) { %>
+      <img class="alt" src="<%= imgs[1] %>" alt="" loading="lazy" decoding="async" aria-hidden="true">
+    <% } %>
+    <span class="card__badges">
+      <% if (soldOut) { %><span class="badge badge--light">Sold out</span><% } %>
+      <% if (onSale) { %><span class="badge">−<%= off %>%</span><% } %>
+    </span>
+  </a>
+
+  <% if (!soldOut) { %>
+    <button type="button" class="btn btn--light card__quick"
+      data-quick-add
+      data-id="<%= product._id %>"
+      data-name="<%= product.name %>"
+      data-price="<%= nowPrice %> EGP"
+      data-image="<%= imgs[0] || '' %>"
+      data-sizes="<%= JSON.stringify(product.sizes || []) %>"
+      data-colors="<%= JSON.stringify(product.colors || []) %>"
+      aria-label="Quick add <%= product.name %>">
+      <span class="card__quick-text">Quick add</span>
+      <svg class="card__quick-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  <% } %>
+  </div>
+
+  <a class="card__body" href="<%= href %>">
+    <h3 class="card__name"><%= product.name %></h3>
+    <div class="price">
+      <% if (onSale) { %>
+        <span class="price__now"><%= sale %> EGP</span>
+        <span class="price__old"><%= price %> EGP</span>
+      <% } else { %>
+        <span class="price__now"><%= price %> EGP</span>
+      <% } %>
+    </div>
+  </a>
+</article>

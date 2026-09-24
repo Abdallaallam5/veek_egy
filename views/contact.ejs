@@ -1,103 +1,75 @@
-<%- include("partials/header") %>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
+<%- include('partials/header', { title: 'Contact' }) %>
 
-.container {
-    width: 500px;
-    max-width: 90%; /* لتناسب الشاشات الصغيرة */
-    margin: 80px auto;
-    background: #fff;
-    padding: 30px 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    box-sizing: border-box;
-}
-
-h1 {
-    margin-bottom: 30px;
-    font-size: 28px;
-    color: #333;
-}
-
-input, textarea {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 14px;
-}
-
-textarea {
-    resize: vertical;
-}
-
-button {
-    padding: 12px 30px;
-    background: black;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.3s;
-}
-
-button:hover {
-    background: #333;
-}
-
-/* Responsive for Mobile */
-@media (max-width: 480px) {
-    .container {
-        margin: 50px auto;
-        padding: 20px 15px;
-    }
-
-    h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-    }
-
-    input, textarea {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    button {
-        width: 100%;
-        padding: 12px 0;
-    }
-}
-</style>
-</head>
-
-<body>
+<%
+  const sent = message && /success/i.test(message);
+%>
 
 <div class="container">
-    <%= message ? `${message}` : '' %>
-    <h1>Contact</h1>
+  <header class="page-hero">
+    <span class="eyebrow">Get in touch</span>
+    <h1 class="display page-hero__title lines">
+      <span class="line"><span style="--i:0">Let’s</span></span>
+      <span class="line"><span style="--i:1">talk.</span></span>
+    </h1>
+  </header>
 
-    <form action="/contact" method="POST">
-        <input type="text" name="name" placeholder="Name" required>
+  <div class="split">
+    <div data-reveal>
+      <p style="font-size:17px;max-width:420px;margin:0">Questions about an order, sizing or an exchange? Send us a message and our team will get back to you as soon as possible.</p>
+      <ul class="info-list">
+        <li><span class="label">Email</span><a href="mailto:veekegy@gmail.com">veekegy@gmail.com</a></li>
+        <li><span class="label">Social</span>Instagram · WhatsApp · Facebook</li>
+        <li><span class="label">Shipping</span>All over Egypt · 5–8 business days</li>
+      </ul>
+    </div>
 
-        <input type="email" name="email" placeholder="Email" required>
+    <div data-reveal style="--d:150">
+      <% if (message) { %>
+        <div class="notice <%= sent ? '' : 'is-error' %>">
+          <span class="toast__icon" style="<%= sent ? '' : 'color:var(--danger)' %>"><%= sent ? '✓' : '!' %></span>
+          <%= message %>
+        </div>
+      <% } %>
 
-        <input type="text" name="phone" placeholder="Phone number">
-
-        <textarea name="message" placeholder="Comment" rows="5" required></textarea>
-
-        <button type="submit">Send</button>
-    </form>
+      <form action="/contact" method="POST" id="contactForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="c-name">Name</label>
+            <input class="input" id="c-name" type="text" name="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="c-phone">Phone <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+            <input class="input" id="c-phone" type="tel" name="phone" autocomplete="tel" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label for="c-email">Email</label>
+          <input class="input" id="c-email" type="email" name="email" autocomplete="email" placeholder="name@gmail.com" required>
+          <small class="error-msg" id="c-email-error"></small>
+        </div>
+        <div class="field">
+          <label for="c-message">Message</label>
+          <textarea class="textarea" id="c-message" name="message" rows="6" required></textarea>
+        </div>
+        <button type="submit" class="btn" data-magnetic>Send message</button>
+      </form>
+    </div>
+  </div>
 </div>
 
-</body>
-</html>
-<%- include("partials/footer") %>
+<script>
+document.getElementById("contactForm").addEventListener("submit", function (e) {
+  var email = document.getElementById("c-email");
+  var err = document.getElementById("c-email-error");
+  if (!/@gmail\.com$/i.test(email.value.trim())) {
+    e.preventDefault();
+    email.classList.add("input-error");
+    err.textContent = "Please use a Gmail address";
+    email.focus();
+    return;
+  }
+  this.querySelector("button[type=submit]").classList.add("is-loading");
+});
+</script>
+
+<%- include('partials/footer') %>

@@ -1,120 +1,35 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Sale' }) %>
 
-<h1 class="page-title">🔥 SALE</h1>
+<%
+  const saleProducts = (products || []).filter(p => Number(p.salePrice) > 0 && Number(p.salePrice) < Number(p.price));
+  const maxOff = saleProducts.reduce((m, p) => Math.max(m, Math.round((1 - p.salePrice / p.price) * 100)), 0);
+%>
 
-<div class="products-grid">
-  <% products.forEach(product => 
-  {
-    if(product.salePrice!=null){ %>
-    
-    <div class="product-card">
+<section class="hero" style="margin-bottom:clamp(28px,4vw,52px)">
+  <div class="container" style="padding-top:clamp(48px,8vw,110px);padding-bottom:clamp(40px,6vw,80px)">
+    <span class="eyebrow" style="color:rgba(255,255,255,.6)">Limited time</span>
+    <h1 class="display page-hero__title lines" style="margin-top:14px">
+      <span class="line"><span style="--i:0">Up to</span></span>
+      <span class="line"><span style="--i:1" class="outline"><%= maxOff || 20 %>% off</span></span>
+    </h1>
+    <p class="hero__lead" data-reveal style="--d:400;margin-bottom:0"><%= saleProducts.length %> pieces on sale while stock lasts.</p>
+  </div>
+</section>
 
-      <div class="sale-badge">SALE</div>
-
-      <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-
-      <h3><%= product.name %></h3>
-
-      <p class="price">
-        <span class="old-price"><%= product.price %> EGP</span>
-        <span class="sale-price"><%= product.salePrice %> EGP</span>
-      </p>
-
-      <a href="/product/<%= product._id %>" class="btn">View</a>
-
+<div class="container">
+  <% if (!saleProducts.length) { %>
+    <div class="empty-state">
+      <p class="display">No sale right now</p>
+      <p>Stay tuned — the next drop is coming.</p>
+      <a href="/" class="btn">Shop new in</a>
     </div>
-  <% }}) %>
+  <% } else { %>
+    <div class="grid" style="padding-bottom:clamp(56px,8vw,110px)">
+      <% saleProducts.forEach(product => { %>
+        <%- include('partials/product-card', { product }) %>
+      <% }) %>
+    </div>
+  <% } %>
 </div>
-<style>
-  /* ===== SALE PAGE ===== */
 
-/* title */
-.page-title {
-  text-align: center;
-  font-size: 36px;
-  margin: 50px 0 40px;
-  letter-spacing: 2px;
-}
-
-/* استخدم نفس الجريد */
-.products-grid {
-  width: 90%;
-  max-width: 1200px;
-  margin: auto;
-}
-
-/* product card تحسين */
-.product-card {
-  position: relative;
-  background: #fff;
-  transition: 0.3s ease;
-  text-align: center;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-}
-
-/* الصورة */
-.product-card img {
-  width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-}
-
-/* الاسم */
-.product-card h3 {
-  font-size: 15px;
-  margin-top: 15px;
-  font-weight: 500;
-}
-
-/* السعر */
-.price {
-  margin-top: 6px;
-  font-size: 15px;
-}
-
-.old-price {
-  text-decoration: line-through;
-  color: #999;
-  margin-right: 8px;
-}
-
-.sale-price {
-  color: red;
-  font-weight: bold;
-}
-
-/* badge */
-.sale-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: red;
-  color: white;
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 4px;
-  z-index: 5;
-}
-
-/* button */
-.btn {
-  margin-top: 10px;
-}
-
-/* hover effect */
-.product-card:hover img {
-  transform: scale(1.05);
-  transition: 0.4s;
-}
-
-/* responsive */
-@media (max-width: 768px) {
-  .page-title {
-    font-size: 24px;
-  }
-}
-</style>
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

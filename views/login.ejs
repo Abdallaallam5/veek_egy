@@ -1,19 +1,21 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Login' }) %>
 
-<h2>Login</h2>
+<div class="narrow">
+  <h1 class="display lines"><span class="line"><span>Login</span></span></h1>
 
-<form action="/login" method="POST" class="mt-3">
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required>
+  <form action="/user/login" method="POST" data-reveal>
+    <div class="field">
+      <label for="l-email">Email</label>
+      <input class="input" id="l-email" type="email" name="email" autocomplete="email" required>
     </div>
-    <div class="mb-3">
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required>
+    <div class="field">
+      <label for="l-password">Password</label>
+      <input class="input" id="l-password" type="password" name="password" autocomplete="current-password" required>
     </div>
-    <button type="submit" class="btn btn-dark">Login</button>
-</form>
+    <button type="submit" class="btn btn--block">Login</button>
+  </form>
 
-<p class="mt-3">Don't have an account? <a href="/signup">Sign up</a></p>
+  <p class="alt">Don’t have an account? <a href="/user/signup">Sign up</a></p>
+</div>
 
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

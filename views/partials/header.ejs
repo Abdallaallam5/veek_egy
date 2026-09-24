@@ -1,276 +1,101 @@
+<%
+  const pageTitle = (typeof title !== 'undefined' && title) ? title + ' — VEEK' : 'VEEK — Crafted to elevate your every day';
+  const bagCount = typeof cartCount !== 'undefined' ? Number(cartCount) || 0 : 0;
+%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
-<meta charset="UTF-8">
-<link rel="icon" type="image/png" href="/images/photo_2026-01-06_18-49-05.jpg">
-<title>Veek</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="/css/style.css">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= pageTitle %></title>
+  <meta name="description" content="VEEK — sophisticated essentials in neutral tones. Designed to move with you. Shipping all over Egypt.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" type="image/jpeg" href="/images/photo_2026-01-06_18-49-05.jpg">
 
-<style>
-/* ================= CART COUNT ================= */
-#cart-count{
-  position:absolute;
-  top:-8px;
-  right:-10px;
-  background:red;
-  color:#fff;
-  font-size:12px;
-  min-width:18px;
-  height:18px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-/* ================= TOP BAR ================= */
-.top-bar{
-  width:100%;
-  background:#000;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  padding:6px 12px;
-  font-size:12px;
-  font-weight:700;
-  position:fixed;
-  top:0;
-  z-index:2000;
-  min-height:34px;
-  letter-spacing:.5px;
-  flex-wrap:wrap;
-}
-
-.sale-text{
-  color:#ffd700;
-}
-
-.bar-divider{
-  opacity:.45;
-}
-
-#countdown{
-  color:#fff;
-}
-
-/* ================= NAVBAR ================= */
-.navbar{
-  width:100%;
-  background:#111;
-  color:#fff;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 5%;
-  position:fixed;
-  top:34px;
-  z-index:1000;
-  height:56px;
-}
-
-.logo{
-  font-size:22px;
-  font-weight:500;
-}
-
-/* nav links */
-.mobile-nav-links{
-  list-style:none;
-  display:flex;
-  gap:25px;
-  margin:0;
-}
-
-.mobile-nav-links a{
-  text-decoration:none;
-  color:#fff;
-  font-size:14px;
-  transition:.3s;
-}
-
-.mobile-nav-links a:hover{
-  opacity:.7;
-}
-
-/* icons */
-.nav-icons{
-  display:flex;
-  gap:15px;
-  font-size:14px;
-  position:relative;
-}
-
-.nav-icons a{
-  color:#fff;
-  text-decoration:none;
-}
-
-/* menu button */
-.mobile-menu-btn{
-  display:none;
-  font-size:28px;
-  cursor:pointer;
-  color:#fff;
-  background:none;
-  border:none;
-  padding:0;
-}
-
-/* overlay */
-.overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  z-index:999;
-}
-
-/* body spacing */
-body{
-  padding-top:90px;
-}
-
-/* ================= MOBILE ================= */
-@media(max-width:768px){
-
-  .top-bar{
-    font-size:10px;
-    gap:6px;
-    padding:6px 8px;
-  }
-
-  .mobile-menu-btn{
-    display:block;
-  }
-
-  .mobile-nav-links{
-    position:fixed;
-    top:90px;
-    right:-100%;
-    width:280px;
-    height:calc(100vh - 90px);
-    background:#000;
-    flex-direction:column;
-    align-items:center;
-    gap:0;
-    transition:right .4s ease;
-    z-index:1001;
-    padding:40px 20px;
-    box-shadow:-5px 0 20px rgba(0,0,0,.5);
-  }
-
-  .mobile-nav-links.active{
-    right:0;
-  }
-
-  .mobile-nav-links li{
-    width:100%;
-    margin-bottom:15px;
-  }
-
-  .mobile-nav-links a{
-    display:block;
-    width:100%;
-    padding:15px 20px;
-    font-size:18px;
-    text-align:center;
-    border-bottom:1px solid #333;
-  }
-
-  .mobile-nav-links a:hover{
-    background:#333;
-  }
-
-  .nav-icons{
-    position:absolute;
-    right:80px;
-    top:50%;
-    transform:translateY(-50%);
-  }
-}
-</style>
+  <link rel="stylesheet" href="/css/veek.css">
+  <script>document.documentElement.className = document.documentElement.className.replace("no-js", "js");</script>
 </head>
-
 <body>
 
-<!-- ================= TOP BAR ================= -->
-<div class="top-bar">
-  <span>FREE SHIPPING OVER 1499 EGP!</span>
-  <span class="bar-divider">|</span>
-  <span class="sale-text">UP TO SALE 20% OFF</span>
+<a class="sr-only" href="#main">Skip to content</a>
 
+<!-- ================= LOADER ================= -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__word">
+    <% 'VEEK'.split('').forEach((ch, i) => { %><span style="--i:<%= i %>"><%= ch %></span><% }) %>
+  </div>
+  <div class="loader__bar"></div>
 </div>
 
-<!-- overlay -->
-<div class="overlay" id="overlay"></div>
-
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar">
-
-  <div class="logo">Veek</div>
-
-  <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-
-  <ul class="mobile-nav-links" id="mobileNavLinks">
-    <li><a href="/">Home</a></li>
-    <li><a href="/collections">Collections</a></li>
-    <li><a href="/sale">SALE!</a></li>
-    <li><a href="/contact">Contact</a></li>
-    <li><a href="/size-guide">Size Guide</a></li>
-    <li><a href="/help">Help?</a></li>
-  </ul>
-
-  <div class="nav-icons">
-    <a href="/cart">
-      <i class="fa fa-shopping-bag"></i>
-      <span id="cart-count"><%= cartCount %></span>
-    </a>
+<!-- ================= ANNOUNCEMENT ================= -->
+<div class="announce" role="region" aria-label="Announcements">
+  <% for (let r = 0; r < 2; r++) { %>
+  <div class="announce__track" <%- r ? 'aria-hidden="true"' : '' %>>
+    <span>Free shipping over 1499 EGP</span>
+    <span>Up to 20% off — Sale is live</span>
+    <span>Shipping all over Egypt</span>
+    <span>14-day easy exchange</span>
+    <span>Free shipping over 1499 EGP</span>
+    <span>Up to 20% off — Sale is live</span>
+    <span>Shipping all over Egypt</span>
+    <span>14-day easy exchange</span>
   </div>
+  <% } %>
+</div>
 
-</nav>
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
 
-<!-- ================= JS ================= -->
-<script>
-document.addEventListener("DOMContentLoaded", function(){
+    <nav aria-label="Main">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="drawer">
+        <span class="bars"></span>
+      </button>
+      <ul class="nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/collections">Collections</a></li>
+        <li><a href="/sale" class="is-sale">Sale</a></li>
+        <li><a href="/size-guide">Size Guide</a></li>
+        <li><a href="/help">Help</a></li>
+      </ul>
+    </nav>
 
-  /* ========== MOBILE MENU ========== */
-  const menuBtn = document.getElementById("mobileMenuBtn");
-  const navLinks = document.getElementById("mobileNavLinks");
-  const overlay = document.getElementById("overlay");
+    <a href="/" class="brand" aria-label="VEEK home">VEEK</a>
 
-  menuBtn.addEventListener("click", function(){
+    <div class="header-actions">
+      <a href="/contact" class="icon-btn" aria-label="Contact us">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
+      <a href="/cart" class="icon-btn" aria-label="Shopping bag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+        <span class="cart-badge <%= bagCount ? '' : 'is-empty' %>" id="cart-count" data-cart-count><%= bagCount %></span>
+      </a>
+    </div>
 
-    const active = navLinks.classList.contains("active");
+  </div>
+</header>
 
-    if(active){
-      menuBtn.innerHTML = "☰";
-      navLinks.classList.remove("active");
-      overlay.style.display = "none";
-      document.body.style.overflow = "";
-    }else{
-      menuBtn.innerHTML = "✕";
-      navLinks.classList.add("active");
-      overlay.style.display = "block";
-      document.body.style.overflow = "hidden";
-    }
+<!-- ================= MOBILE DRAWER ================= -->
+<div class="drawer" id="drawer">
+  <div class="drawer__backdrop" data-close-menu></div>
+  <div class="drawer__panel">
+    <ul class="drawer__links">
+      <li><a href="/" style="--i:0">Home</a></li>
+      <li><a href="/collections" style="--i:1">Collections</a></li>
+      <li><a href="/sale" style="--i:2">Sale</a></li>
+      <li><a href="/size-guide" style="--i:3">Size Guide</a></li>
+      <li><a href="/help" style="--i:4">Help</a></li>
+      <li><a href="/contact" style="--i:5">Contact</a></li>
+    </ul>
+    <div class="drawer__foot">
+      <p>veekegy@gmail.com</p>
+      <p>© <%= new Date().getFullYear() %> VEEK Clothing</p>
+    </div>
+  </div>
+</div>
 
-  });
-
-  overlay.addEventListener("click", function(){
-    menuBtn.innerHTML = "☰";
-    navLinks.classList.remove("active");
-    overlay.style.display = "none";
-    document.body.style.overflow = "";
-  });
-});
-  
-</script>
-
-</body>
-</html>
+<main class="page" id="main">

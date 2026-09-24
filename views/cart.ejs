@@ -1,135 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Cart</title>
-  <style>
-    body { font-family: Arial; margin:0; padding:0; background:#f4f4f4; }
-    header { background:#000; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
-    header h1 { margin:0; font-size:22px; }
-    #cart-count { background:red; color:white; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; }
+<%
+  const FREE_SHIP = 1499;
+  const subtotal = cartItems.reduce((sum, i) => sum + Number(i.selectedPrice) * i.quantity, 0);
+  const count = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+%>
+<%- include('partials/header', { title: 'Your bag' }) %>
 
-    .cart-container { display:flex; flex-direction:column; gap:20px; max-width:800px; margin:20px auto; }
-    .cart-item { display:flex; gap:20px; align-items:center; border:1px solid #ccc; padding:10px; border-radius:10px; background:#fff; position:relative; }
-    .cart-item img { width:100px; height:100px; object-fit:cover; border-radius:10px; }
-    .cart-details h4 { margin:0; font-size:18px; }
-    .cart-details p { margin:5px 0; }
+<div class="container">
+  <header class="page-hero">
+    <span class="eyebrow">Shopping bag</span>
+    <h1 class="display page-hero__title lines">
+      <span class="line"><span>Your bag<sup class="section-head__count" id="bagCount"><%= String(count).padStart(2, '0') %></sup></span></span>
+    </h1>
+  </header>
 
-    .remove-btn { position:absolute; top:10px; right:10px; background:#dc3545; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; }
-    .remove-btn:hover { background:#c82333; }
-
-    .checkout-btn { align-self:flex-end; padding:10px 20px; background:#007bff; color:#fff; text-decoration:none; border-radius:5px; }
-    .checkout-btn:hover { background:#0056b3; }
-    @media (max-width: 768px) {
-
-  .cart-container {
-    padding: 10px;
-  }
-
-  .cart-item {
-    display: flex;
-    flex-direction: row; /* نخليه صف بس منظم */
-    gap: 10px;
-    padding: 10px;
-    align-items: flex-start;
-  }
-
-  .cart-item img {
-    width: 90px;
-    height: 90px;
-    flex-shrink: 0;
-    border-radius: 8px;
-  }
-
-  .cart-details {
-    flex: 1;
-  }
-
-  .cart-details h4 {
-    font-size: 15px;
-    margin-bottom: 5px;
-  }
-
-  .cart-details p {
-    font-size: 13px;
-    margin: 2px 0;
-  }
-
-  .remove-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-
-  .checkout-btn {
-    width: 100%;
-    text-align: center;
-    margin-top: 10px;
-  }
-}
-  </style>
-</head>
-<body>
-
-<header>
-  <h1>Veek Cart</h1>
-  <div>Cart: <span id="cart-count"><%= cartItems.reduce((sum,i)=>sum+i.quantity,0) %></span></div>
-</header>
-
-<h2 style="text-align:center; margin-top:20px;">Your Cart</h2>
-
-<% if(cartItems.length === 0){ %>
-  <p style="text-align:center;">Your cart is empty</p>
-<% } else { %>
-  <div class="cart-container">
-    <% cartItems.forEach(item => { %>
-      <div class="cart-item" data-id="<%= item._id %>">
-        <img src="<%= item.images && item.images.length ? item.images[0] : '/images/default.png' %>" alt="<%= item.name %>">
-        <div class="cart-details">
-          <h4><%= item.name %></h4>
-          <p>Price: <%= item.selectedPrice %> EGP</p>
-          <p>Quantity: <%= item.quantity %></p>
-          <p>Total: <%= item.selectedPrice * item.quantity %> EGP</p>
-          <% if(item.selectedSize){ %><p>Size: <%= item.selectedSize %></p><% } %>
-          <% if(item.selectedColor){ %><p>Color: <%= item.selectedColor %></p><% } %>
-        </div>
-        <button class="remove-btn">Remove</button>
+  <div id="cartRoot">
+  <% if (!cartItems.length) { %>
+    <div class="empty-state">
+      <p class="display">Your bag is empty</p>
+      <p>Looks like you haven’t added anything yet.</p>
+      <a href="/" class="btn">Start shopping</a>
+    </div>
+  <% } else { %>
+    <div class="cart">
+      <div class="cart__lines">
+        <% cartItems.forEach((item, i) => { %>
+          <div class="cart-line" data-id="<%= item._id %>" data-line-total="<%= Number(item.selectedPrice) * item.quantity %>" data-line-qty="<%= item.quantity %>" data-reveal style="--d:<%= i * 80 %>">
+            <a href="/product/<%= item._id %>" class="cart-line__img">
+              <img src="<%= (item.images && item.images[0]) || '/images/photo_2026-01-06_18-49-05.jpg' %>" alt="<%= item.name %>">
+            </a>
+            <div>
+              <h2 class="cart-line__name"><a href="/product/<%= item._id %>"><%= item.name %></a></h2>
+              <div class="cart-line__meta">
+                <% if (item.selectedSize) { %><span>Size: <%= item.selectedSize %></span><% } %>
+                <% if (item.selectedColor) { %><span>Color: <%= item.selectedColor %></span><% } %>
+                <span>Qty: <%= item.quantity %></span>
+                <span><%= item.selectedPrice %> EGP each</span>
+              </div>
+            </div>
+            <div class="cart-line__right">
+              <span class="cart-line__total"><%= Number(item.selectedPrice) * item.quantity %> EGP</span>
+              <button type="button" class="text-btn remove-btn">Remove</button>
+            </div>
+          </div>
+        <% }) %>
       </div>
-    <% }) %>
-    <a href="/checkout/get" class="checkout-btn">Proceed to Checkout</a>
+
+      <aside class="summary" data-reveal style="--d:150">
+        <h2 class="summary__title">Order summary</h2>
+
+        <div class="ship-meter">
+          <p id="shipText">
+            <% if (subtotal >= FREE_SHIP) { %>
+              You’ve unlocked <b>free shipping</b> ✓
+            <% } else { %>
+              Add <b><%= FREE_SHIP - subtotal %> EGP</b> more for free shipping
+            <% } %>
+          </p>
+          <div class="ship-meter__bar"><i id="shipBar" style="--p:0%" data-target="<%= Math.min(100, Math.round(subtotal / FREE_SHIP * 100)) %>%"></i></div>
+        </div>
+
+        <div class="summary__row"><span>Subtotal</span><span id="cartSubtotal"><%= subtotal %> EGP</span></div>
+        <div class="summary__row"><span>Shipping</span><span>Calculated at checkout</span></div>
+        <div class="summary__row summary__row--total"><span>Total</span><span id="cartTotal"><%= subtotal %> EGP</span></div>
+
+        <a href="/checkout/get" class="btn btn--block" data-magnetic>Checkout</a>
+        <p class="summary__note">Cash on delivery · Max 10 items per order</p>
+      </aside>
+    </div>
+  <% } %>
   </div>
-<% } %>
+</div>
 
 <script>
-document.querySelectorAll('.remove-btn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const parent = btn.closest('.cart-item');
-    const productId = parent.dataset.id;
+document.addEventListener("DOMContentLoaded", function () {
+  var FREE_SHIP = <%= FREE_SHIP %>;
+  var bar = document.getElementById("shipBar");
+  if (bar) setTimeout(function () { bar.style.setProperty("--p", bar.dataset.target); }, 400);
 
-    try {
-      const res = await fetch('/cart/remove', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({ productId })
-      });
-      const data = await res.json();
-      if(data.success){
-        parent.remove();
-        document.getElementById('cart-count').innerText = data.totalQuantity || 0;
-        if(document.querySelectorAll('.cart-item').length === 0){
-          document.querySelector('.cart-container').innerHTML = '<p style="text-align:center;">Your cart is empty</p>';
-        }
-      }
-    } catch(err){
-      console.error(err);
-      alert('Error removing product from cart');
+  function recalc() {
+    var lines = document.querySelectorAll(".cart-line");
+    var subtotal = 0, count = 0;
+    lines.forEach(function (l) {
+      subtotal += Number(l.dataset.lineTotal) || 0;
+      count += Number(l.dataset.lineQty) || 0;
+    });
+    document.getElementById("bagCount").textContent = String(count).padStart(2, "0");
+
+    if (!lines.length) {
+      document.getElementById("cartRoot").innerHTML =
+        '<div class="empty-state"><p class="display">Your bag is empty</p><p>Looks like you haven’t added anything yet.</p><a href="/" class="btn">Start shopping</a></div>';
+      return;
     }
+
+    document.getElementById("cartSubtotal").textContent = subtotal + " EGP";
+    document.getElementById("cartTotal").textContent = subtotal + " EGP";
+    document.getElementById("shipText").innerHTML = subtotal >= FREE_SHIP
+      ? "You’ve unlocked <b>free shipping</b> ✓"
+      : "Add <b>" + (FREE_SHIP - subtotal) + " EGP</b> more for free shipping";
+    bar.style.setProperty("--p", Math.min(100, Math.round(subtotal / FREE_SHIP * 100)) + "%");
+  }
+
+  document.querySelectorAll(".remove-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var productId = btn.closest(".cart-line").dataset.id;
+      btn.disabled = true;
+
+      fetch("/cart/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: productId })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (!data.success) throw new Error();
+          // the server removes every variant of this product
+          var lines = document.querySelectorAll('.cart-line[data-id="' + productId + '"]');
+          lines.forEach(function (l) { l.classList.add("is-removing"); });
+          setTimeout(function () {
+            lines.forEach(function (l) { l.remove(); });
+            recalc();
+          }, 450);
+          Veek.setCartCount(data.totalQuantity || 0);
+          Veek.toast("Removed from your bag");
+        })
+        .catch(function () {
+          btn.disabled = false;
+          Veek.toast("Couldn’t remove the item, please try again", "error");
+        });
+    });
   });
 });
 </script>
 
-</body>
-</html>
+<%- include('partials/footer') %>
