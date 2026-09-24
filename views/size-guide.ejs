@@ -1,107 +1,52 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Size guide' }) %>
 
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Size Guide</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f7f7f7;
-    color: #333;
-  }
+<div class="container" style="padding-bottom:clamp(56px,8vw,110px)">
+  <header class="page-hero" style="margin-bottom:0;border-bottom:0">
+    <span class="eyebrow">Find your fit</span>
+    <h1 class="display page-hero__title lines"><span class="line"><span>Size guide</span></span></h1>
+    <p class="page-hero__meta" data-reveal style="--d:300">All measurements are in centimeters. Tap a chart to enlarge it.</p>
+  </header>
 
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  h1 {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  .size-section {
-    margin-bottom: 40px;
-  }
-
-  .size-section h2 {
-    font-size: 22px;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #333;
-    padding-bottom: 5px;
-  }
-
-  .size-images {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-  }
-
-  .size-images img {
-    width: 100%;
-    max-width: 250px;
-    object-fit: contain;
-    border: 1px solid #ddd;
-    padding: 5px;
-    background: white;
-    border-radius: 8px;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .size-images {
-      flex-direction: column;
-      align-items: center;
-    }
-    .size-images img {
-      max-width: 90%;
-    }
-  }
-</style>
-</head>
-<body>
-
-<div class="container">
-  <h1> Size Guide</h1>
-
-  <!-- الهوديز -->
-  <div class="size-section">
-    <h2>Hoodies</h2>
-    <div class="size-images">
-      <img src="images/Screenshot 2026-04-09 153643.jpg" alt="">
-
-    </div>
-  </div>
-
-  <!-- التيشرتات -->
-  <div class="size-section">
-    <h2>T-Shirts</h2>
-    <div class="size-images">
-      <img src="images/Screenshot 2026-04-09 153035.jpg" alt="">
-      <img src="images/Screenshot 2026-04-09 153346.jpg" alt="">
-      
-    </div>
-  </div>
-
-  <!-- البناطيل -->
-  <div class="size-section">
-    <h2>Sweatpants</h2>
-    <div class="size-images">
-      <img src="images/Screenshot 2026-04-09 153518.jpg" alt="">
-
-    </div>
-  </div>
-
+  <% [
+    { name: 'Hoodies', imgs: ['/images/Screenshot 2026-04-09 153643.jpg'] },
+    { name: 'T-Shirts', imgs: ['/images/Screenshot 2026-04-09 153035.jpg', '/images/Screenshot 2026-04-09 153346.jpg'] },
+    { name: 'Sweatpants', imgs: ['/images/Screenshot 2026-04-09 153518.jpg'] }
+  ].forEach(group => { %>
+    <section class="size-block">
+      <h2 class="display size-block__title lines"><span class="line"><span><%= group.name %></span></span></h2>
+      <div class="size-block__imgs">
+        <% group.imgs.forEach((src, i) => { %>
+          <button type="button" data-lightbox="<%= src %>" data-reveal style="--d:<%= i * 120 %>" aria-label="Enlarge <%= group.name %> size chart">
+            <img src="<%= src %>" alt="<%= group.name %> size chart" loading="lazy">
+          </button>
+        <% }) %>
+      </div>
+    </section>
+  <% }) %>
 </div>
 
-</body>
-</html>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Size chart">
+  <img src="" alt="Size chart">
+</div>
 
-<%- include("partials/footer") %>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var box = document.getElementById("lightbox");
+  var img = box.querySelector("img");
+  document.querySelectorAll("[data-lightbox]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      img.src = b.dataset.lightbox;
+      box.classList.add("is-open");
+      document.body.classList.add("no-scroll");
+    });
+  });
+  function close() {
+    box.classList.remove("is-open");
+    document.body.classList.remove("no-scroll");
+  }
+  box.addEventListener("click", close);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+});
+</script>
+
+<%- include('partials/footer') %>

@@ -1,340 +1,224 @@
-<%- include('partials/header') %>
+<%
+  const price = Number(product.price) || 0;
+  const sale = Number(product.salePrice) || 0;
+  const onSale = sale > 0 && sale < price;
+  const off = onSale ? Math.round((1 - sale / price) * 100) : 0;
+  const images = (product.images || []).filter(Boolean);
+  if (!images.length) images.push('/images/photo_2026-01-06_18-49-05.jpg');
+  const sizes = (product.sizes || []).filter(Boolean);
+  const colors = (product.colors || []).filter(Boolean);
+  const soldOut = Number(product.stock) <= 0;
+  const lowStock = !soldOut && Number(product.stock) <= 5;
+%>
+<%- include('partials/header', { title: product.name }) %>
 
-<div class="container product-page">
-  <div class="row align-items-start g-4">
+<div class="container pdp">
 
-    <!-- الصور -->
-    <div class="col-md-6">
-      <div class="slider">
+  <!-- ================= GALLERY ================= -->
+  <div class="gallery" data-reveal="fade">
+    <div class="gallery__thumbs">
+      <% images.forEach((img, i) => { %>
+        <button type="button" class="gallery__thumb <%= i === 0 ? 'is-active' : '' %>" data-go="<%= i %>" aria-label="Image <%= i + 1 %>">
+          <img src="<%= img %>" alt="" loading="lazy">
+        </button>
+      <% }) %>
+    </div>
 
-        <button class="nav prev" onclick="prevSlide()"></button>
-
-        <div class="main-image">
-          <img id="mainProductImage" src="<%= product.images[0] %>" alt="<%= product.name %>">
-        </div>
-
-        <button class="nav next" onclick="nextSlide()"></button>
-
-      </div>
-
-      <div class="thumbs">
-        <% product.images.forEach((img, i) => { %>
-          <img src="<%= img %>" onclick="setSlide(<%= i %>)">
+    <div class="gallery__main">
+      <div class="gallery__track" id="galleryTrack">
+        <% images.forEach((img, i) => { %>
+          <div class="gallery__slide">
+            <img src="<%= img %>" alt="<%= product.name %> — image <%= i + 1 %>" <%= i ? 'loading=lazy' : '' %>>
+          </div>
         <% }) %>
       </div>
+      <% if (images.length > 1) { %>
+        <button type="button" class="gallery__nav gallery__nav--prev" data-step="-1" aria-label="Previous image">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button type="button" class="gallery__nav gallery__nav--next" data-step="1" aria-label="Next image">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <span class="gallery__counter"><span id="galleryIndex">1</span> / <%= images.length %></span>
+      <% } %>
     </div>
+  </div>
 
-    <!-- التفاصيل -->
-    <div class="col-md-6 product-info">
+  <!-- ================= INFO ================= -->
+  <div class="pdp__info">
+    <nav class="crumbs" aria-label="Breadcrumb" data-reveal>
+      <a href="/">Home</a><span>/</span><a href="/collections">Collections</a>
+    </nav>
 
-      <form action="/checkout/get" method="GET" class="add-to-cart-form mt-4">
+    <form action="/checkout/get" method="GET" id="productForm">
+      <input type="hidden" name="productId" value="<%= product._id %>">
 
-        <input type="hidden" name="productId" value="<%= product._id %>">
+      <h1 class="pdp__title" data-reveal style="--d:80"><%= product.name %></h1>
 
-        <h1 class="product-title"><%= product.name %></h1>
+      <div class="price pdp__price" data-reveal style="--d:160">
+        <% if (onSale) { %>
+          <span class="price__now"><%= sale %> EGP</span>
+          <span class="price__old"><%= price %> EGP</span>
+          <span class="badge">−<%= off %>%</span>
+        <% } else { %>
+          <span class="price__now"><%= price %> EGP</span>
+        <% } %>
+      </div>
 
-        <div class="price">
-          <% if(product.salePrice && product.salePrice < product.price){ %>
-            <span class="old"><%= product.price %> EGP</span>
-            <span class="new"><%= product.salePrice %> EGP</span>
-            <span class="badge-sale">Sale</span>
-          <% } else { %>
-            <span class="new"><%= product.price %> EGP</span>
-          <% } %>
+      <% if (colors.length) { %>
+        <div class="pdp__block" data-reveal style="--d:220">
+          <div class="pdp__block-head">
+            <span class="label">Color <span class="picked" data-picked="color"><%= colors[0] %></span></span>
+          </div>
+          <div class="chips">
+            <% colors.forEach((c, i) => { %>
+              <label class="chip"><input type="radio" name="color" value="<%= c %>" <%= i === 0 ? 'checked' : '' %>><span><%= c %></span></label>
+            <% }) %>
+          </div>
         </div>
+      <% } %>
 
-        <p class="desc"><%= product.description %></p>
-
-        <label>Color</label>
-        <select name="color" class="select-box">
-          <% product.colors.forEach(color => { %>
-            <option value="<%= color %>"><%= color %></option>
-          <% }) %>
-        </select>
-
-        <label>Size</label>
-        <select name="size" class="select-box">
-          <% product.sizes.forEach(size => { %>
-            <option value="<%= size %>"><%= size %></option>
-          <% }) %>
-        </select>
-
-        <div class="qty-box">
-          <button type="button" onclick="changeQty(-1)">-</button>
-          <input id="qty" name="qty" type="number" value="1" min="1">
-          <button type="button" onclick="changeQty(1)">+</button>
+      <% if (sizes.length) { %>
+        <div class="pdp__block" data-reveal style="--d:280">
+          <div class="pdp__block-head">
+            <span class="label">Size <span class="picked" data-picked="size"><%= sizes[0] %></span></span>
+            <a href="/size-guide" class="text-btn">Size guide</a>
+          </div>
+          <div class="chips">
+            <% sizes.forEach((s, i) => { %>
+              <label class="chip"><input type="radio" name="size" value="<%= s %>" <%= i === 0 ? 'checked' : '' %>><span><%= s %></span></label>
+            <% }) %>
+          </div>
         </div>
+      <% } %>
 
-        <div class="mb-3">
-          <a href="/size-guide" class="size-guide-link">Size Guide</a>
+      <div class="pdp__buy" data-reveal style="--d:340">
+        <div class="qty">
+          <button type="button" data-qty="-1" aria-label="Decrease">−</button>
+          <input id="qty" name="qty" type="number" value="1" min="1" max="10" aria-label="Quantity">
+          <button type="button" data-qty="1" aria-label="Increase">+</button>
         </div>
+        <button type="button" id="addToBag" class="btn btn--ghost" <%= soldOut ? 'disabled' : '' %>>
+          <%= soldOut ? 'Sold out' : 'Add to bag' %>
+        </button>
+        <button type="submit" class="btn btn--now" <%= soldOut ? 'disabled' : '' %>>Buy it now</button>
+      </div>
 
-        <button id="confirmAdd" class="btn-cart">Add to cart</button>
-        <button class="btn-buy">Buy it now</button>
+      <p class="pdp__stock <%= soldOut ? 'is-out' : '' %>" data-reveal style="--d:380">
+        <%= soldOut ? 'Currently out of stock' : (lowStock ? 'Only ' + product.stock + ' left — order soon' : 'In stock, ready to ship') %>
+      </p>
+    </form>
 
-      </form>
+    <div style="margin-top:28px;--d:420" data-reveal>
+      <% if (product.description) { %>
+        <details class="acc" open>
+          <summary>Description <span class="plus"></span></summary>
+          <div class="acc__body"><%= product.description %></div>
+        </details>
+      <% } %>
+      <details class="acc">
+        <summary>Shipping <span class="plus"></span></summary>
+        <div class="acc__body">Delivered within 5–7 business days in Cairo, Giza and Alexandria, and up to 8 business days for other governorates. Free shipping on orders over 1499 EGP.</div>
+      </details>
+      <details class="acc">
+        <summary>Returns &amp; exchange <span class="plus"></span></summary>
+        <div class="acc__body">Return or exchange within 14 days of delivery. Items must be unworn, unwashed and in original condition. <a href="/help#return" style="border-bottom:1px solid">Read the full policy</a>.</div>
+      </details>
     </div>
-
   </div>
 </div>
 
-<%- include('partials/footer') %>
-
-<style>
-.product-page{
-  margin-top:50px;
-}
-
-/* ================= slider ================= */
-.slider{
-  position:relative;
-  width:100%;
-  max-width:100%;
-  overflow:hidden;
-}
-
-.main-image{
-  width:100%;
-  height:500px;
-  background:#f5f5f5;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-  overflow:hidden;
-}
-
-.main-image img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
-/* arrows */
-.nav{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:42px;
-  height:42px;
-  border:none;
-  border-radius:50%;
-  background:rgba(0,0,0,.7);
-  color:#fff;
-  font-size:20px;
-  cursor:pointer;
-  z-index:5;
-}
-
-.prev{ left:10px; }
-.next{ right:10px; }
-
-/* thumbs */
-.thumbs{
-  display:flex;
-  gap:10px;
-  margin-top:15px;
-  flex-wrap:wrap;
-}
-
-.thumbs img{
-  width:75px;
-  height:75px;
-  object-fit:cover;
-  border-radius:8px;
-  cursor:pointer;
-  border:1px solid #eee;
-}
-
-/* ================= info ================= */
-.product-title{
-  font-size:28px;
-  font-weight:600;
-}
-
-.price{
-  margin:15px 0;
-}
-
-.price .old{
-  color:#888;
-  text-decoration:line-through;
-  margin-right:10px;
-}
-
-.price .new{
-  font-size:22px;
-  font-weight:700;
-}
-
-.badge-sale{
-  background:red;
-  color:#fff;
-  padding:4px 10px;
-  font-size:12px;
-  border-radius:20px;
-}
-
-.desc{
-  max-height:220px;
-  overflow:auto;
-  margin-bottom:15px;
-}
-
-.select-box{
-  width:100%;
-  padding:12px;
-  margin-bottom:15px;
-}
-
-.qty-box{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin:15px 0;
-}
-
-.qty-box button{
-  width:40px;
-  height:40px;
-  border:none;
-  background:#111;
-  color:#fff;
-}
-
-.qty-box input{
-  width:70px;
-  text-align:center;
-  height:40px;
-}
-
-.size-guide-link{
-  display:inline-block;
-  color:#111;
-  text-decoration:none;
-  border-bottom:1px solid #111;
-  font-weight:600;
-}
-
-.btn-cart,
-.btn-buy{
-  width:100%;
-  padding:14px;
-  border:none;
-  margin-bottom:10px;
-}
-
-.btn-cart{
-  background:#fff;
-  border:2px solid #111;
-}
-
-.btn-buy{
-  background:#111;
-  color:#fff;
-}
-
-/* ================= mobile ================= */
-@media (max-width:768px){
-
-  .product-page{
-    margin-top:20px;
-    padding-left:12px;
-    padding-right:12px;
-  }
-
-  .main-image{
-    height:320px;
-  }
-
-  .nav{
-    width:36px;
-    height:36px;
-    font-size:16px;
-  }
-
-  .prev{ left:6px; }
-  .next{ right:6px; }
-
-  .thumbs{
-    justify-content:center;
-    gap:8px;
-  }
-
-  .thumbs img{
-    width:60px;
-    height:60px;
-  }
-
-  .product-title{
-    font-size:24px;
-    margin-top:15px;
-  }
-
-}
-</style>
+<!-- Mobile sticky bar -->
+<div class="buybar" id="buybar">
+  <button type="button" class="btn btn--ghost" data-proxy="addToBag" <%= soldOut ? 'disabled' : '' %>><%= soldOut ? 'Sold out' : 'Add to bag' %></button>
+  <button type="button" class="btn" data-proxy="buyNow" <%= soldOut ? 'disabled' : '' %>>Buy now</button>
+</div>
 
 <script>
-function changeQty(amount){
-  let qty = document.getElementById("qty");
-  let value = parseInt(qty.value) || 1;
-  value += amount;
-  if(value < 1) value = 1;
-  qty.value = value;
-}
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("productForm");
+  var track = document.getElementById("galleryTrack");
+  var slides = track.children;
+  var thumbs = document.querySelectorAll(".gallery__thumb");
+  var counter = document.getElementById("galleryIndex");
 
-/* ajax add to cart */
-document.getElementById('confirmAdd').addEventListener('click', async (e) => {
-  e.preventDefault();
-
-  const form = document.querySelector('.add-to-cart-form');
-
-  const productId = form.querySelector('input[name="productId"]').value;
-  const color = form.querySelector('select[name="color"]').value;
-  const size = form.querySelector('select[name="size"]').value;
-  const qty = parseInt(form.querySelector('input[name="qty"]').value) || 1;
-
-  try{
-    const res = await fetch('/cart/add',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({productId,color,size,qty})
-    });
-
-    const data = await res.json();
-
-    if(data.success){
-      const cartCount = document.getElementById('cart-count');
-      if(cartCount) cartCount.innerText = data.totalQuantity || 0;
-    }else{
-      alert(data.error || 'Error');
-    }
-
-  }catch(err){
-    alert('Error');
+  /* ---- gallery ---- */
+  function currentIndex() {
+    return Math.round(track.scrollLeft / track.clientWidth);
   }
+
+  function goTo(i) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    track.scrollTo({ left: i * track.clientWidth });
+  }
+
+  function sync() {
+    var i = currentIndex();
+    thumbs.forEach(function (t, n) { t.classList.toggle("is-active", n === i); });
+    if (counter) counter.textContent = i + 1;
+  }
+
+  var scrollTimer;
+  track.addEventListener("scroll", function () {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(sync, 60);
+  }, { passive: true });
+
+  thumbs.forEach(function (t) {
+    t.addEventListener("click", function () { goTo(Number(t.dataset.go)); });
+  });
+
+  document.querySelectorAll("[data-step]").forEach(function (b) {
+    b.addEventListener("click", function () { goTo(currentIndex() + Number(b.dataset.step)); });
+  });
+
+  // hover zoom on desktop
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    Array.prototype.forEach.call(slides, function (slide) {
+      var img = slide.querySelector("img");
+      slide.addEventListener("click", function () { slide.classList.toggle("is-zoomed"); });
+      slide.addEventListener("mousemove", function (e) {
+        var r = slide.getBoundingClientRect();
+        img.style.setProperty("--zx", ((e.clientX - r.left) / r.width * 100) + "%");
+        img.style.setProperty("--zy", ((e.clientY - r.top) / r.height * 100) + "%");
+      });
+      slide.addEventListener("mouseleave", function () { slide.classList.remove("is-zoomed"); });
+    });
+  }
+
+  /* ---- picked option labels ---- */
+  form.addEventListener("change", function (e) {
+    var picked = form.querySelector('[data-picked="' + e.target.name + '"]');
+    if (picked) picked.textContent = e.target.value;
+  });
+
+  /* ---- add to bag ---- */
+  var addBtn = document.getElementById("addToBag");
+  addBtn.addEventListener("click", function () {
+    var color = form.querySelector('input[name="color"]:checked');
+    var size = form.querySelector('input[name="size"]:checked');
+    addBtn.classList.add("is-loading");
+    Veek.addToCart({
+      productId: form.productId.value,
+      color: color ? color.value : null,
+      size: size ? size.value : null,
+      qty: parseInt(form.qty.value, 10) || 1
+    }).then(function () { addBtn.classList.remove("is-loading"); });
+  });
+
+  /* ---- mobile sticky buy bar ---- */
+  var buybar = document.getElementById("buybar");
+  var buyZone = document.querySelector(".pdp__buy");
+  document.body.classList.add("has-buybar");
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      var e = entries[0];
+      buybar.classList.toggle("is-visible", !e.isIntersecting && e.boundingClientRect.top < 0);
+    }).observe(buyZone);
+  }
+  buybar.querySelector('[data-proxy="addToBag"]').addEventListener("click", function () { addBtn.click(); });
+  buybar.querySelector('[data-proxy="buyNow"]').addEventListener("click", function () { form.requestSubmit ? form.requestSubmit() : form.submit(); });
 });
-
-/* slider */
-let images = <%- JSON.stringify(product.images) %>;
-let currentIndex = 0;
-
-function showImage(index){
-  currentIndex = index;
-  document.getElementById("mainProductImage").src = images[currentIndex];
-}
-
-function nextSlide(){
-  currentIndex = (currentIndex + 1) % images.length;
-  showImage(currentIndex);
-}
-
-function prevSlide(){
-  currentIndex = (currentIndex - 1 + images.length) % images.length;
-  showImage(currentIndex);
-}
-
-function setSlide(index){
-  showImage(index);
-}
 </script>
+
+<%- include('partials/footer') %>

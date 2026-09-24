@@ -1,23 +1,29 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Collections' }) %>
 
-<h1 class="page-title">Collections</h1>
+<div class="container">
+  <header class="page-hero">
+    <span class="eyebrow">Shop by category</span>
+    <h1 class="display page-hero__title lines"><span class="line"><span>Collections</span></span></h1>
+  </header>
 
-<div class="collections-grid">
-
-  <% categories.forEach(category => { %>
-
-    <a href="/collections/<%= category._id %>" class="collection-card">
-
-      <img src="<%= category.image %>" alt="vvv">
-
-      <div class="collection-info">
-        <span><%= category.name %> →</span>
-      </div>
-
-    </a>
-
-  <% }) %>
-
+  <% if (!categories.length) { %>
+    <div class="empty-state">
+      <p class="display">Coming soon</p>
+      <p>New collections are on their way.</p>
+    </div>
+  <% } else { %>
+    <div class="tiles" style="padding-bottom:clamp(56px,8vw,110px)">
+      <% categories.forEach(category => { %>
+        <a href="/collections/<%= category._id %>" class="tile" data-reveal>
+          <img src="<%= category.image || '/images/photo_2026-01-23_00-05-32.jpg' %>" alt="<%= category.name %>" loading="lazy">
+          <span class="tile__label">
+            <span class="tile__name"><%= category.name %></span>
+            <span class="tile__arrow" aria-hidden="true">→</span>
+          </span>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
 </div>
 
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

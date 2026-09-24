@@ -1,347 +1,135 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Help' }) %>
 
-<section class="help-page">
-  <div class="help-hero">
-    <h1>Help Center</h1>
-    <p>Everything you need in one place</p>
+<div class="container" style="padding-bottom:clamp(56px,8vw,110px)">
+  <header class="page-hero">
+    <span class="eyebrow">Help center</span>
+    <h1 class="display page-hero__title lines"><span class="line"><span>How can we help?</span></span></h1>
+    <p class="page-hero__meta" data-reveal style="--d:300">Everything about shipping, returns and your orders — in one place.</p>
+  </header>
+
+  <div class="tabs" role="tablist" data-reveal>
+    <span class="tabs__ink" aria-hidden="true"></span>
+    <button class="tab-btn active" role="tab" data-tab="shipping">Shipping policy</button>
+    <button class="tab-btn" role="tab" data-tab="return">Return &amp; exchange</button>
+    <button class="tab-btn" role="tab" data-tab="faqs">FAQs</button>
   </div>
 
-  <!-- Tabs -->
-  <div class="help-tabs">
-    <button class="tab-btn active" onclick="showTab('shipping')">Shipping Policy</button>
-    <button class="tab-btn" onclick="showTab('return')">Return & Exchange</button>
-    <button class="tab-btn" onclick="showTab('faqs')">FAQs</button>
+  <!-- Shipping -->
+  <div class="tab-panel prose active" id="shipping" role="tabpanel">
+    <h2>Shipping policy</h2>
+
+    <h3>Delivery time</h3>
+    <p>Orders are delivered within 5–7 business days in Cairo, Giza, and Alexandria, and up to 8 business days for other governorates.</p>
+
+    <h3>Delivery attempts</h3>
+    <p>Our shipping partner will attempt delivery up to 3 times and will contact you using the phone number provided during checkout.</p>
+
+    <h3>Undelivered orders</h3>
+    <p>If the order cannot be delivered after 3 attempts, it will be automatically returned and marked as a returned order.</p>
+
+    <h3>Important note</h3>
+    <p>Please make sure your contact details and delivery address are accurate to avoid delays or missed deliveries.</p>
+
+    <h3>Need help?</h3>
+    <p>For any questions or support, feel free to contact us via email: <strong>veekegy@gmail.com</strong></p>
   </div>
 
-<!-- Shipping -->
-<div class="tab-content active" id="shipping">
-  <div class="card">
-    <h2>Shipping Policy</h2>
+  <!-- Return -->
+  <div class="tab-panel prose" id="return" role="tabpanel">
+    <h2>Veek return &amp; exchange policy</h2>
 
-    <h3>Delivery Time</h3>
-    <p>
-      Orders are delivered within 5–7 business days in Cairo, Giza, and Alexandria,
-      and up to 8 business days for other governorates.
-    </p>
+    <p>At Veek, we want you to love every piece you order. If you are not completely satisfied, you can return or exchange your order within 14 days of delivery.</p>
 
-    <h3>Delivery Attempts</h3>
-    <p>
-      Our shipping partner will attempt delivery up to 3 times and will contact you
-      using the phone number provided during checkout.
-    </p>
-
-    <h3>Undelivered Orders</h3>
-    <p>
-      If the order cannot be delivered after 3 attempts, it will be automatically
-      returned and marked as a returned order.
-    </p>
-
-    <h3>Important Note</h3>
-    <p>
-      Please make sure your contact details and delivery address are accurate
-      to avoid delays or missed deliveries.
-    </p>
-
-    <h3>Need Help?</h3>
-    <p>
-      For any questions or support, feel free to contact us via email:
-      <strong>veekegy@gmail.com</strong>
-    </p>
-  </div>
-</div>
-
-<!-- Return -->
-<div class="tab-content" id="return">
-  <div class="card">
-    <h2>Veek Return & Exchange Policy</h2>
-
-    <p>
-      At Veek, we want you to love every piece you order. If you are not completely
-      satisfied, you can return or exchange your order within 14 days of delivery.
-    </p>
-
-    <h3>Conditions for Return / Exchange</h3>
+    <h3>Conditions for return / exchange</h3>
     <ul>
       <li>Items must be unworn, unwashed, and in original condition.</li>
       <li>Customized or printed items are non-returnable unless defective.</li>
       <li>Sale, clearance, or end-of-season items are non-refundable.</li>
     </ul>
 
-    <h3>Defective or Wrong Items</h3>
+    <h3>Defective or wrong items</h3>
     <ul>
-      <li>
-        If your item is defective or the wrong product was delivered, Veek covers
-        all shipping costs.
-      </li>
-      <li>
-        A replacement or refund will be provided at no extra charge.
-      </li>
+      <li>If your item is defective or the wrong product was delivered, Veek covers all shipping costs.</li>
+      <li>A replacement or refund will be provided at no extra charge.</li>
     </ul>
 
-    <h3>Shipping & Costs</h3>
+    <h3>Shipping &amp; costs</h3>
     <ul>
-      <li>
-        Customers are responsible for return shipping unless the item is defective
-        or incorrect.
-      </li>
-      <li>
-        Exchange shipping costs are collected by the courier upon delivery.
-      </li>
+      <li>Customers are responsible for return shipping unless the item is defective or incorrect.</li>
+      <li>Exchange shipping costs are collected by the courier upon delivery.</li>
     </ul>
 
-    <h3>How to Return or Exchange</h3>
-    <p>
-      Customers can request returns or exchanges through:
-    </p>
+    <h3>How to return or exchange</h3>
+    <p>Customers can request returns or exchanges through:</p>
     <ul>
       <li>Email: <strong>veekegy@gmail.com</strong></li>
       <li>Instagram</li>
       <li>WhatsApp</li>
       <li>Facebook</li>
     </ul>
+    <p>Our team will confirm your request and guide you through the process.</p>
 
-    <p>
-      Our team will confirm your request and guide you through the process.
-    </p>
-
-    <h3>Refunds & Exchanges</h3>
+    <h3>Refunds &amp; exchanges</h3>
     <ul>
-      <li>
-        Refunds are processed through the original payment method within
-        10–14 business days after receiving the returned item.
-      </li>
-      <li>
-        Exchanges are processed within 5–10 business days depending on stock availability.
-      </li>
+      <li>Refunds are processed through the original payment method within 10–14 business days after receiving the returned item.</li>
+      <li>Exchanges are processed within 5–10 business days depending on stock availability.</li>
     </ul>
 
-    <h3>Customer Rights & Legal Notice</h3>
-    <p>
-      This policy is in accordance with the Egyptian Consumer Protection Law
-      No. 181 of 2018.
-    </p>
+    <h3>Customer rights &amp; legal notice</h3>
+    <p>This policy is in accordance with the Egyptian Consumer Protection Law No. 181 of 2018.</p>
+    <p>If you have any questions, our team is always here to help and make your experience smooth and fair.</p>
+  </div>
 
-    <p>
-      If you have any questions, our team is always here to help and make your
-      experience smooth and fair.
-    </p>
+  <!-- FAQs -->
+  <div class="tab-panel" id="faqs" role="tabpanel">
+    <% [
+      ["How can I purchase your products?", "You can purchase through our website."],
+      ["Can I open the package before paying the courier?", "Unfortunately, no. Couriers are not allowed to wait for try-ons or return with opened packages."],
+      ["Where can I find the size chart?", "The size chart is available on our Size Guide page and linked from every product page."],
+      ["How long does delivery take?", "Orders are delivered within 5–7 business days in Cairo, Giza, and Alexandria, and up to 8 business days for other governorates."],
+      ["Can I make my order arrive faster?", "Unfortunately, delivery times cannot be expedited."],
+      ["Do you have a physical store?", "No, we operate exclusively online."],
+      ["Do you allow exchanges / returns?", "Yes, according to our return and exchange policy."],
+      ["How can I request a refund, exchange, or cancel my order?", "Contact us at veekegy@gmail.com or via our social media pages."],
+      ["How can I contact you?", "Through DM, our Contact page, or email: veekegy@gmail.com."],
+      ["What happens if the courier cannot deliver my order?", "After 3 attempts, the order will be returned automatically."],
+      ["Can I order two sizes of the same item?", "No, such orders are not allowed and may be canceled automatically."]
+    ].forEach(([q, a], i) => { %>
+      <details class="acc">
+        <summary><%= q %> <span class="plus"></span></summary>
+        <div class="acc__body"><%= a %></div>
+      </details>
+    <% }) %>
   </div>
 </div>
-
-<!-- FAQs -->
-<div class="tab-content" id="faqs">
-  <div class="faq-box">
-
-    <details>
-      <summary>How can I purchase your products?</summary>
-      <p>You can purchase through our website.</p>
-    </details>
-
-    <details>
-      <summary>Can I open the package before paying the courier?</summary>
-      <p>
-        Unfortunately, no. Couriers are not allowed to wait for try-ons
-        or return with opened packages.
-      </p>
-    </details>
-
-    <details>
-      <summary>Where can I find the size chart?</summary>
-      <p>
-        The size chart is available in the product gallery on each product page.
-      </p>
-    </details>
-
-    <details>
-      <summary>How long does delivery take?</summary>
-      <p>
-        Orders are delivered within 5–7 business days in Cairo, Giza,
-        and Alexandria, and up to 8 business days for other governorates.
-      </p>
-    </details>
-
-    <details>
-      <summary>Can I make my order arrive faster?</summary>
-      <p>
-        Unfortunately, delivery times cannot be expedited.
-      </p>
-    </details>
-
-    <details>
-      <summary>Do you have a physical store?</summary>
-      <p>No, we operate exclusively online.</p>
-    </details>
-
-    <details>
-      <summary>Do you allow exchanges / returns?</summary>
-      <p>
-        Yes, according to our return and exchange policy.
-      </p>
-    </details>
-
-    <details>
-      <summary>How can I request refund, exchange, or cancel order?</summary>
-      <p>
-        Contact us at <strong>veekegy@gmail.com</strong> or via social media pages.
-      </p>
-    </details>
-
-    <details>
-      <summary>How can I contact you?</summary>
-      <p>
-        Through DM, Contact Us page, or email:
-        <strong>veekegy@gmail.com</strong>
-      </p>
-    </details>
-
-    <details>
-      <summary>What happens if courier cannot deliver my order?</summary>
-      <p>
-        After 3 attempts, the order will be returned automatically.
-      </p>
-    </details>
-
-    <details>
-      <summary>Can I order two sizes of the same item?</summary>
-      <p>
-        No, such orders are not allowed and may be canceled automatically.
-      </p>
-    </details>
-
-  </div>
-</div>
-</section>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#f8f8f8;
-}
-
-/* HERO */
-.help-hero{
-  text-align:center;
-  padding:40px 20px 20px;
-}
-
-.help-hero h1{
-  font-size:38px;
-  margin:0;
-}
-
-.help-hero p{
-  color:#666;
-  margin-top:10px;
-}
-
-/* TABS */
-.help-tabs{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
-  padding:20px;
-}
-
-.tab-btn{
-  border:none;
-  background:#fff;
-  padding:12px 20px;
-  border-radius:30px;
-  cursor:pointer;
-  font-weight:600;
-  transition:.3s;
-  box-shadow:0 5px 15px rgba(0,0,0,.08);
-}
-
-.tab-btn.active,
-.tab-btn:hover{
-  background:#111;
-  color:#fff;
-}
-
-/* CONTENT */
-.tab-content{
-  display:none;
-  max-width:900px;
-  margin:auto;
-  padding:10px 20px 50px;
-}
-
-.tab-content.active{
-  display:block;
-}
-
-.card{
-  background:#fff;
-  padding:25px;
-  border-radius:18px;
-  box-shadow:0 8px 20px rgba(0,0,0,.07);
-}
-
-.card h2{
-  margin-top:0;
-}
-
-/* FAQ */
-.faq-box details{
-  background:#fff;
-  margin-bottom:12px;
-  padding:16px;
-  border-radius:14px;
-  box-shadow:0 5px 12px rgba(0,0,0,.06);
-}
-
-.faq-box summary{
-  cursor:pointer;
-  font-weight:600;
-}
-
-.faq-box p{
-  margin-top:12px;
-  color:#555;
-}
-
-/* MOBILE */
-@media(max-width:768px){
-
-  .help-hero h1{
-    font-size:28px;
-  }
-
-  .help-tabs{
-    overflow-x:auto;
-    flex-wrap:nowrap;
-    justify-content:flex-start;
-    padding:15px;
-  }
-
-  .tab-btn{
-    min-width:max-content;
-    font-size:14px;
-    padding:10px 16px;
-  }
-
-  .card{
-    padding:18px;
-  }
-}
-</style>
 
 <script>
-function showTab(tabId){
-  document.querySelectorAll('.tab-content').forEach(tab=>{
-    tab.classList.remove('active');
+document.addEventListener("DOMContentLoaded", function () {
+  var tabs = document.querySelectorAll(".tab-btn");
+  var ink = document.querySelector(".tabs__ink");
+
+  function moveInk(btn) {
+    ink.style.width = btn.offsetWidth + "px";
+    ink.style.transform = "translateX(" + btn.offsetLeft + "px)";
+  }
+
+  function show(id, push) {
+    var btn = document.querySelector('.tab-btn[data-tab="' + id + '"]');
+    if (!btn) return;
+    tabs.forEach(function (t) { t.classList.toggle("active", t === btn); });
+    document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.toggle("active", p.id === id); });
+    moveInk(btn);
+    if (push) history.replaceState(null, "", "#" + id);
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () { show(t.dataset.tab, true); });
   });
 
-  document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.classList.remove('active');
-  });
-
-  document.getElementById(tabId).classList.add('active');
-  event.target.classList.add('active');
-}
+  show((location.hash || "#shipping").slice(1) || "shipping", false);
+  window.addEventListener("resize", function () { moveInk(document.querySelector(".tab-btn.active")); });
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1), false); });
+});
 </script>
 
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

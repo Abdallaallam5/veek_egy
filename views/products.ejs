@@ -1,24 +1,18 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Shop all' }) %>
 
-<h2 class="mb-4">Shop All Products</h2>
+<div class="container">
+  <header class="page-hero">
+    <span class="eyebrow">Everything</span>
+    <h1 class="display page-hero__title lines">
+      <span class="line"><span>Shop all<sup class="section-head__count"><%= String(products.length).padStart(2, '0') %></sup></span></span>
+    </h1>
+  </header>
 
-<div class="row">
+  <div class="grid" style="padding-bottom:clamp(56px,8vw,110px)">
     <% products.forEach(product => { %>
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm">
-                <img src="<%= product.images[0] || 'https://via.placeholder.com/300' %>" 
-                     class="card-img-top" 
-                     style="height:250px; object-fit:cover;">
-                <div class="card-body text-center">
-                    <h6><%= product.name %></h6>
-                    <p>$<%= product.price %></p>
-                    <a href="/products/<%= product._id %>" class="btn btn-outline-dark btn-sm">
-                        View
-                    </a>
-                </div>
-            </div>
-        </div>
+      <%- include('partials/product-card', { product }) %>
     <% }) %>
+  </div>
 </div>
 
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

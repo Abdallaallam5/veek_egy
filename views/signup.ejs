@@ -1,23 +1,25 @@
-<%- include("partials/header") %>
+<%- include('partials/header', { title: 'Sign up' }) %>
 
-<h2>Sign Up</h2>
+<div class="narrow">
+  <h1 class="display lines"><span class="line"><span>Sign up</span></span></h1>
 
-<form action="/signup" method="POST" class="mt-3">
-    <div class="mb-3">
-        <label>Name</label>
-        <input type="text" name="name" class="form-control" required>
+  <form action="/user/signup" method="POST" data-reveal>
+    <div class="field">
+      <label for="s-name">Name</label>
+      <input class="input" id="s-name" type="text" name="name" autocomplete="name" required>
     </div>
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required>
+    <div class="field">
+      <label for="s-email">Email</label>
+      <input class="input" id="s-email" type="email" name="email" autocomplete="email" required>
     </div>
-    <div class="mb-3">
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required>
+    <div class="field">
+      <label for="s-password">Password</label>
+      <input class="input" id="s-password" type="password" name="password" autocomplete="new-password" required>
     </div>
-    <button type="submit" class="btn btn-dark">Sign Up</button>
-</form>
+    <button type="submit" class="btn btn--block">Create account</button>
+  </form>
 
-<p class="mt-3">Already have an account? <a href="/login">Login</a></p>
+  <p class="alt">Already have an account? <a href="/user/login">Login</a></p>
+</div>
 
-<%- include("partials/footer") %>
+<%- include('partials/footer') %>

@@ -1,649 +1,312 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-  @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-/* ===== Checkout Page Layout ===== */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f7f8fc;
-  margin: 0;
-  padding: 0;
-}
+<%- include('partials/header', { title: 'Checkout' }) %>
 
-.checkout {
-  display: flex;
-  max-width: 1100px;
-  margin: 40px auto;
-  gap: 30px;
-}
+<div class="container">
+  <header class="page-hero">
+    <span class="eyebrow">Secure checkout · Cash on delivery</span>
+    <h1 class="display page-hero__title lines"><span class="line"><span>Checkout</span></span></h1>
+  </header>
 
-/* ===== Left Section ===== */
-.checkout-left {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  border: 1px solid #e9ecef;
-}
+  <form id="checkoutForm" novalidate>
+    <div class="checkout">
 
-.checkout-left h2 {
-  margin-bottom: 20px;
-  color: #2c3e50;
-  font-size: 22px;
-  font-weight: 600;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 10px;
-}
+      <!-- ================= LEFT ================= -->
+      <div>
+        <section class="checkout-step" data-reveal>
+          <div class="checkout-step__head"><span class="checkout-step__num">1</span><h2>Contact</h2></div>
 
-/* ===== BEAUTIFUL SELECT & INPUTS ===== */
-.checkout-left input,
-.checkout-left select {
-  width: 100%;
-  padding: 16px 18px;
-  margin-bottom: 18px;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  font-size: 15px;
-  background: #fff;
-  outline: none;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
+          <div class="field">
+            <label for="f-name">Full name</label>
+            <input class="input" id="f-name" name="name" autocomplete="name" placeholder="Your full name">
+            <small class="error-msg" id="error-name"></small>
+          </div>
 
-.checkout-left input:focus,
-.checkout-left select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-  transform: translateY(-1px);
-}
+          <div class="field-row">
+            <div class="field">
+              <label for="f-email">Email</label>
+              <input class="input" id="f-email" name="email" type="email" autocomplete="email" placeholder="name@gmail.com">
+              <small class="error-msg" id="error-email"></small>
+            </div>
+            <div class="field">
+              <label for="f-phone">Phone</label>
+              <input class="input" id="f-phone" name="phone" placeholder="01xxxxxxxxx" maxlength="11" inputmode="numeric" autocomplete="tel">
+              <small class="error-msg" id="error-phone"></small>
+            </div>
+          </div>
+        </section>
 
-/* ===== CUSTOM SELECT ARROW ===== */
-.checkout-left select {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 16px center;
-  background-repeat: no-repeat;
-  background-size: 18px;
-  padding-right: 48px;
-}
+        <section class="checkout-step" data-reveal style="--d:100">
+          <div class="checkout-step__head"><span class="checkout-step__num">2</span><h2>Shipping</h2></div>
 
-/* ===== COUPON SECTION IN LEFT ===== */
-.coupon-section-left {
-  margin-bottom: 25px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
-  border: 2px dashed #007bff;
-  border-radius: 12px;
-  text-align: center;
-}
+          <div class="field">
+            <label for="citySelect">Governorate</label>
+            <select class="select" name="city" id="citySelect">
+              <option value="">Select governorate</option>
+              <% [
+                "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
+                "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
+                "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
+                "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
+                "Luxor","Qena","Sohag"
+              ].forEach(g => { %>
+                <option value="<%= g %>"><%= g %></option>
+              <% }) %>
+            </select>
+            <small class="error-msg" id="error-city"></small>
+          </div>
 
-.coupon-section-left h3 {
-  margin: 0 0 15px 0;
-  color: #007bff;
-  font-size: 16px;
-  font-weight: 600;
-}
+          <div class="field">
+            <label for="f-address">Address</label>
+            <input class="input" id="f-address" name="address" autocomplete="street-address" placeholder="Street, building, floor, apartment">
+            <small class="error-msg" id="error-address"></small>
+          </div>
+        </section>
 
-.coupon-input-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+        <section class="checkout-step" data-reveal style="--d:200">
+          <div class="checkout-step__head"><span class="checkout-step__num">3</span><h2>Promo code</h2></div>
+          <div class="coupon">
+            <input class="input" type="text" id="couponCode" placeholder="Enter code" autocomplete="off">
+            <button type="button" class="btn btn--ghost" id="applyCoupon">Apply</button>
+          </div>
+          <p id="couponMessage-left" class="coupon-msg"></p>
+        </section>
 
-.coupon-input-group input {
-  flex: 1;
-  margin-bottom: 0 !important;
-  border-radius: 25px;
-  padding: 14px 20px;
-  border: 2px solid #007bff;
-  font-weight: 500;
-}
+        <section class="checkout-step" data-reveal style="--d:300">
+          <div class="checkout-step__head"><span class="checkout-step__num">4</span><h2>Payment</h2></div>
+          <div class="cod-note">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="1"/><circle cx="12" cy="12" r="2.5"/></svg>
+            <div><b>Cash on delivery</b><small>Pay the courier when your order arrives.</small></div>
+          </div>
+        </section>
 
-.coupon-input-group button {
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #28a745, #20c997);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-}
+        <button type="submit" class="btn btn--block checkout-btn" data-reveal style="--d:350">Confirm order</button>
+      </div>
 
-.coupon-input-group button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40,167,69,0.4);
-}
+      <!-- ================= RIGHT ================= -->
+      <aside class="checkout-summary">
+        <div class="summary" data-reveal="fade">
+          <h2 class="summary__title">Your order</h2>
 
-#couponMessage-left {
-  margin-top: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  min-height: 20px;
-}
+          <% cartItems.forEach(item => { %>
+            <div class="order-item">
+              <div class="order-item__img">
+                <img src="<%= (item.images && item.images[0]) || '/images/photo_2026-01-06_18-49-05.jpg' %>" alt="<%= item.name %>">
+                <span class="order-item__qty"><%= item.quantity %></span>
+              </div>
+              <div>
+                <h4><%= item.name %></h4>
+                <p>
+                  <%= [item.selectedSize, item.selectedColor].filter(Boolean).join(' · ') %>
+                </p>
+              </div>
+              <span class="order-item__price"><%= Number(item.selectedPrice) * item.quantity %> EGP</span>
 
-.checkout-left .checkout-btn {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-}
+              <input type="hidden" name="productId[]" value="<%= item._id %>">
+              <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
+              <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
+              <input type="hidden" name="size[]" value="<%= item.selectedSize || '' %>">
+              <input type="hidden" name="color[]" value="<%= item.selectedColor || '' %>">
+            </div>
+          <% }) %>
 
-.checkout-left .checkout-btn:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,123,255,0.4);
-}
+          <div style="margin-top:20px">
+            <div class="summary__row"><span>Subtotal</span><span id="subtotal" data-value="<%= subtotal %>"><%= subtotal %> EGP</span></div>
+            <div class="summary__row"><span>Discount</span><span id="discount" data-value="0">0 EGP</span></div>
+            <div class="summary__row">
+              <span>Shipping</span>
+              <span><span id="shipping" data-value="<%= shipping %>"><%= subtotal >= 1499 ? 'Free' : 'Select governorate' %></span><span id="message" class="free-ship-msg"></span></span>
+            </div>
+            <div class="summary__row summary__row--total"><span>Total</span><span id="total" data-value="<%= subtotal + shipping %>"><%= subtotal + shipping %> EGP</span></div>
+          </div>
+        </div>
+      </aside>
 
-/* ===== Right Section ===== */
-.checkout-right {
-  flex: 1;
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  border: 1px solid #e9ecef;
-}
-
-.order-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.order-item:hover {
-  background: #e9ecef;
-  transform: translateX(3px);
-}
-
-.order-item img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-right: 15px;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.order-item h4 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.order-item p {
-  margin: 4px 0;
-  font-size: 14px;
-  color: #6c757d;
-}
-
-.price-box {
-  border-top: 2px solid #e9ecef;
-  padding-top: 20px;
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 15px;
-  color: #495057;
-  font-weight: 500;
-}
-
-.total-row {
-  font-weight: 700;
-  font-size: 20px;
-  color: #007bff;
-  padding: 15px 0;
-  border-top: 2px solid #dee2e6;
-}
-
-#message {
-  font-weight: 700;
-  color: #28a745;
-  margin-left: 10px;
-  font-size: 14px;
-}
-
-/* ===== Popup & Loading ===== */
-#popupAlert {
-  display: none;
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #000;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 25px;
-  z-index: 99999;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-#loadingOverlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 18px;
-  flex-direction: column;
-}
-.error-msg {
-  color: #e74c3c;
-  font-size: 13px;
-  margin-top: -10px;
-  margin-bottom: 10px;
-  display: block;
-}
-
-.input-error {
-  border-color: #e74c3c !important;
-}
-/* ===== Responsive - MOBILE PERFECT ===== */
-@media (max-width: 900px) {
-  .checkout {
-    flex-direction: column;
-    margin: 10px;
-    gap: 20px;
-  }
-
-  .checkout-left,
-  .checkout-right {
-    padding: 25px 20px;
-    border-radius: 12px;
-  }
-
-  .checkout-left h2 {
-    font-size: 20px;
-  }
-
-  /* ===== MOBILE COUPON PERFECT ===== */
-  .coupon-section-left {
-    padding: 18px 15px;
-  }
-
-  .coupon-input-group {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .coupon-input-group input {
-    border-radius: 12px;
-  }
-
-  .coupon-input-group button {
-    width: 100%;
-    padding: 16px;
-    font-size: 16px;
-  }
-
-  .checkout-left input,
-  .checkout-left select {
-    padding: 14px 16px;
-    font-size: 15px;
-  }
-
-  .checkout-left select {
-    padding-right: 45px;
-    background-position: right 14px center;
-  }
-
-  .order-item {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 18px 15px;
-  }
-
-  .order-item img {
-    width: 60px;
-    height: 60px;
-  }
-}
-
-@media (max-width: 480px) {
-  .checkout-left,
-  .checkout-right {
-    padding: 20px 15px;
-  }
-
-  .coupon-section-left {
-    padding: 15px 12px;
-  }
-
-  .coupon-input-group button {
-    padding: 15px;
-  }
-
-  .order-item img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .order-item h4 {
-    font-size: 15px;
-  }
-}
-</style>
-</head>
-<body>
-  
-<div id="popupAlert"></div>
-<div id="loadingOverlay">
-  <div style="
-    width: 40px;
-    height: 40px;
-    border: 4px solid #fff;
-    border-top: 4px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 10px;
-  "></div>
-  Processing Order...
+    </div>
+  </form>
 </div>
 
-<form id="checkoutForm" onsubmit="event.preventDefault(); submitOrder();">
-  <div class="checkout">
-    <!-- LEFT -->
-    <div class="checkout-left">
-      <h2>Contact</h2>
-<input name="name" placeholder="Full Name">
-<small class="error-msg" id="error-name"></small>
-
-<input name="email" placeholder="Email" type="email">
-<small class="error-msg" id="error-email"></small>
-
-<input 
-  name="phone" 
-  placeholder="Phone (01xxxxxxxxx)" 
-  maxlength="11"
-  inputmode="numeric"
-  oninput="formatPhone(this)"
->
-<small class="error-msg" id="error-phone"></small>
-
-     
-
-      <h2>Shipping</h2>
-<input name="address" placeholder="Address">
-<small class="error-msg" id="error-address"></small>
-      <select name="city" id="citySelect">
-        <small class="error-msg" id="error-city"></small>
-        <option value="">Select Governorate</option>
-        <% [
-  "Cairo","Giza","Alexandria","Dakahlia","Red Sea","Beheira",
-  "Fayoum","Gharbia","Ismailia","Menofia","Minya","Qaliubiya",
-  "New Valley","Suez","Aswan","Assiut","Beni Suef","Port Said",
-  "Damietta","Sharkia","South Sinai","Kafr El Sheikh","Matrouh",
-  "Luxor","Qena","Sohag"
-].forEach(g => { %>
-          <option value="<%= g %>"><%= g %></option>
-        <% }) %>
-      </select>
- <!-- ===== COUPON MOVED HERE ===== -->
-      <div class="coupon-section-left">
-        <h3> Have a Promo Code?</h3>
-        <div class="coupon-input-group">
-          <input type="text" id="couponCode" placeholder="Enter coupon code">
-          <button type="button" id="applyCoupon">Apply Coupon</button>
-        </div>
-        <p id="couponMessage-left" style="color:#dc3545;"></p>
-      </div>
-      <button type="submit" class="checkout-btn">Confirm Order</button>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="checkout-right">
-<% cartItems.forEach(item => { %>
-      <div class="order-item">
-        <img src="<%= item.images?.[0] || '/uploads/default.jpg' %>" alt="Product">
-        <div>
-          <h4><%= item.name %></h4>
-          <% if(item.selectedSize) { %>
-            <p>Size: <%= item.selectedSize %></p>
-          <% } %>
-          <% if(item.selectedColor) { %>
-            <p>Color: <%= item.selectedColor %></p>
-          <% } %>
-          <p>Price: <%= item.selectedPrice %> EGP</p>
-          <p>Quantity: <%= item.quantity %></p>
-          <input type="hidden" name="productId[]" value="<%= item._id %>">
-          <input type="hidden" name="quantity[]" value="<%= item.quantity %>">
-          <input type="hidden" name="price[]" value="<%= item.selectedPrice %>">
-          <input type="hidden" name="size[]" value="<%= item.selectedSize %>">
-          <input type="hidden" name="color[]" value="<%= item.selectedColor %>">
-        </div>
-      </div>
-<% }) %>
-
-      <div class="price-box">
-        <div class="price-row">
-          <span>Subtotal</span>
-          <span id="subtotal"><%= subtotal %> EGP</span>
-        </div>
-
-        <div class="price-row">
-          <span>Discount</span>
-          <span id="discount">0 EGP</span>
-        </div>
-
-        <div class="price-row">
-          <span>Shipping</span>
-          <span id="shipping"><%= shipping %> EGP</span>
-          <span id="message"><%= message %></span>
-        </div>
-
-        <div class="price-row total-row">
-          <span>Total</span>
-          <span id="total"><%= subtotal + shipping %> EGP</span>
-        </div>
-      </div>
-    </div>
+<!-- Loading / success overlay -->
+<div class="overlay-status" id="statusOverlay" aria-live="assertive">
+  <div id="statusLoading">
+    <div class="spinner"></div>
+    <p>Placing your order…</p>
   </div>
-</form>
+  <div id="statusDone" hidden>
+    <svg class="check-anim" viewBox="0 0 76 76" fill="none" stroke="#0a0a0a" stroke-width="2">
+      <circle cx="38" cy="38" r="36"/>
+      <path d="M24 39l10 10 19-21"/>
+    </svg>
+    <h2 class="display" style="font-size:clamp(32px,6vw,56px)">Thank you</h2>
+    <p>Your order has been placed</p>
+  </div>
+</div>
 
 <script>
-function setError(field, message) {
-  const input = document.querySelector(`[name="${field}"]`);
-  const error = document.getElementById(`error-${field}`);
+document.addEventListener("DOMContentLoaded", function () {
+  var form = document.getElementById("checkoutForm");
+  var citySelect = document.getElementById("citySelect");
+  var couponInput = document.getElementById("couponCode");
+  var couponMsg = document.getElementById("couponMessage-left");
+  var submitBtn = form.querySelector(".checkout-btn");
 
-  input.classList.add("input-error");
-  error.textContent = message;
-}
+  function field(name) { return form.querySelector('[name="' + name + '"]'); }
 
-function clearErrors() {
-  document.querySelectorAll(".error-msg").forEach(el => el.textContent = "");
-  document.querySelectorAll("input, select").forEach(el => el.classList.remove("input-error"));
-}
-
-function validateForm() {
-  clearErrors();
-
-  let isValid = true;
-
-  const name = document.querySelector("[name='name']").value.trim();
-  const email = document.querySelector("[name='email']").value.trim();
-  const phone = document.querySelector("[name='phone']").value.trim();
-  const address = document.querySelector("[name='address']").value.trim();
-  const city = document.querySelector("[name='city']").value;
-
-  if (name.length < 3) {
-    setError("name", "Name must be at least 3 characters");
-    isValid = false;
+  function setError(name, message) {
+    field(name).classList.add("input-error");
+    document.getElementById("error-" + name).textContent = message;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    setError("email", "Invalid email format");
-    isValid = false;
+  function clearErrors() {
+    form.querySelectorAll(".error-msg").forEach(function (el) { el.textContent = ""; });
+    form.querySelectorAll(".input-error").forEach(function (el) { el.classList.remove("input-error"); });
   }
 
-  const phoneRegex = /^01[0-2,5][0-9]{8}$/;
-  if (!phoneRegex.test(phone)) {
-    setError("phone", "Enter valid number like 01000000000");
-    isValid = false;
+  function validateForm() {
+    clearErrors();
+    var ok = true;
+    var name = field("name").value.trim();
+    var email = field("email").value.trim();
+    var phone = field("phone").value.trim();
+    var address = field("address").value.trim();
+
+    if (name.length < 3) { setError("name", "Name must be at least 3 characters"); ok = false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("email", "Enter a valid email"); ok = false; }
+    else if (!/@gmail\.com$/i.test(email)) { setError("email", "Please use a Gmail address"); ok = false; }
+    if (!/^01[0125][0-9]{8}$/.test(phone)) { setError("phone", "Enter a valid number like 01000000000"); ok = false; }
+    if (!citySelect.value) { setError("city", "Please select a governorate"); ok = false; }
+    if (address.length < 5) { setError("address", "Address is too short"); ok = false; }
+
+    if (!ok) {
+      var first = form.querySelector(".input-error");
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    return ok;
   }
 
-  if (address.length < 5) {
-    setError("address", "Address is too short");
-    isValid = false;
-  }
+  field("phone").addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0, 11);
+  });
 
-  if (!city) {
-    setError("city", "Please select a governorate");
-    isValid = false;
-  }
-
-  return isValid;
-}
-function formatPhone(input) {
-  input.value = input.value.replace(/\D/g, "");
-
-  if (input.value.length > 11) {
-    input.value = input.value.slice(0, 11);
-  }
-}
-  function popupAlert(message, type = "success") {
-  const el = document.getElementById("popupAlert");
-
-  el.textContent = message;
-  el.style.display = "block";
-
-  el.style.background =
-    type === "error" ? "#e74c3c" :
-    type === "success" ? "#2ecc71" : "#000";
-
-  setTimeout(() => {
-    el.style.display = "none";
-  }, 2500);
-}
-  function showLoading() {
-  document.getElementById("loadingOverlay").style.display = "flex";
-}
-
-function hideLoading() {
-  document.getElementById("loadingOverlay").style.display = "none";
-}
-async function updatePrices() {
-  const couponCode = document.getElementById("couponCode").value;
-  const subtotal = parseFloat(document.getElementById("subtotal").textContent) || 0;
-  const governorate = document.getElementById("citySelect").value;
-  if(!governorate) return;
-
-  const res = await fetch(`/checkout/calculate?subtotal=${subtotal}&code=${couponCode}&governorate=${encodeURIComponent(governorate)}`);
-  const data = await res.json();
-
-  if(data.success) {
-    document.getElementById("discount").textContent = data.discount.toFixed(2) + " EGP";
-    document.getElementById("shipping").textContent = data.shipping.toFixed(2) + " EGP";
-    document.getElementById("total").textContent = data.total.toFixed(2) + " EGP";
-    document.getElementById("couponMessage-left").textContent = data.message || '';
-    document.getElementById("couponMessage-left").style.color = data.message && data.discount > 0 ? '#28a745' : '#dc3545';
-  }
-}
-
-document.getElementById("citySelect").addEventListener('change', updatePrices);
-document.getElementById("applyCoupon").addEventListener('click', updatePrices);
-
-async function submitOrder() {
-
-  if (!validateForm()) return;
-
-  const btn = document.querySelector(".checkout-btn");
-  btn.disabled = true;
-  try {
-    showLoading();
-
-    const form = document.getElementById("checkoutForm");
-    const formData = new FormData(form);
-
-    const productIds = formData.getAll("productId[]");
-    const quantities = formData.getAll("quantity[]");
-    const prices = formData.getAll("price[]");
-    const sizes = formData.getAll("size[]");
-    const colors = formData.getAll("color[]");
-
-    const products = productIds.map((id, i) => ({
-      product: id,
-      quantity: parseInt(quantities[i]),
-      price: parseFloat(prices[i]),
-      size: sizes[i] || null,
-      color: colors[i] || null
-    }));
-
-    const data = Object.fromEntries(formData.entries());
-
-    const shipping = parseFloat(document.getElementById("shipping").textContent) || 0;
-    const discount = parseFloat(document.getElementById("discount").textContent) || 0;
-    const total = parseFloat(document.getElementById("total").textContent) || 0;
-
-    const res = await fetch("/checkout/place-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        products,
-        customerName: data.name,
-        customerEmail: data.email,
-        customerNumber: data.phone,
-        customerAddress: data.address,
-        governorate: data.city,
-        shipping,
-        discount,
-        total,
-        couponCode: document.getElementById("couponCode").value || null
-      })
+  form.querySelectorAll(".input, .select").forEach(function (el) {
+    el.addEventListener("input", function () {
+      el.classList.remove("input-error");
+      var err = document.getElementById("error-" + el.name);
+      if (err) err.textContent = "";
     });
+  });
 
-    const result = await res.json();
+  function setMoney(id, value, text) {
+    var el = document.getElementById(id);
+    var changed = Number(el.dataset.value) !== Number(value);
+    el.dataset.value = value;
+    el.textContent = text !== undefined ? text : (Math.round(value * 100) / 100) + " EGP";
+    if (changed) {
+      el.classList.remove("value-flash");
+      void el.offsetWidth;
+      el.classList.add("value-flash");
+    }
+  }
 
-    if (res.ok) {
-      popupAlert("Order placed successfully", "success");
-      window.location.href = "/";
-    } else {
-      popupAlert("Error : " + (result.error || "Unknown error"), "error");
+  function updatePrices(fromCouponBtn) {
+    var subtotal = Number(document.getElementById("subtotal").dataset.value) || 0;
+    var governorate = citySelect.value;
+
+    if (!governorate) {
+      if (fromCouponBtn) {
+        setError("city", "Select your governorate first");
+        citySelect.focus();
+      }
+      return;
     }
 
-  } catch (err) {
-    console.error("Submit Error:", err);
-    popupAlert("Something went wrong", "error");
-  } finally {
-  hideLoading();
-  btn.disabled = false;
-}
-}
+    var btn = document.getElementById("applyCoupon");
+    if (fromCouponBtn) btn.classList.add("is-loading");
+
+    fetch("/checkout/calculate?subtotal=" + subtotal +
+      "&code=" + encodeURIComponent(couponInput.value.trim()) +
+      "&governorate=" + encodeURIComponent(governorate))
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data.success) return;
+        setMoney("discount", data.discount, data.discount ? "− " + (Math.round(data.discount * 100) / 100) + " EGP" : "0 EGP");
+        setMoney("shipping", data.shipping, data.shipping ? undefined : "Free");
+        setMoney("total", data.total);
+        couponMsg.textContent = data.message || "";
+        couponMsg.className = "coupon-msg " + (data.discount > 0 ? "ok" : "bad");
+      })
+      .catch(function () { Veek.toast("Couldn’t update prices, please try again", "error"); })
+      .finally(function () { btn.classList.remove("is-loading"); });
+  }
+
+  citySelect.addEventListener("change", function () { updatePrices(false); });
+  document.getElementById("applyCoupon").addEventListener("click", function () { updatePrices(true); });
+  couponInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); updatePrices(true); }
+  });
+
+  var overlay = document.getElementById("statusOverlay");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    submitBtn.disabled = true;
+    overlay.classList.add("is-on");
+
+    var fd = new FormData(form);
+    var ids = fd.getAll("productId[]");
+    var quantities = fd.getAll("quantity[]");
+    var prices = fd.getAll("price[]");
+    var sizes = fd.getAll("size[]");
+    var colors = fd.getAll("color[]");
+
+    var products = ids.map(function (id, i) {
+      return {
+        product: id,
+        quantity: parseInt(quantities[i], 10),
+        price: parseFloat(prices[i]),
+        size: sizes[i] || null,
+        color: colors[i] || null
+      };
+    });
+
+    fetch("/checkout/place-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        products: products,
+        customerName: fd.get("name").trim(),
+        customerEmail: fd.get("email").trim(),
+        customerNumber: fd.get("phone").trim(),
+        customerAddress: fd.get("address").trim(),
+        governorate: fd.get("city"),
+        shipping: Number(document.getElementById("shipping").dataset.value) || 0,
+        discount: Number(document.getElementById("discount").dataset.value) || 0,
+        total: Number(document.getElementById("total").dataset.value) || 0,
+        couponCode: couponInput.value.trim() || null
+      })
+    })
+      .then(function (res) {
+        return res.json().then(function (result) { return { ok: res.ok, result: result }; });
+      })
+      .then(function (r) {
+        if (r.ok) {
+          document.getElementById("statusLoading").hidden = true;
+          document.getElementById("statusDone").hidden = false;
+          Veek.setCartCount(0);
+          setTimeout(function () { window.location.href = "/"; }, 2400);
+        } else {
+          overlay.classList.remove("is-on");
+          submitBtn.disabled = false;
+          Veek.toast(r.result.error || "Something went wrong", "error");
+        }
+      })
+      .catch(function () {
+        overlay.classList.remove("is-on");
+        submitBtn.disabled = false;
+        Veek.toast("Something went wrong, please try again", "error");
+      });
+  });
+});
 </script>
+
+<%- include('partials/footer') %>
