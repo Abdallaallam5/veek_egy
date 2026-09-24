@@ -43,7 +43,13 @@
 
 <!-- ================= CATEGORIES ================= -->
 <div id="shop">
-<% const sections = (productsByCategory || []).filter(s => s.products && s.products.length); %>
+<%
+  // Summer Collection always leads the page (display order only, DB untouched)
+  const isSummer = s => /summer/i.test((s.category && s.category.name) || '');
+  const sections = (productsByCategory || [])
+    .filter(s => s.products && s.products.length)
+    .sort((a, b) => isSummer(b) - isSummer(a));
+%>
 <% if (!sections.length) { %>
   <div class="container empty-state">
     <p class="display">New drop soon</p>
