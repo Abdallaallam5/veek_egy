@@ -1,0 +1,12 @@
+# dependencies (Vercel installs them from package.json)
+node_modules/
+
+# secrets — use Vercel Environment Variables in production
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
