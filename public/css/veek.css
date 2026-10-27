@@ -2589,10 +2589,19 @@ body.menu-open .drawer__links a {
 
   /* rack: the rail scrolls sideways on small screens */
   .rack {
-    --w: 92px;
-    --fw: min(60vw, 280px, calc((100svh - 430px) / 1.58));
+    --w: 80px;
+    --fw: min(46vw, 220px, calc((100svh - 430px) / 1.58));
     min-height: 0;
   }
+
+  .rack__head { padding-top: calc(clamp(26px, 3.4vw, 44px) + 10px); }
+  .rack__stage { padding: 14px 0 8px; }
+  .rack__name { font-size: 18px; }
+  .rack__price { margin-bottom: 10px; }
+  .rack__toggle { margin-bottom: 10px; }
+  .rack__actions { margin-bottom: 8px; }
+  .rack__actions .btn { min-height: 42px; padding: 0 20px; }
+  .rack__info { padding-bottom: 16px; }
 
   .rack:not(.is-focus) .rack__scroller {
     overflow-x: auto;
@@ -2607,7 +2616,7 @@ body.menu-open .drawer__links a {
   .rack__arrow { width: 40px; height: 40px; }
   .rack__arrow--prev { left: 10px; }
   .rack__arrow--next { right: 10px; }
-  .rack__info { min-height: 220px; }
+  .rack__info { min-height: 190px; }
 }
 
 @media (max-width: 560px) {
