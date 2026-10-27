@@ -69,7 +69,7 @@
   function layoutFocus() {
     var w = items[current].offsetWidth;
     var narrow = window.innerWidth < 900;
-    var gaps = narrow ? [0, 0.74, 1.18, 1.5] : [0, 0.84, 1.42, 1.86];
+    var gaps = narrow ? [0, 0.6, 0.96, 1.24] : [0, 0.84, 1.42, 1.86];
     var scales = [1, 0.56, 0.42, 0.34];
     var blurs = [0, 3, 6, 8];
     var fades = [1, 0.72, 0.32, 0];
