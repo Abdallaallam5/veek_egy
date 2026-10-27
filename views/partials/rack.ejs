@@ -1,18 +1,41 @@
 <%
   /* expects: items (array of products, already picked & ordered) */
+
+  // The product photos are not stored front-first, so the rack's Front/Back
+  // pairs are picked per product here (display only — the database is untouched).
+  // Shirt-only shots are preferred over model shots where both sides exist.
+  // Products not listed fall back to their 1st / 2nd photo.
+  const S = '/images/summer_collection/';
+  const SIDES = {
+    '69e7a24098d70be7abbfa361': { front: S + 'summer collection 2026 (9).png', back: S + 'IMG_2339.PNG' },            // Olive Land
+    '69e7a2e298d70be7abbfa362': { front: S + 'summer collection 2026 (2).png', back: S + 'summer collection 2026 (3).png' }, // Cursed Eye
+    '69e7aa5f342941174bb0982e': { front: S + 'IMG_2343.PNG', back: S + 'IMG_2337.PNG' },                               // Japan
+    '69e7aa97342941174bb0982f': { front: S + 'IMG_2347.PNG', back: S + 'IMG_2338.PNG' },                               // لا شيء يعجبني
+    '69e7ab7f342941174bb09830': { front: S + 'summer collection 2026 (26).png', back: S + 'summer collection 2026 (25).png' }, // Red Empire
+    '69ee082b31e1fdf881aeffd2': { front: S + 'IMG_2424.PNG', back: S + 'IMG_2426.PNG' },                               // Regular fit Long Sleeves
+    '69ee08db31e1fdf881aeffd3': { front: S + 'IMG_2423.PNG', back: S + 'IMG_2425.PNG' },                               // Washed Long Sleeves
+    '69ee52634f5f9da15449f7d3': { front: S + 'IMG_2488.PNG', back: S + 'IMG_2432.PNG' },                               // Silent Threat
+    '69ee071931e1fdf881aeffd0': { front: S + 'IMG_2341.PNG', back: '' }                                                // Washed Tee (no back photo)
+  };
+
   const info = (p) => {
     const price = Number(p.price) || 0;
     const sale = Number(p.salePrice) || 0;
     const onSale = sale > 0 && sale < price;
     const imgs = (p.images || []).filter(Boolean);
+    const pick = SIDES[String(p._id)];
+    // only trust the override if those photos still belong to the product
+    const sides = pick && imgs.includes(pick.front) && (!pick.back || imgs.includes(pick.back))
+      ? pick
+      : { front: imgs[0], back: imgs[1] || '' };
     return {
       id: String(p._id),
       name: (p.name || '').trim(),
       price, sale, onSale,
       now: onSale ? sale : price,
       off: onSale ? Math.round((1 - sale / price) * 100) : 0,
-      front: imgs[0],
-      back: imgs[1] || '',
+      front: sides.front,
+      back: sides.back,
       soldOut: Number(p.stock) <= 0,
       sizes: JSON.stringify(p.sizes || []),
       colors: JSON.stringify(p.colors || [])
