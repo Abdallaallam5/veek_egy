@@ -267,7 +267,7 @@
     });
   });
 
-  rack.querySelector("[data-rack-open]").addEventListener("click", function () { enter(0); });
+  rack.querySelector("[data-rack-open]").addEventListener("click", function () { enter(current); });
   rack.querySelector("[data-rack-close]").addEventListener("click", exit);
 
   rack.querySelectorAll("[data-rack-step]").forEach(function (b) {
@@ -303,5 +303,18 @@
     if (!focused) return;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () { freeze(); layoutFocus(); }, 120);
+  });
+
+  /* ---------- open straight on the clothes ---------- */
+  focused = true;
+  rack.classList.add("is-settled");
+  freeze();
+  layoutFocus();
+  updateInfo();
+  window.requestAnimationFrame(function () {
+    items.forEach(function (el) { el.style.transition = ""; });
+    rack.classList.remove("is-booting");
+    rack.classList.add("is-intro");
+    setTimeout(function () { rack.classList.remove("is-intro"); }, 2200);
   });
 })();

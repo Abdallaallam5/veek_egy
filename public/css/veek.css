@@ -2015,8 +2015,10 @@ body.menu-open .drawer__links a {
   display: flex;
   flex-direction: column;
   min-height: calc(100svh - var(--announce-h) - var(--header-h));
-  background: var(--paper);
+  background: #14110e;
+  color: #f3efe8;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .rack__head {
@@ -2385,6 +2387,139 @@ body.menu-open .drawer__links a {
 }
 
 .rack__ticker-track span::after { content: "/"; margin-left: 34px; opacity: .4; }
+
+/* ---------- the wardrobe ---------- */
+.rack__closet {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* back wall: dark wood panels with fine grain */
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, .55), transparent 9%, transparent 91%, rgba(0, 0, 0, .55)),
+    repeating-linear-gradient(90deg, transparent 0 calc(16.66% - 2px), rgba(0, 0, 0, .45) calc(16.66% - 2px) 16.66%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, #241e18 0%, #1a1511 55%, #0f0c0a 100%);
+}
+
+/* side walls of the wardrobe */
+.rack__closet::before,
+.rack__closet::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(18px, 3.2vw, 54px);
+  background: linear-gradient(90deg, #0c0a08, #2a231c 70%, #3a3027);
+  box-shadow: 12px 0 30px rgba(0, 0, 0, .55);
+}
+
+.rack__closet::before { left: 0; }
+.rack__closet::after { right: 0; transform: scaleX(-1); }
+
+/* top shelf */
+.rack__shelf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: clamp(26px, 3.4vw, 44px);
+  background: linear-gradient(180deg, #3b3128, #2a231c 70%, #1d1813);
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, .6);
+}
+
+/* warm light from inside the wardrobe */
+.rack__light {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 60% at 50% 18%, rgba(255, 226, 180, .2), transparent 70%),
+    radial-gradient(ellipse 70% 30% at 50% 100%, rgba(0, 0, 0, .55), transparent 70%);
+  animation: closet-light 7s ease-in-out infinite alternate;
+}
+
+@keyframes closet-light {
+  from { opacity: .85; }
+  to { opacity: 1; }
+}
+
+.rack .eyebrow { color: rgba(243, 239, 232, .55); }
+.rack__head { position: relative; padding-top: calc(clamp(26px, 3.4vw, 44px) + 16px); }
+
+/* chrome rail + silver hangers */
+.rack__rail {
+  height: 5px;
+  background: linear-gradient(180deg, #fafafa 0%, #9c9c9c 45%, #e6e6e6 70%, #6d6d6d 100%);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .5);
+}
+
+.rack__rail::before,
+.rack__rail::after {
+  width: 12px;
+  height: 12px;
+  border-color: #cfcfcf;
+  background: #3a3027;
+}
+
+.rack .hang__btn { color: #d8d6d2; }
+.rack .hang__img { background: #241e18; box-shadow: 0 22px 34px -16px rgba(0, 0, 0, .8); }
+.rack.is-focus .hang.is-current .hang__img { box-shadow: 0 50px 70px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .04); }
+
+.rack .hang__tag { background: #f3efe8; color: var(--ink); }
+.rack .hang__tag::before { background: #14110e; }
+.rack .hang__tag::after { background: #d8d6d2; }
+
+.rack__caption { color: rgba(243, 239, 232, .55); }
+.rack__caption.is-live { color: #f3efe8; }
+
+.rack .price__old { color: rgba(243, 239, 232, .5); }
+.rack .badge { background: #f3efe8; color: var(--ink); }
+
+.rack__toggle { border-color: rgba(243, 239, 232, .7); }
+.rack__toggle-ink { background: #f3efe8; }
+.rack__toggle button { color: #f3efe8; }
+.rack__toggle button.is-on { color: var(--ink); }
+
+.rack .text-btn { color: rgba(243, 239, 232, .6); }
+.rack .text-btn:hover { color: #f3efe8; }
+
+.rack__arrow {
+  border-color: rgba(255, 255, 255, .18);
+  background: rgba(20, 17, 14, .55);
+  color: #f3efe8;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.rack__arrow:hover { background: #f3efe8; color: var(--ink); border-color: #f3efe8; }
+
+.btn--light-ghost { background: transparent; color: #f3efe8; border-color: rgba(243, 239, 232, .55); }
+.btn--light-ghost::before { background: #f3efe8; }
+.btn--light-ghost:hover { color: var(--ink); border-color: #f3efe8; }
+
+.rack__ticker { background: #f3efe8; color: var(--ink); }
+
+/* first load: hidden until laid out, then the wardrobe "opens" */
+.js .rack.is-booting .rack__track,
+.js .rack.is-booting .rack__info { opacity: 0; }
+
+.rack.is-intro .rack__track { animation: closet-in 1.3s var(--ease-out) both; }
+.rack.is-intro .hang.is-current .hang__btn { animation: swing-in 2s var(--ease-out) .35s both; }
+.rack.is-intro .rack__detail { animation: fadeUp .9s var(--ease-out) .5s both; }
+
+@keyframes closet-in {
+  from { opacity: 0; transform: scale(1.06); filter: blur(10px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes swing-in {
+  0% { transform: rotate(7deg); }
+  30% { transform: rotate(-5deg); }
+  55% { transform: rotate(2.5deg); }
+  78% { transform: rotate(-1deg); }
+  100% { transform: none; }
+}
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1100px) {

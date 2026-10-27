@@ -20,8 +20,12 @@
   };
   const pieces = items.map(info);
 %>
-<section class="rack" data-rack aria-label="On the rack">
+<section class="rack is-focus is-booting" data-rack aria-label="On the rack">
   <h1 class="sr-only">VEEK — on the rack</h1>
+  <div class="rack__closet" aria-hidden="true">
+    <span class="rack__shelf"></span>
+    <span class="rack__light"></span>
+  </div>
   <div class="container rack__head">
     <span class="eyebrow">Veek — on the rack</span>
     <span class="eyebrow"><%= String(pieces.length).padStart(2, '0') %> pieces</span>
@@ -75,8 +79,8 @@
     <div class="rack__browse">
       <p class="rack__caption" aria-live="polite" data-default="Hover the rack · pick a piece to try it on">Hover the rack · pick a piece to try it on</p>
       <div class="rack__cta">
-        <button type="button" class="btn" data-rack-open data-magnetic>Shop the rack</button>
-        <a href="/collections" class="btn btn--ghost">Collections</a>
+        <button type="button" class="btn btn--light" data-rack-open data-magnetic>Try a piece on</button>
+        <a href="/collections" class="btn btn--light-ghost">Collections</a>
       </div>
     </div>
 
@@ -90,10 +94,10 @@
         <button type="button" data-side="back">Back</button>
       </div>
       <div class="rack__actions">
-        <a href="#" class="btn" id="rackView">View piece</a>
-        <button type="button" class="btn btn--ghost" id="rackAdd" data-quick-add>Quick add</button>
+        <a href="#" class="btn btn--light" id="rackView">View piece</a>
+        <button type="button" class="btn btn--light-ghost" id="rackAdd" data-quick-add>Quick add</button>
       </div>
-      <button type="button" class="text-btn rack__back" data-rack-close>← Back to the rack</button>
+      <button type="button" class="text-btn rack__back" data-rack-close>See the whole rack</button>
     </div>
   </div>
 
