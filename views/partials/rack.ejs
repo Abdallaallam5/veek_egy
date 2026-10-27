@@ -83,7 +83,7 @@
                 </svg>
                 <span class="hang__tag" aria-hidden="true"><%= p.onSale ? '−' + p.off + '%' : p.now + ' EGP' %></span>
                 <span class="hang__img">
-                  <img src="<%= p.front %>" alt="<%= p.name %>" decoding="async" <%= i > 5 ? 'loading=lazy' : '' %>>
+                  <img src="<%= p.back || p.front %>" alt="<%= p.name %>" decoding="async" <%= i > 5 ? 'loading=lazy' : '' %>>
                 </span>
               </button>
             </li>

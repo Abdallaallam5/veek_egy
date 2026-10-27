@@ -127,7 +127,7 @@
     addEl.textContent = d.soldout ? "Sold out" : "Quick add";
 
     toggle.hidden = !d.back;
-    setSide("front", true);
+    setSide(d.back ? "back" : "front", true);
   }
 
   /* ---------- front / back ---------- */
@@ -152,11 +152,12 @@
     }, 220);
   }
 
-  // put every other piece back on its front side
+  // put every other piece back on its default side (back when there is one)
   function resetSides() {
     items.forEach(function (el, i) {
       var p = img(i);
-      if (p.getAttribute("src") !== data(i).front) p.src = data(i).front;
+      var start = data(i).back || data(i).front;
+      if (p.getAttribute("src") !== start) p.src = start;
     });
   }
 
