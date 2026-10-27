@@ -1,55 +1,31 @@
 <%- include('partials/header') %>
 
-<!-- ================= HERO ================= -->
-<section class="hero" data-hero>
-  <div class="container hero__inner">
-    <div class="hero__copy">
-      <span class="eyebrow">New season · Veek <%= new Date().getFullYear() %></span>
-      <h1 class="display hero__title lines">
-        <span class="line"><span style="--i:0">Wear</span></span>
-        <span class="line"><span style="--i:1" class="outline">the</span></span>
-        <span class="line"><span style="--i:2">moment.</span></span>
-      </h1>
-      <p class="hero__lead" data-reveal style="--d:500">Crafted to elevate your every day. Sophisticated essentials in neutral tones — designed to move with you.</p>
-      <div class="hero__cta" data-reveal style="--d:650">
-        <a href="#shop" class="btn btn--light" data-magnetic>Shop now</a>
-        <a href="/collections" class="btn btn--ghost" style="color:#fff;border-color:rgba(255,255,255,.5)">Collections</a>
-      </div>
-    </div>
-
-    <div class="hero__visual" data-reveal="scale" style="--d:200">
-      <% ['/images/photo_2026-01-23_00-05-32.jpg', '/images/photo_2026-01-23_00-05-32 (2).jpg'].forEach((src, i) => { %>
-        <div class="hero-slide <%= i === 0 ? 'is-active' : '' %>">
-          <img class="hero-slide__bg" src="<%= src %>" alt="" aria-hidden="true">
-          <img class="hero-slide__fg" src="<%= src %>" alt="VEEK campaign <%= i + 1 %>" <%= i === 0 ? '' : 'loading=lazy' %>>
-        </div>
-      <% }) %>
-      <div class="hero__dots">
-        <button class="hero__dot" aria-label="Slide 1"></button>
-        <button class="hero__dot" aria-label="Slide 2"></button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= MARQUEE ================= -->
-<div class="marquee" aria-hidden="true">
-  <% for (let r = 0; r < 2; r++) { %>
-    <div class="marquee__track">
-      <span>Veek</span><span>Essentials</span><span>Veek</span><span>Streetwear</span><span>Veek</span><span>Everyday</span>
-    </div>
-  <% } %>
-</div>
-
-<!-- ================= CATEGORIES ================= -->
-<div id="shop">
 <%
   // Summer Collection always leads the page (display order only, DB untouched)
   const isSummer = s => /summer/i.test((s.category && s.category.name) || '');
   const sections = (productsByCategory || [])
     .filter(s => s.products && s.products.length)
     .sort((a, b) => isSummer(b) - isSummer(a));
+
+  // Pieces for the rack: newest sections first, in-stock first, one per product, max 9
+  const seen = new Set();
+  const all = [];
+  sections.forEach(sec => sec.products.forEach(pr => {
+    const id = String(pr._id);
+    if (!seen.has(id) && pr.images && pr.images[0]) { seen.add(id); all.push(pr); }
+  }));
+  const rackItems = all.filter(pr => Number(pr.stock) > 0)
+    .concat(all.filter(pr => Number(pr.stock) <= 0))
+    .slice(0, 9);
 %>
+
+<!-- ================= RACK HERO ================= -->
+<% if (rackItems.length) { %>
+  <%- include('partials/rack', { items: rackItems }) %>
+<% } %>
+
+<!-- ================= CATEGORIES ================= -->
+<div id="shop">
 <% if (!sections.length) { %>
   <div class="container empty-state">
     <p class="display">New drop soon</p>

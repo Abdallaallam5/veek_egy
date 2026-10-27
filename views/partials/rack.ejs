@@ -1,0 +1,111 @@
+<%
+  /* expects: items (array of products, already picked & ordered) */
+  const info = (p) => {
+    const price = Number(p.price) || 0;
+    const sale = Number(p.salePrice) || 0;
+    const onSale = sale > 0 && sale < price;
+    const imgs = (p.images || []).filter(Boolean);
+    return {
+      id: String(p._id),
+      name: (p.name || '').trim(),
+      price, sale, onSale,
+      now: onSale ? sale : price,
+      off: onSale ? Math.round((1 - sale / price) * 100) : 0,
+      front: imgs[0],
+      back: imgs[1] || '',
+      soldOut: Number(p.stock) <= 0,
+      sizes: JSON.stringify(p.sizes || []),
+      colors: JSON.stringify(p.colors || [])
+    };
+  };
+  const pieces = items.map(info);
+%>
+<section class="rack" data-rack aria-label="On the rack">
+  <h1 class="sr-only">VEEK — on the rack</h1>
+  <div class="container rack__head">
+    <span class="eyebrow">Veek — on the rack</span>
+    <span class="eyebrow"><%= String(pieces.length).padStart(2, '0') %> pieces</span>
+  </div>
+
+  <div class="rack__stage">
+    <button type="button" class="rack__arrow rack__arrow--prev" data-rack-step="-1" aria-label="Previous piece">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>
+    </button>
+
+    <div class="rack__scroller">
+      <div class="rack__track">
+        <div class="rack__rail" aria-hidden="true"></div>
+        <ul class="rack__items">
+          <% pieces.forEach((p, i) => { %>
+            <li class="hang" style="--i:<%= i %>"
+              data-index="<%= i %>"
+              data-id="<%= p.id %>"
+              data-name="<%= p.name %>"
+              data-now="<%= p.now %>"
+              data-was="<%= p.onSale ? p.price : '' %>"
+              data-off="<%= p.off %>"
+              data-front="<%= p.front %>"
+              data-back="<%= p.back %>"
+              data-soldout="<%= p.soldOut ? '1' : '' %>"
+              data-sizes="<%= p.sizes %>"
+              data-colors="<%= p.colors %>">
+              <button type="button" class="hang__btn" aria-label="<%= p.name %> — <%= p.now %> EGP">
+                <svg class="hang__hanger" viewBox="0 0 100 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M50 15V10.5a5 5 0 1 0-5-5"/>
+                  <path d="M50 15L7 34.5c-3 1.4-2 4.5 1.2 4.5h83.6c3.2 0 4.2-3.1 1.2-4.5L50 15z"/>
+                </svg>
+                <span class="hang__tag" aria-hidden="true"><%= p.onSale ? '−' + p.off + '%' : p.now + ' EGP' %></span>
+                <span class="hang__img">
+                  <img src="<%= p.front %>" alt="<%= p.name %>" decoding="async" <%= i > 5 ? 'loading=lazy' : '' %>>
+                </span>
+              </button>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+
+    <button type="button" class="rack__arrow rack__arrow--next" data-rack-step="1" aria-label="Next piece">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+
+  <div class="container rack__info">
+    <!-- rack mode -->
+    <div class="rack__browse">
+      <p class="rack__caption" aria-live="polite" data-default="Hover the rack · pick a piece to try it on">Hover the rack · pick a piece to try it on</p>
+      <div class="rack__cta">
+        <button type="button" class="btn" data-rack-open data-magnetic>Shop the rack</button>
+        <a href="/collections" class="btn btn--ghost">Collections</a>
+      </div>
+    </div>
+
+    <!-- focus mode -->
+    <div class="rack__detail" aria-live="polite">
+      <h2 class="display rack__name" id="rackName"></h2>
+      <div class="price rack__price" id="rackPrice"></div>
+      <div class="rack__toggle" role="group" aria-label="Side">
+        <span class="rack__toggle-ink" aria-hidden="true"></span>
+        <button type="button" class="is-on" data-side="front">Front</button>
+        <button type="button" data-side="back">Back</button>
+      </div>
+      <div class="rack__actions">
+        <a href="#" class="btn" id="rackView">View piece</a>
+        <button type="button" class="btn btn--ghost" id="rackAdd" data-quick-add>Quick add</button>
+      </div>
+      <button type="button" class="text-btn rack__back" data-rack-close>← Back to the rack</button>
+    </div>
+  </div>
+
+  <div class="rack__ticker" aria-hidden="true">
+    <% for (let r = 0; r < 2; r++) { %>
+      <div class="rack__ticker-track">
+        <% for (let k = 0; k < 3; k++) { %>
+          <span>New drops</span><span>On the rack</span><span>Veek <%= new Date().getFullYear() %></span><span>Free shipping over 1499 EGP</span>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<script src="/js/rack.js" defer></script>
