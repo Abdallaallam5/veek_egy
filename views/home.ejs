@@ -14,9 +14,32 @@
     const id = String(pr._id);
     if (!seen.has(id) && pr.images && pr.images[0]) { seen.add(id); all.push(pr); }
   }));
-  const rackItems = all.filter(pr => Number(pr.stock) > 0)
-    .concat(all.filter(pr => Number(pr.stock) <= 0))
-    .slice(0, 9);
+  // Pieces photographed alone on a hanger (transparent background) hang on the rack
+  // in this order. Display only — product data is untouched.
+  const R = '/images/rack/';
+  const CUTOUTS = [
+    ['69e7a2e298d70be7abbfa362', R + 'cursed-eye-back.webp'],
+    ['69e7aa97342941174bb0982f', R + 'darwish-back.webp'],
+    ['69e7aa5f342941174bb0982e', R + 'japan-back.webp'],
+    ['69e7a24098d70be7abbfa361', R + 'olive-land-back.webp'],
+    ['69e7ab7f342941174bb09830', R + 'red-empire-back.webp'],
+    ['69ee0c3ea973fc9752a175c8', R + 'relaxed-polo.webp'],
+    ['69ee52634f5f9da15449f7d3', R + 'silent-threat-front.webp'],
+    ['69ee0de56ce13fba4f935173', R + 'straight-leg-sweatpants.webp']
+  ];
+  const cutoutItems = CUTOUTS
+    .map(([id, cutout]) => {
+      const pr = all.find(x => String(x._id) === id);
+      return pr ? Object.assign({}, pr, { cutout }) : null;
+    })
+    .filter(Boolean);
+
+  // fall back to regular product photos if the hanger shots don't match the catalogue
+  const rackItems = cutoutItems.length >= 3
+    ? cutoutItems
+    : all.filter(pr => Number(pr.stock) > 0)
+        .concat(all.filter(pr => Number(pr.stock) <= 0))
+        .slice(0, 9);
 %>
 
 <!-- ================= RACK HERO ================= -->

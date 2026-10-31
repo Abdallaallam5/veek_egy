@@ -32,7 +32,7 @@
   /* ---------- helpers ---------- */
   function data(i) { return items[i].dataset; }
 
-  function img(i) { return items[i].querySelector(".hang__img img"); }
+  function img(i) { return items[i].querySelector(".hang__btn img"); }
 
   // shortest distance around the rail, so the carousel loops
   function offset(i) {
@@ -312,10 +312,16 @@
   freeze();
   layoutFocus();
   updateInfo();
-  window.requestAnimationFrame(function () {
+  var opened = false;
+  function open() {
+    if (opened) return;
+    opened = true;
     items.forEach(function (el) { el.style.transition = ""; });
     rack.classList.remove("is-booting");
     rack.classList.add("is-intro");
     setTimeout(function () { rack.classList.remove("is-intro"); }, 2200);
-  });
+  }
+  // rAF can stall in background tabs, so never leave the rack hidden
+  window.requestAnimationFrame(open);
+  setTimeout(open, 120);
 })();

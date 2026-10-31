@@ -25,11 +25,14 @@
     const imgs = (p.images || []).filter(Boolean);
     const pick = SIDES[String(p._id)];
     // only trust the override if those photos still belong to the product
-    const sides = pick && imgs.includes(pick.front) && (!pick.back || imgs.includes(pick.back))
-      ? pick
-      : { front: imgs[0], back: imgs[1] || '' };
+    const sides = p.cutout
+      ? { front: p.cutout, back: '' }
+      : pick && imgs.includes(pick.front) && (!pick.back || imgs.includes(pick.back))
+        ? pick
+        : { front: imgs[0], back: imgs[1] || '' };
     return {
       id: String(p._id),
+      cutout: !!p.cutout,
       name: (p.name || '').trim(),
       price, sale, onSale,
       now: onSale ? sale : price,
@@ -43,7 +46,7 @@
   };
   const pieces = items.map(info);
 %>
-<section class="rack is-focus is-booting" data-rack aria-label="On the rack">
+<section class="rack is-focus is-booting<%= pieces.length && pieces.every(p => p.cutout) ? ' rack--cutouts' : '' %>" data-rack aria-label="On the rack">
   <h1 class="sr-only">VEEK — on the rack</h1>
   <div class="rack__closet" aria-hidden="true">
     <span class="rack__shelf"></span>
@@ -64,7 +67,7 @@
         <div class="rack__rail" aria-hidden="true"></div>
         <ul class="rack__items">
           <% pieces.forEach((p, i) => { %>
-            <li class="hang" style="--i:<%= i %>"
+            <li class="hang<%= p.cutout ? ' hang--cutout' : '' %>" style="--i:<%= i %>"
               data-index="<%= i %>"
               data-id="<%= p.id %>"
               data-name="<%= p.name %>"
@@ -77,6 +80,12 @@
               data-sizes="<%= p.sizes %>"
               data-colors="<%= p.colors %>">
               <button type="button" class="hang__btn" aria-label="<%= p.name %> — <%= p.now %> EGP">
+                <% if (p.cutout) { %>
+                <span class="hang__tag" aria-hidden="true"><%= p.onSale ? '−' + p.off + '%' : p.now + ' EGP' %></span>
+                <span class="hang__cut">
+                  <img src="<%= p.front %>" alt="<%= p.name %>" decoding="async" <%= i > 3 ? 'loading=lazy' : '' %>>
+                </span>
+                <% } else { %>
                 <svg class="hang__hanger" viewBox="0 0 100 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M50 15V10.5a5 5 0 1 0-5-5"/>
                   <path d="M50 15L7 34.5c-3 1.4-2 4.5 1.2 4.5h83.6c3.2 0 4.2-3.1 1.2-4.5L50 15z"/>
@@ -85,6 +94,7 @@
                 <span class="hang__img">
                   <img src="<%= p.back || p.front %>" alt="<%= p.name %>" decoding="async" <%= i > 5 ? 'loading=lazy' : '' %>>
                 </span>
+                <% } %>
               </button>
             </li>
           <% }) %>

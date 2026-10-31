@@ -2500,6 +2500,42 @@ body.menu-open .drawer__links a {
 
 .rack__ticker { background: #f3efe8; color: var(--ink); }
 
+/* ---------- pieces shot alone on their own hanger (transparent PNG/WebP) ---------- */
+.hang--cutout .hang__cut {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  margin-top: -3%;           /* the hook curls over the rail */
+  transition: opacity .45s, filter .45s;
+}
+
+.hang--cutout .hang__cut img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 0;
+  /* thin rim light so black hangers read on the dark wood, plus a soft drop shadow */
+  filter: drop-shadow(0 0 .6px rgba(255, 244, 228, .55)) drop-shadow(0 22px 22px rgba(0, 0, 0, .55));
+  transition: opacity .35s;
+}
+
+.hang--cutout .hang__tag { top: 7%; left: 70%; }
+
+.rack:not(.is-focus) .hang--cutout .hang__btn:hover { transform: translateY(6px) scale(1.1); }
+
+.rack:not(.is-focus) .rack__items:has(.hang__btn:hover) .hang:not(:hover) .hang__cut {
+  opacity: .35;
+  filter: grayscale(1) blur(1px);
+}
+
+/* hanger shots have no card under them, so they can hang larger */
+.rack--cutouts { --w: clamp(96px, 11vw, 170px); --fw: min(30vw, 340px, calc((100svh - 450px) / 1.36)); }
+.rack--cutouts.is-focus .rack__track { height: calc(var(--fw) * 1.36); }
+
+/* pieces on the rail sit close together, like a real wardrobe */
+.rack__items:has(.hang--cutout) { gap: 0; }
+.rack:not(.is-focus) .hang--cutout + .hang--cutout { margin-left: calc(var(--w) * -.12); }
+
 /* first load: hidden until laid out, then the wardrobe "opens" */
 .js .rack.is-booting .rack__track,
 .js .rack.is-booting .rack__info { opacity: 0; }
@@ -2594,6 +2630,7 @@ body.menu-open .drawer__links a {
     min-height: 0;
   }
 
+  .rack--cutouts { --w: 106px; --fw: min(56vw, 260px, calc((100svh - 420px) / 1.36)); }
   .rack__head { padding-top: calc(clamp(26px, 3.4vw, 44px) + 10px); }
   .rack__stage { padding: 14px 0 8px; }
   .rack__name { font-size: 18px; }
