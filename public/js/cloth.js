@@ -30,13 +30,12 @@ function init() {
 
   /* ---------- scene ---------- */
   const scene = new THREE.Scene();
-  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-  const key = new THREE.DirectionalLight(0xfff0dc, 0.62);
-  key.position.set(-0.7, 1.4, 1.6);
+  // Light comes from just above the viewer: a face pointing at you keeps the photo's
+  // own colours (ambient + key ≈ 1), and only the sides that curve away get a soft shade.
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const key = new THREE.DirectionalLight(0xfff6ea, 0.46);
+  key.position.set(0, 0.55, 1.6);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xdfe6ff, 0.25);
-  fill.position.set(1.2, -0.3, 0.8);
-  scene.add(fill);
 
   // Canvas overhangs the piece's 3:4 box: 25% each side, 6% above, 22% below (see .cloth in CSS).
   const BOX_H = 4 / 3;
@@ -83,6 +82,19 @@ function init() {
 
     const pos = geo.attributes.position.array;
     const count = pos.length / 3;
+
+    // Give the garment volume: the body rounds back towards the sides like fabric over
+    // a hanger, a touch more towards the hem, with a slight fullness at the chest.
+    for (let i = 0; i < count; i++) {
+      const k = i * 3;
+      const sx = pos[k] / (w / 2);          // -1 … 1 across
+      const v = -pos[k + 1] / h;            // 0 at the hook, 1 at the hem
+      const round = -0.17 * w * sx * sx * (0.45 + 0.55 * Math.min(1, v * 2.2));
+      const chest = 0.035 * w * (1 - sx * sx) * Math.sin(Math.min(1, v * 1.4) * Math.PI);
+      pos[k + 2] = (round + chest) * Math.min(1, v * 6); // flat where the hanger holds it
+    }
+    geo.computeVertexNormals();
+
     const rest = Float32Array.from(pos);
     const prev = Float32Array.from(pos);
     const pinned = new Uint8Array(count);
@@ -100,7 +112,8 @@ function init() {
     const link = (i, j) => {
       const dx = rest[i * 3] - rest[j * 3];
       const dy = rest[i * 3 + 1] - rest[j * 3 + 1];
-      links.push(i, j, Math.hypot(dx, dy));
+      const dz = rest[i * 3 + 2] - rest[j * 3 + 2];
+      links.push(i, j, Math.hypot(dx, dy, dz));
     };
     for (let y = 0; y < ny; y++) {
       for (let x = 0; x < nx; x++) {
@@ -135,6 +148,7 @@ function init() {
   let yaw = 0;
   let yawVel = 0;
   let yawTarget = 0;
+  let lookYaw = 0; // turns gently towards the mouse while hovering
   let dragging = false;
 
   function step() {
@@ -148,8 +162,9 @@ function init() {
       if (c.pinned[i]) continue;
       const k = i * 3;
       const v = -r[k + 1] / c.h;
-      // soft draft: travelling waves, stronger towards the hem
-      const draft = 0.00042 * v * (Math.sin(time * 1.25 + r[k] * 3.1 + v * 4.2) + 0.55 * Math.sin(time * 2.1 - r[k] * 5.3 + v * 2.4));
+      // draft: slow, broad gusts that build towards the hem, with a little flutter on top
+      const gust = 0.6 + 0.4 * Math.sin(time * 0.37);
+      const draft = 0.0008 * v * v * gust * (Math.sin(time * 0.9 + r[k] * 2.2 + v * 3.1) + 0.35 * Math.sin(time * 1.9 - r[k] * 4.1 + v * 2.2));
       for (let d = 0; d < 3; d++) {
         const cur = p[k + d];
         let acc = (r[k + d] - cur) * c.stiff[i]; // keep the garment's shape
@@ -184,12 +199,13 @@ function init() {
     c.geo.computeVertexNormals();
 
     // the whole piece turns on its hook
-    const idle = dragging ? 0 : Math.sin(time * 0.55) * 0.07;
-    yawVel += ((yawTarget + idle) - yaw) * 0.045;
+    const idle = dragging ? 0 : Math.sin(time * 0.5) * 0.11 + Math.sin(time * 0.23) * 0.04;
+    yawVel += ((yawTarget + lookYaw + idle) - yaw) * 0.04;
     yawVel *= 0.9;
     yaw += yawVel;
     pivot.rotation.y = yaw;
-    pivot.rotation.z = -yawVel * 0.6; // a little sideways swing while it turns
+    // pendulum: it sways a touch on the hook, more while it turns
+    pivot.rotation.z = -yawVel * 0.6 + Math.sin(time * 0.8) * 0.012;
   }
 
   /* ---------- pointer: poke the fabric, drag to turn ---------- */
@@ -215,13 +231,17 @@ function init() {
     if (!raycaster.ray.intersectPlane(plane, hit)) return;
     pivot.worldToLocal(hit);
 
+    // a wide, soft push — the fabric gives way instead of denting
     const c = cloth;
-    const R = 0.2;
+    const R = 0.42;
     for (let i = 0; i < c.count; i++) {
       if (c.pinned[i]) continue;
       const k = i * 3;
       const d = Math.hypot(c.rest[k] - hit.x, c.rest[k + 1] - hit.y);
-      if (d < R) c.prev[k + 2] += strength * (1 - d / R) * (1 - d / R);
+      if (d < R) {
+        const f = 1 - d / R;
+        c.prev[k + 2] += strength * f * f * (3 - 2 * f);
+      }
     }
   }
 
@@ -229,18 +249,23 @@ function init() {
     const speed = Math.min(Math.hypot(e.clientX - lastX, e.clientY - lastY), 40);
     lastX = e.clientX;
     lastY = e.clientY;
-    poke(e.clientX, e.clientY, 0.0006 + speed * 0.00022);
+    poke(e.clientX, e.clientY, speed * 0.00006);
     if (dragging) {
       moved = Math.max(moved, Math.abs(e.clientX - downX));
       yawTarget = Math.max(-0.95, Math.min(0.95, (e.clientX - downX) * 0.008));
+    } else if (e.pointerType === "mouse") {
+      const b = canvas.getBoundingClientRect();
+      lookYaw = ((e.clientX - b.left) / b.width - 0.5) * 0.45;
     }
   });
+
+  canvas.addEventListener("pointerleave", () => { lookYaw = 0; });
 
   canvas.addEventListener("pointerdown", (e) => {
     lastX = downX = e.clientX;
     lastY = e.clientY;
     moved = 0;
-    poke(e.clientX, e.clientY, 0.012);
+    poke(e.clientX, e.clientY, 0.004);
     if (e.pointerType === "mouse") {
       dragging = true;
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* pointer already gone */ }
@@ -319,6 +344,7 @@ function init() {
     setCloth(buildCloth(tex));
     yaw = 0;
     yawTarget = 0;
+    lookYaw = 0;
     yawVel = 0.018; // it settles onto the hook with a little swing
     step();
     renderer.render(scene, camera);
