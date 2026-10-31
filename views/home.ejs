@@ -19,14 +19,14 @@
   const R = '/images/rack/';
   // [product id, hanger shot, side that shot shows, optional other side shown when the 3D piece turns]
   const CUTOUTS = [
-    ['69e7a2e298d70be7abbfa362', R + 'cursed-eye-back.webp', 'back', R + 'cursed-eye-front.webp?v=2'],
-    ['69e7aa97342941174bb0982f', R + 'darwish-back.webp', 'back', R + 'darwish-front.webp?v=2'],
-    ['69e7aa5f342941174bb0982e', R + 'japan-back.webp', 'back', R + 'japan-front.webp'],
-    ['69e7a24098d70be7abbfa361', R + 'olive-land-back.webp', 'back', R + 'olive-land-front.webp?v=2'],
-    ['69e7ab7f342941174bb09830', R + 'red-empire-back.webp', 'back', R + 'red-empire-front.webp?v=2'],
-    ['69ee0c3ea973fc9752a175c8', R + 'relaxed-polo.webp', 'front'],
-    ['69ee52634f5f9da15449f7d3', R + 'silent-threat-front.webp', 'front', R + 'silent-threat-back.webp'],
-    ['69ee0de56ce13fba4f935173', R + 'straight-leg-sweatpants.webp', 'front']
+    ['69e7a2e298d70be7abbfa362', R + 'cursed-eye-back.webp', 'back', R + 'cursed-eye-front.webp?v=4'],
+    ['69e7aa97342941174bb0982f', R + 'darwish-back.webp', 'back', R + 'darwish-front.webp?v=4'],
+    ['69e7aa5f342941174bb0982e', R + 'japan-back.webp', 'back', R + 'japan-front.webp?v=4'],
+    ['69e7a24098d70be7abbfa361', R + 'olive-land-back.webp', 'back', R + 'olive-land-front.webp?v=4'],
+    ['69e7ab7f342941174bb09830', R + 'red-empire-back.webp', 'back', R + 'red-empire-front.webp?v=4'],
+    ['69ee0c3ea973fc9752a175c8', R + 'relaxed-polo.webp', 'front', R + 'relaxed-polo-back.webp?v=4'],
+    ['69ee52634f5f9da15449f7d3', R + 'silent-threat-front.webp', 'front', R + 'silent-threat-back.webp?v=4'],
+    ['69ee0de56ce13fba4f935173', R + 'straight-leg-sweatpants.webp', 'front', R + 'straight-leg-sweatpants-back.webp?v=4']
   ];
   const cutoutItems = CUTOUTS
     .map(([id, cutout, shotSide, turn]) => {
