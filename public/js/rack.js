@@ -127,18 +127,22 @@
     addEl.textContent = d.soldout ? "Sold out" : "Quick add";
 
     toggle.hidden = !d.back && !d.turn;
-    setSide(d.back || d.turn ? "back" : "front", true, true);
+    setSide(d.turn ? d.shotside : (d.back ? "back" : "front"), true, true);
     announce();
   }
 
   /* ---------- front / back ---------- */
-  // Photo pieces swap their image. Hanger shots with a `turn` side are 3D: the hanger
-  // shot is their back and cloth.js turns the fabric round to show the front.
+  // Photo pieces swap their image. Hanger shots with a `turn` side are 3D: cloth.js shows
+  // the hanger shot ("shot" face, which is the piece's d.shotside) or turns it round to
+  // the other side ("turn" face).
+  function faceOf(d, side) { return side === d.shotside ? "shot" : "turn"; }
+  function sideOf(d, face) { return face === "shot" ? d.shotside : (d.shotside === "back" ? "front" : "back"); }
+
   function setSide(side, instant, quiet) {
     var d = data(current);
     var picture = img(current);
     var src = d.turn
-      ? (side === "front" ? d.turn : d.front)
+      ? (faceOf(d, side) === "turn" ? d.turn : d.front)
       : (side === "back" && d.back ? d.back : d.front);
 
     toggle.classList.toggle("is-back", side === "back");
@@ -146,7 +150,7 @@
       b.classList.toggle("is-on", b.getAttribute("data-side") === side);
     });
 
-    if (d.turn && !quiet) rack.dispatchEvent(new CustomEvent("rack:side", { detail: { side: side } }));
+    if (d.turn && !quiet) rack.dispatchEvent(new CustomEvent("rack:side", { detail: { face: faceOf(d, side) } }));
 
     if (picture.getAttribute("src") === src) return;
     if (instant) { picture.src = src; return; }
@@ -169,7 +173,7 @@
   }
 
   // the fabric turned by itself (or was dragged round) — keep the toggle in step
-  rack.addEventListener("cloth:side", function (e) { setSide(e.detail.side, true, true); });
+  rack.addEventListener("cloth:side", function (e) { setSide(sideOf(data(current), e.detail.face), true, true); });
 
   /* ---------- let the 3D fabric (cloth.js) know which piece is in focus ---------- */
   var settleTimer = null;

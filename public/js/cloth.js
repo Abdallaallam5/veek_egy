@@ -161,8 +161,8 @@ function init() {
   let lookYaw = 0; // turns gently towards the mouse while hovering
   let dragging = false;
 
-  // Pieces with a turn side face "back" (the hanger shot) or "front" (turned half round).
-  let side = "back";
+  // Pieces with a turn side show their "shot" face (the hanger shot) or "turn" (half round).
+  let side = "shot";
   let base = 0;        // resting angle: a multiple of π
   let lastFlip = 0;
   let idleSince = 0;
@@ -171,10 +171,10 @@ function init() {
     side = next;
     // the nearest multiple of π with the right parity, so it never spins the long way
     const k = Math.round(yaw / Math.PI);
-    const wantOdd = next === "front";
+    const wantOdd = next === "turn";
     base = (Math.abs(k) % 2 === 1) === wantOdd ? k * Math.PI : (k + (yaw > k * Math.PI ? 1 : -1)) * Math.PI;
     lastFlip = time;
-    if (emit) rack.dispatchEvent(new CustomEvent("cloth:side", { detail: { side } }));
+    if (emit) rack.dispatchEvent(new CustomEvent("cloth:side", { detail: { face: side } }));
   }
 
   // Tint each vertex by how squarely it faces the viewer: 1 = the photo's own colour,
@@ -209,7 +209,7 @@ function init() {
 
     // show off the other side now and then while nobody is touching it
     if (c.turns && !dragging && time - idleSince > 6 && time - lastFlip > 5.5) {
-      turnTo(side === "back" ? "front" : "back", true);
+      turnTo(side === "shot" ? "turn" : "shot", true);
     }
 
     for (let i = 0; i < c.count; i++) {
@@ -340,10 +340,10 @@ function init() {
       // settle on whichever side is closest to where it was let go
       const k = Math.round((base + yawTarget) / Math.PI);
       base = k * Math.PI;
-      const next = Math.abs(k) % 2 === 1 ? "front" : "back";
+      const next = Math.abs(k) % 2 === 1 ? "turn" : "shot";
       if (next !== side) {
         side = next;
-        rack.dispatchEvent(new CustomEvent("cloth:side", { detail: { side } }));
+        rack.dispatchEvent(new CustomEvent("cloth:side", { detail: { face: side } }));
       }
       lastFlip = time;
     }
@@ -419,7 +419,7 @@ function init() {
     yaw = 0;
     yawTarget = 0;
     lookYaw = 0;
-    side = "back";
+    side = "shot";
     base = 0;
     lastFlip = time;
     idleSince = time - 3; // first turn comes a few seconds after it settles
@@ -436,7 +436,7 @@ function init() {
   rack.addEventListener("rack:side", (e) => {
     if (!cloth || !cloth.turns) return;
     idleSince = time + 6; // the shopper chose a side — hold it a good while
-    turnTo(e.detail.side, false);
+    turnTo(e.detail.face, false);
   });
 
   // pause when the rack is off screen or the tab is hidden

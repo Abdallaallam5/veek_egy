@@ -34,6 +34,7 @@
       id: String(p._id),
       cutout: !!p.cutout,
       turn: p.turn || '',
+      shotSide: p.shotSide || 'back',
       name: (p.name || '').trim(),
       price, sale, onSale,
       now: onSale ? sale : price,
@@ -78,6 +79,7 @@
               data-front="<%= p.front %>"
               data-back="<%= p.back %>"
               data-turn="<%= p.turn %>"
+              data-shotside="<%= p.shotSide %>"
               data-soldout="<%= p.soldOut ? '1' : '' %>"
               data-sizes="<%= p.sizes %>"
               data-colors="<%= p.colors %>">
