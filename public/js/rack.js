@@ -79,7 +79,7 @@
       var a = Math.min(Math.abs(d), 3);
       var x = d === 0 ? 0 : (d > 0 ? 1 : -1) * w * gaps[a];
       el.style.transform = "translate(" + x + "px,0) scale(" + scales[a] + ")";
-      el.style.filter = blurs[a] ? "blur(" + blurs[a] + "px) grayscale(.6)" : "none";
+      el.style.filter = blurs[a] ? "blur(" + blurs[a] + "px)" : "none";
       el.style.opacity = fades[a];
       el.style.zIndex = String(10 - a);
       el.classList.toggle("is-current", d === 0);
@@ -126,21 +126,27 @@
     addEl.disabled = !!d.soldout;
     addEl.textContent = d.soldout ? "Sold out" : "Quick add";
 
-    toggle.hidden = !d.back;
-    setSide(d.back ? "back" : "front", true);
+    toggle.hidden = !d.back && !d.turn;
+    setSide(d.back || d.turn ? "back" : "front", true, true);
     announce();
   }
 
   /* ---------- front / back ---------- */
-  function setSide(side, instant) {
+  // Photo pieces swap their image. Hanger shots with a `turn` side are 3D: the hanger
+  // shot is their back and cloth.js turns the fabric round to show the front.
+  function setSide(side, instant, quiet) {
     var d = data(current);
     var picture = img(current);
-    var src = side === "back" && d.back ? d.back : d.front;
+    var src = d.turn
+      ? (side === "front" ? d.turn : d.front)
+      : (side === "back" && d.back ? d.back : d.front);
 
     toggle.classList.toggle("is-back", side === "back");
     toggle.querySelectorAll("button").forEach(function (b) {
       b.classList.toggle("is-on", b.getAttribute("data-side") === side);
     });
+
+    if (d.turn && !quiet) rack.dispatchEvent(new CustomEvent("rack:side", { detail: { side: side } }));
 
     if (picture.getAttribute("src") === src) return;
     if (instant) { picture.src = src; return; }
@@ -161,6 +167,9 @@
       if (p.getAttribute("src") !== start) p.src = start;
     });
   }
+
+  // the fabric turned by itself (or was dragged round) — keep the toggle in step
+  rack.addEventListener("cloth:side", function (e) { setSide(e.detail.side, true, true); });
 
   /* ---------- let the 3D fabric (cloth.js) know which piece is in focus ---------- */
   var settleTimer = null;

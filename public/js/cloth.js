@@ -30,12 +30,9 @@ function init() {
 
   /* ---------- scene ---------- */
   const scene = new THREE.Scene();
-  // Light comes from just above the viewer: a face pointing at you keeps the photo's
-  // own colours (ambient + key ≈ 1), and only the sides that curve away get a soft shade.
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  const key = new THREE.DirectionalLight(0xfff6ea, 0.46);
-  key.position.set(0, 0.55, 1.6);
-  scene.add(key);
+  // No scene lights: the fabric is unlit so the photo keeps its exact colours.
+  // Shading is a per-vertex tint (see shade()): 1.0 where the cloth faces you,
+  // only slightly darker where it curves or folds away.
 
   // Canvas overhangs the piece's 3:4 box: 25% each side, 6% above, 22% below (see .cloth in CSS).
   const BOX_H = 4 / 3;
@@ -52,23 +49,29 @@ function init() {
   const loader = new THREE.TextureLoader();
   const textures = {};
 
-  function texture(src) {
-    if (!textures[src]) {
-      textures[src] = new Promise((resolve, reject) => {
+  // `mirror`: for the back face — seen from behind the mesh, it must be flipped to read right
+  function texture(src, mirror) {
+    const id = src + (mirror ? "#m" : "");
+    if (!textures[id]) {
+      textures[id] = new Promise((resolve, reject) => {
         loader.load(src, (t) => {
           t.colorSpace = THREE.SRGBColorSpace;
           t.anisotropy = 4;
+          if (mirror) {
+            t.wrapS = THREE.RepeatWrapping;
+            t.repeat.x = -1;
+          }
           resolve(t);
         }, undefined, reject);
       });
     }
-    return textures[src];
+    return textures[id];
   }
 
   /* ---------- cloth ---------- */
   let cloth = null;
 
-  function buildCloth(tex) {
+  function buildCloth(tex, turnTex) {
     const img = tex.image;
     const a = img.height / img.width;
     // object-fit: contain, anchored to the top of the box
@@ -123,21 +126,28 @@ function init() {
       }
     }
 
-    const mat = new THREE.MeshLambertMaterial({
-      map: tex,
-      transparent: true,
-      alphaTest: 0.35,
-      side: THREE.DoubleSide
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    return { mesh, geo, pos, rest, prev, pinned, stiff, links: Float32Array.from(links), count, w, h };
+    // one face shows the hanger shot; if there is a turn side, the other face shows it
+    const mesh = new THREE.Group();
+    geo.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(count * 3).fill(1), 3));
+    const face = (map, side) => new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+      map, side, transparent: true, alphaTest: 0.35, vertexColors: true
+    }));
+    if (turnTex) {
+      mesh.add(face(tex, THREE.FrontSide));
+      mesh.add(face(turnTex, THREE.BackSide));
+    } else {
+      mesh.add(face(tex, THREE.DoubleSide));
+    }
+
+    const restZ = Float32Array.from({ length: count }, (_, i) => rest[i * 3 + 2]);
+    return { mesh, geo, pos, rest, restZ, prev, pinned, stiff, links: Float32Array.from(links), count, w, h, turns: !!turnTex };
   }
 
   function setCloth(next) {
     if (cloth) {
       pivot.remove(cloth.mesh);
       cloth.geo.dispose();
-      cloth.mesh.material.dispose();
+      cloth.mesh.children.forEach((m) => m.material.dispose());
     }
     cloth = next;
     pivot.add(cloth.mesh);
@@ -151,12 +161,56 @@ function init() {
   let lookYaw = 0; // turns gently towards the mouse while hovering
   let dragging = false;
 
+  // Pieces with a turn side face "back" (the hanger shot) or "front" (turned half round).
+  let side = "back";
+  let base = 0;        // resting angle: a multiple of π
+  let lastFlip = 0;
+  let idleSince = 0;
+
+  function turnTo(next, emit) {
+    side = next;
+    // the nearest multiple of π with the right parity, so it never spins the long way
+    const k = Math.round(yaw / Math.PI);
+    const wantOdd = next === "front";
+    base = (Math.abs(k) % 2 === 1) === wantOdd ? k * Math.PI : (k + (yaw > k * Math.PI ? 1 : -1)) * Math.PI;
+    lastFlip = time;
+    if (emit) rack.dispatchEvent(new CustomEvent("cloth:side", { detail: { side } }));
+  }
+
+  // Tint each vertex by how squarely it faces the viewer: 1 = the photo's own colour,
+  // down to 0.8 on fabric turned edge-on. Works for both faces (abs of the dot).
+  function shade(c) {
+    const n = c.geo.attributes.normal.array;
+    const col = c.geo.attributes.color.array;
+    const vx = -Math.sin(yaw);
+    const vz = Math.cos(yaw);
+    for (let i = 0; i < c.count; i++) {
+      const k = i * 3;
+      const facing = Math.min(1, Math.abs(n[k] * vx + n[k + 2] * vz) * 1.06);
+      const s = 0.8 + 0.2 * facing;
+      col[k] = col[k + 1] = col[k + 2] = s;
+    }
+    c.geo.attributes.color.needsUpdate = true;
+  }
+
   function step() {
     const c = cloth;
     const p = c.pos;
     const r = c.rest;
     const q = c.prev;
     time += 1 / 60;
+
+    // the garment's volume always bulges towards whoever is looking at it
+    const facing = Math.cos(yaw);
+    for (let i = 0; i < c.count; i++) {
+      r[i * 3 + 2] = c.restZ[i] * facing;
+      if (c.pinned[i]) p[i * 3 + 2] = r[i * 3 + 2];
+    }
+
+    // show off the other side now and then while nobody is touching it
+    if (c.turns && !dragging && time - idleSince > 6 && time - lastFlip > 5.5) {
+      turnTo(side === "back" ? "front" : "back", true);
+    }
 
     for (let i = 0; i < c.count; i++) {
       if (c.pinned[i]) continue;
@@ -197,10 +251,11 @@ function init() {
 
     c.geo.attributes.position.needsUpdate = true;
     c.geo.computeVertexNormals();
+    shade(c);
 
     // the whole piece turns on its hook
     const idle = dragging ? 0 : Math.sin(time * 0.5) * 0.11 + Math.sin(time * 0.23) * 0.04;
-    yawVel += ((yawTarget + lookYaw + idle) - yaw) * 0.04;
+    yawVel += ((base + yawTarget + lookYaw + idle) - yaw) * 0.04;
     yawVel *= 0.9;
     yaw += yawVel;
     pivot.rotation.y = yaw;
@@ -250,9 +305,12 @@ function init() {
     lastX = e.clientX;
     lastY = e.clientY;
     poke(e.clientX, e.clientY, speed * 0.00006);
+    idleSince = time;
     if (dragging) {
       moved = Math.max(moved, Math.abs(e.clientX - downX));
-      yawTarget = Math.max(-0.95, Math.min(0.95, (e.clientX - downX) * 0.008));
+      const turn = (e.clientX - downX) * 0.009;
+      // pieces with two sides can be dragged all the way round
+      yawTarget = cloth && cloth.turns ? turn : Math.max(-0.95, Math.min(0.95, turn));
     } else if (e.pointerType === "mouse") {
       const b = canvas.getBoundingClientRect();
       lookYaw = ((e.clientX - b.left) / b.width - 0.5) * 0.45;
@@ -278,7 +336,19 @@ function init() {
   function release() {
     if (!dragging) return;
     dragging = false;
+    if (cloth && cloth.turns) {
+      // settle on whichever side is closest to where it was let go
+      const k = Math.round((base + yawTarget) / Math.PI);
+      base = k * Math.PI;
+      const next = Math.abs(k) % 2 === 1 ? "front" : "back";
+      if (next !== side) {
+        side = next;
+        rack.dispatchEvent(new CustomEvent("cloth:side", { detail: { side } }));
+      }
+      lastFlip = time;
+    }
     yawTarget = 0;
+    idleSince = time;
     canvas.classList.remove("is-grabbing");
   }
   canvas.addEventListener("pointerup", release);
@@ -332,7 +402,11 @@ function init() {
     const my = token;
     const src = el.dataset.front;
     let tex;
-    try { tex = await texture(src); } catch (e) { return; }
+    let turnTex = null;
+    try {
+      tex = await texture(src);
+      if (el.dataset.turn) turnTex = await texture(el.dataset.turn, true);
+    } catch (e) { if (!tex) return; }
     if (my !== token) return; // focus moved on while loading
 
     host = el;
@@ -341,10 +415,14 @@ function init() {
     resizeObserver.observe(canvas);
     resize();
 
-    setCloth(buildCloth(tex));
+    setCloth(buildCloth(tex, turnTex));
     yaw = 0;
     yawTarget = 0;
     lookYaw = 0;
+    side = "back";
+    base = 0;
+    lastFlip = time;
+    idleSince = time - 3; // first turn comes a few seconds after it settles
     yawVel = 0.018; // it settles onto the hook with a little swing
     step();
     renderer.render(scene, camera);
@@ -355,6 +433,11 @@ function init() {
 
   rack.addEventListener("rack:settle", (e) => attach(e.detail.el));
   rack.addEventListener("rack:leave", detach);
+  rack.addEventListener("rack:side", (e) => {
+    if (!cloth || !cloth.turns) return;
+    idleSince = time + 6; // the shopper chose a side — hold it a good while
+    turnTo(e.detail.side, false);
+  });
 
   // pause when the rack is off screen or the tab is hidden
   new IntersectionObserver((entries) => {
@@ -368,7 +451,10 @@ function init() {
   });
 
   // warm up the other textures once the page is idle
-  const warm = () => rack.querySelectorAll(".hang--cutout").forEach((el) => texture(el.dataset.front).catch(() => {}));
+  const warm = () => rack.querySelectorAll(".hang--cutout").forEach((el) => {
+    texture(el.dataset.front).catch(() => {});
+    if (el.dataset.turn) texture(el.dataset.turn, true).catch(() => {});
+  });
   if ("requestIdleCallback" in window) requestIdleCallback(warm, { timeout: 4000 });
   else setTimeout(warm, 2500);
 

@@ -33,6 +33,7 @@
     return {
       id: String(p._id),
       cutout: !!p.cutout,
+      turn: p.turn || '',
       name: (p.name || '').trim(),
       price, sale, onSale,
       now: onSale ? sale : price,
@@ -76,6 +77,7 @@
               data-off="<%= p.off %>"
               data-front="<%= p.front %>"
               data-back="<%= p.back %>"
+              data-turn="<%= p.turn %>"
               data-soldout="<%= p.soldOut ? '1' : '' %>"
               data-sizes="<%= p.sizes %>"
               data-colors="<%= p.colors %>">
