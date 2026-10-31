@@ -128,6 +128,7 @@
 
     toggle.hidden = !d.back;
     setSide(d.back ? "back" : "front", true);
+    announce();
   }
 
   /* ---------- front / back ---------- */
@@ -159,6 +160,16 @@
       var start = data(i).back || data(i).front;
       if (p.getAttribute("src") !== start) p.src = start;
     });
+  }
+
+  /* ---------- let the 3D fabric (cloth.js) know which piece is in focus ---------- */
+  var settleTimer = null;
+  function announce() {
+    clearTimeout(settleTimer);
+    rack.dispatchEvent(new CustomEvent("rack:leave"));
+    settleTimer = setTimeout(function () {
+      if (focused) rack.dispatchEvent(new CustomEvent("rack:settle", { detail: { el: items[current] } }));
+    }, 900); // after the slide finishes
   }
 
   /* ---------- enter / move / exit ---------- */
@@ -202,6 +213,8 @@
 
   function exit() {
     if (!focused) return;
+    clearTimeout(settleTimer);
+    rack.dispatchEvent(new CustomEvent("rack:leave"));
 
     var first = rectsOf();
     var fades = items.map(function (el) { return getComputedStyle(el).opacity; });

@@ -2528,6 +2528,24 @@ body.menu-open .drawer__links a {
   filter: grayscale(1) blur(1px);
 }
 
+/* 3D fabric (cloth.js) drawn over the piece in focus; overhangs its box so it can swing */
+.cloth {
+  position: absolute;
+  top: -6%;
+  left: -25%;
+  width: 150%;
+  height: 128%;
+  opacity: 0;
+  cursor: grab;
+  touch-action: pan-y;
+  filter: drop-shadow(0 0 .6px rgba(255, 244, 228, .45)) drop-shadow(0 22px 22px rgba(0, 0, 0, .55));
+  transition: opacity .45s var(--ease-out);
+}
+
+.cloth.is-on { opacity: 1; }
+.cloth.is-grabbing { cursor: grabbing; }
+.hang.has-cloth .hang__cut img { opacity: 0; }
+
 /* hanger shots have no card under them, so they can hang larger */
 .rack--cutouts { --w: clamp(96px, 11vw, 170px); --fw: min(30vw, 340px, calc((100svh - 450px) / 1.36)); }
 .rack--cutouts.is-focus .rack__track { height: calc(var(--fw) * 1.36); }
